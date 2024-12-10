@@ -20,7 +20,7 @@ library(tidyverse)
 
 ## Read in the Data
 ```{r}
-sites <- read.csv("data/DenverGardens_Sites.csv")
+gardens <- read.csv("data/DenverGardens_Sites.csv")
 
 tcc_path <- "data/"
 imperv_path <- "data/"
@@ -35,7 +35,7 @@ imperv_ras <- rast(imperv_path)
 Extract City Coordinates
 ```{r}
 # Extract city coordinates
-city_coords <- st_as_sf(cities.test, coords = c("Long", "Lat"), crs = 4326) # Use EPSG 4326 for WGS84
+garden_coords <- st_as_sf(gardens, coords = c("Long", "Lat"), crs = 4326) # Use EPSG 4326 for WGS84
 ```
 
 Extract Raster CRS
@@ -45,10 +45,10 @@ crs_rasters <- crs(tcc_ras)
 ```
 
 Create buffers and function to extract summed buffer values
-#```{r}
-# Create a 45 km buffer around cities
-buffer_radius <- 45000  # 45,000 meters
-cities_buffer <- st_transform(st_buffer(st_transform(city_coords, crs_rasters), dist = buffer_radius), crs_rasters)
+```{r}
+# Create a buffer around sites
+buffer_radius <- 1000  # set to desired buffer size (in meters)
+garden_buffer <- st_transform(st_buffer(st_transform(garden_coords, crs_rasters), dist = buffer_radius), crs_rasters)
 
 # Function to extract summed raster values for buffers
 extract_raster_sum <- function(raster, buffers) {
@@ -57,27 +57,27 @@ extract_raster_sum <- function(raster, buffers) {
 }
 ```
 
-Extract summed tree canopy cover and impervious surface values from each city
-#```{r}
+Extract summed tree canopy cover and impervious surface values from each garden
+```{r}
 # Extract summed values for the 45 km buffer from both rasters
-cities.test$tcc45km <- extract_raster_sum(tcc_ras, cities_buffer)
-cities.test$imperv45km <- extract_raster_sum(imperv_ras, cities_buffer)
+gardens$tcc1km <- extract_raster_sum(tcc_ras, garden_buffer)
+gardens$imp1km <- extract_raster_sum(imperv_ras, garden_buffer)
 
 # View the final dataframe
-print(cities.test)
+print(gardens)
 ```
 
 ### Project cities points onto rasters
 ```{r}
 plot(tcc_ras,
      main = "Tree Canopy Cover")
-plot(city_coords$geometry,
+plot(garden_coords$geometry,
      pch = 19)
 ```
 
 ```{r}
 plot(imperv_ras,
      main = "Impervious Surface")
-plot(city_coords$geometry)
+plot(garden_coords$geometry)
 ```
 
