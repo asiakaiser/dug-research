@@ -1,0 +1,83 @@
+---
+title: "Land Cover Data"
+author: "Asia Kaiser"
+date: "2024-12-10"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load Packages
+```{r}
+library(terra)
+library(sf)
+library(sp)
+library(tidyverse)
+```
+
+
+## Read in the Data
+```{r}
+sites <- read.csv("data/DenverGardens_Sites.csv")
+
+tcc_path <- "data/"
+imperv_path <- "data/"
+
+# Load rasters into R
+tcc_ras <- rast(tcc_path)  # Tree canopy cover raster
+imperv_ras <- rast(imperv_path)
+```
+
+# Extract Raster Data
+
+Extract City Coordinates
+```{r}
+# Extract city coordinates
+city_coords <- st_as_sf(cities.test, coords = c("Long", "Lat"), crs = 4326) # Use EPSG 4326 for WGS84
+```
+
+Extract Raster CRS
+```{r}
+# Get the CRS of the rasters (assuming both rasters have the same CRS)
+crs_rasters <- crs(tcc_ras)
+```
+
+Create buffers and function to extract summed buffer values
+#```{r}
+# Create a 45 km buffer around cities
+buffer_radius <- 45000  # 45,000 meters
+cities_buffer <- st_transform(st_buffer(st_transform(city_coords, crs_rasters), dist = buffer_radius), crs_rasters)
+
+# Function to extract summed raster values for buffers
+extract_raster_sum <- function(raster, buffers) {
+  extracted_values <- terra::extract(raster, as(buffers, "SpatVector"), fun = sum, na.rm = TRUE)
+  extracted_values[, 2]  # Assuming the summed values are in the second column
+}
+```
+
+Extract summed tree canopy cover and impervious surface values from each city
+#```{r}
+# Extract summed values for the 45 km buffer from both rasters
+cities.test$tcc45km <- extract_raster_sum(tcc_ras, cities_buffer)
+cities.test$imperv45km <- extract_raster_sum(imperv_ras, cities_buffer)
+
+# View the final dataframe
+print(cities.test)
+```
+
+### Project cities points onto rasters
+```{r}
+plot(tcc_ras,
+     main = "Tree Canopy Cover")
+plot(city_coords$geometry,
+     pch = 19)
+```
+
+```{r}
+plot(imperv_ras,
+     main = "Impervious Surface")
+plot(city_coords$geometry)
+```
+
