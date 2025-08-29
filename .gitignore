@@ -3,3 +3,5 @@
 .RData
 .Ruserdata
 data/DenverGardens_Sites.csv
+data/arthropod_data.csv
+data/site_data.csv
