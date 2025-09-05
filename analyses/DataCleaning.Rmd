@@ -4,5 +4,43 @@ output: html_document
 date: "2025-08-29"
 ---
 
+# Load Packages
+```{r}
+library("tidyverse")
+```
+
+# Read in the Data
+```{r}
+setwd("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research")
+arthropods_jun_raw <- read.csv("data/arthropod_data_june.csv", na.strings = c("", " "))
+cucumbers_raw <- read.csv("data/cucumber_data.csv", na.strings = c("", " "))
+sites_raw <- read.csv("data/site_data.csv", na.strings = c("", " "))
+beebox_raw <- read.csv("data/cavitynesters_data.csv", na.strings = c("", " "))
+predation <- read.csv("data/predation_data.csv", na.strings = c("", " "))
+```
+
+# Explore the data
+```{r}
+str(arthropods_jun_raw)
+str(cucumbers_raw)
+str(sites)
+str(beebox_raw)
+str(predation)
+```
+# Data Cleaning 
+
+Select subset of site variables
+```{r}
+sites <- sites_raw %>%
+    select(site_code, Area_m2, WealthIndex, imp200m, imp500m, imp1km, imp1.5km)
+```
+
+## Final Predation Dataset
+
+```{r}
+#adding site level variables to predation data set
+predation_test <- left_join(predation, sites, by = "site_code")
+predation_test
+```
 
 
