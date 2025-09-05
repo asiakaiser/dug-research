@@ -20,10 +20,11 @@ library(tidyverse)
 
 ## Read in the Data
 ```{r}
-gardens <- read.csv("data/DenverGardens_Sites.csv")
+setwd("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research")
+sites <- read.csv("data/site_data.csv")
 
-tcc_path <- "data/"
-imperv_path <- "data/"
+imperv_path <- "data/NLCD_mf5qnksxr8tzfi/Annual_NLCD_FctImp_2024_CU_C1V1_mf5qnksxr8tzfi.tiff"
+tcc_path <- "data/NLCD_mf5qnksxr8tzfi/nlcd_tcc_conus_wgs84_v2023-5_20230101_20231231_mf5qnksxr8tzfi.tiff"
 
 # Load rasters into R
 tcc_ras <- rast(tcc_path)  # Tree canopy cover raster
@@ -35,7 +36,7 @@ imperv_ras <- rast(imperv_path)
 Extract City Coordinates
 ```{r}
 # Extract city coordinates
-garden_coords <- st_as_sf(gardens, coords = c("Long", "Lat"), crs = 4326) # Use EPSG 4326 for WGS84
+garden_coords <- st_as_sf(sites_raw, coords = c("Long", "Lat"), crs = 4326) # Use EPSG 4326 for WGS84
 ```
 
 Extract Raster CRS
@@ -44,27 +45,68 @@ Extract Raster CRS
 crs_rasters <- crs(tcc_ras)
 ```
 
-Create buffers and function to extract summed buffer values
+Sum raster values within each buffer
+NOTE TO SELF: figure out equation to get the percent imperv and tcc values within each entire buffer summed values/no of pixels in that buffer.
 ```{r}
 # Create a buffer around sites
-buffer_radius <- 1000  # set to desired buffer size (in meters)
-garden_buffer <- st_transform(st_buffer(st_transform(garden_coords, crs_rasters), dist = buffer_radius), crs_rasters)
+buffer_radius <- c(200, 500, 1000)  # set to desired buffer size (in meters)
 
 # Function to extract summed raster values for buffers
 extract_raster_sum <- function(raster, buffers) {
   extracted_values <- terra::extract(raster, as(buffers, "SpatVector"), fun = sum, na.rm = TRUE)
-  extracted_values[, 2]  # Assuming the summed values are in the second column
+  extracted_values[, 2]  # summed values in second column
+}
+
+for (i in buffer_radius) {
+  # create buffer of radius i
+  garden_buffer <- st_transform(
+    st_buffer(st_transform(garden_coords, crs_rasters), dist = i),
+    crs_rasters
+  )
+  
+  # dynamic column names
+  tcc_col <- paste0("tcc", i, "m")
+  imp_col <- paste0("imp", i, "m")
+  
+  # extract and save into dataframe
+  sites[[tcc_col]] <- extract_raster_sum(tcc_ras, garden_buffer)
+  sites[[imp_col]] <- extract_raster_sum(imperv_ras, garden_buffer)
 }
 ```
 
-Extract summed tree canopy cover and impervious surface values from each garden
-```{r}
-# Extract summed values for the 45 km buffer from both rasters
-gardens$tcc1km <- extract_raster_sum(tcc_ras, garden_buffer)
-gardens$imp1km <- extract_raster_sum(imperv_ras, garden_buffer)
+Mean raster values
 
+```{r}
+# Create a buffer around sites
+buffer_radius <- c(200, 500, 1000)  # set to desired buffer size (in meters)
+
+# Function to extract summed raster values for buffers
+extract_raster_mean <- function(raster, buffers) {
+  extracted_values <- terra::extract(raster, as(buffers, "SpatVector"), fun = mean, na.rm = TRUE)
+  extracted_values[, 2]  # summed values in second column
+}
+
+for (i in buffer_radius) {
+  # create buffer of radius i
+  garden_buffer <- st_transform(
+    st_buffer(st_transform(garden_coords, crs_rasters), dist = i),
+    crs_rasters
+  )
+  
+  # dynamic column names
+  tcc_col <- paste0("tcc", i, "m")
+  imp_col <- paste0("imp", i, "m")
+  
+  # extract and save into dataframe
+  sites[[tcc_col]] <- extract_raster_mean(tcc_ras, garden_buffer)
+  sites[[imp_col]] <- extract_raster_mean(imperv_ras, garden_buffer)
+}
+```
+
+Final dataframe
+```{r}
 # View the final dataframe
-print(gardens)
+print(sites)
 ```
 
 ### Project cities points onto rasters
