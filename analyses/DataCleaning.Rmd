@@ -11,10 +11,14 @@ library("tidyverse")
 
 # Read in the Data
 ```{r}
+#Clear environment
+rm(list = ls())
+
+#Load in all datasets
 setwd("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research")
 arthropods_jun_raw <- read.csv("data/arthropod_data_june.csv", na.strings = c("", " "))
 cucumbers_raw <- read.csv("data/cucumber_data.csv", na.strings = c("", " "))
-sites_raw <- read.csv("data/site_data.csv", na.strings = c("", " "))
+sites_raw <- read.csv("data/DUG_sites.csv", na.strings = c("", " "))
 beebox_raw <- read.csv("data/cavitynesters_data.csv", na.strings = c("", " "))
 predation <- read.csv("data/predation_data.csv", na.strings = c("", " "))
 ```
@@ -23,7 +27,7 @@ predation <- read.csv("data/predation_data.csv", na.strings = c("", " "))
 ```{r}
 str(arthropods_jun_raw)
 str(cucumbers_raw)
-str(sites)
+str(sites_raw)
 str(beebox_raw)
 str(predation)
 ```
@@ -31,16 +35,32 @@ str(predation)
 
 Select subset of site variables
 ```{r}
+#Select which site level variables you want to keep in dataframe
 sites <- sites_raw %>%
-    select(site_code, Area_m2, WealthIndex, imp200m, imp500m, imp1km, imp1.5km)
+    select(site_code, Area_m2, WealthIndex, tcc200m, imp200m, tcc500m, imp500m)
 ```
 
 ## Final Predation Dataset
 
 ```{r}
 #adding site level variables to predation data set
-predation_test <- left_join(predation, sites, by = "site_code")
-predation_test
+predation <- left_join(predation, sites, by = "site_code")
+predation
 ```
+
+Bee Box Data Cleaning
+```{r}
+#Pivot bee box data long to get in proper format and add site data
+beebox <- beebox_raw %>%
+  pivot_longer(
+    cols = starts_with("C."),             # all the temperature columns
+    names_to = c("location", "size"),     # new columns
+    names_pattern = "C\\._(top|bot|cent)_(s|b)", # regex groups to extract
+    values_to = "temp"
+  )%>%
+    left_join(sites, by = "site_code") #add site data
+beebox
+```
+
 
 
