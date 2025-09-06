@@ -36,7 +36,7 @@ imperv_ras <- rast(imperv_path)
 Extract City Coordinates
 ```{r}
 # Extract city coordinates
-garden_coords <- st_as_sf(sites_raw, coords = c("Long", "Lat"), crs = 4326) # Use EPSG 4326 for WGS84
+garden_coords <- st_as_sf(sites, coords = c("Long", "Lat"), crs = 4326) # Use EPSG 4326 for WGS84
 ```
 
 Extract Raster CRS
@@ -45,37 +45,7 @@ Extract Raster CRS
 crs_rasters <- crs(tcc_ras)
 ```
 
-Sum raster values within each buffer
-NOTE TO SELF: figure out equation to get the percent imperv and tcc values within each entire buffer summed values/no of pixels in that buffer.
-```{r}
-# Create a buffer around sites
-buffer_radius <- c(200, 500, 1000)  # set to desired buffer size (in meters)
-
-# Function to extract summed raster values for buffers
-extract_raster_sum <- function(raster, buffers) {
-  extracted_values <- terra::extract(raster, as(buffers, "SpatVector"), fun = sum, na.rm = TRUE)
-  extracted_values[, 2]  # summed values in second column
-}
-
-for (i in buffer_radius) {
-  # create buffer of radius i
-  garden_buffer <- st_transform(
-    st_buffer(st_transform(garden_coords, crs_rasters), dist = i),
-    crs_rasters
-  )
-  
-  # dynamic column names
-  tcc_col <- paste0("tcc", i, "m")
-  imp_col <- paste0("imp", i, "m")
-  
-  # extract and save into dataframe
-  sites[[tcc_col]] <- extract_raster_sum(tcc_ras, garden_buffer)
-  sites[[imp_col]] <- extract_raster_sum(imperv_ras, garden_buffer)
-}
-```
-
-Mean raster values
-
+Extract mean raster values within each buffer
 ```{r}
 # Create a buffer around sites
 buffer_radius <- c(200, 500, 1000)  # set to desired buffer size (in meters)
@@ -121,5 +91,10 @@ plot(garden_coords$geometry,
 plot(imperv_ras,
      main = "Impervious Surface")
 plot(garden_coords$geometry)
+```
+
+Save updated sites dataframe as csv
+```{r}
+write.csv(sites, "/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/data/DUG_sites.csv", row.names = FALSE)
 ```
 
