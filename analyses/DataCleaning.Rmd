@@ -41,14 +41,13 @@ sites <- sites_raw %>%
 ```
 
 ## Final Predation Dataset
-
 ```{r}
 #adding site level variables to predation data set
 predation <- left_join(predation, sites, by = "site_code")
 predation
 ```
 
-Bee Box Data Cleaning
+## Final Bee Box Dataset
 ```{r}
 #Pivot bee box data long to get in proper format and add site data
 beebox <- beebox_raw %>%
@@ -62,5 +61,56 @@ beebox <- beebox_raw %>%
 beebox
 ```
 
+## Arthropod Data (June Preliminary Data)
+### Functional Groups
+```{r}
+#Functional groups across sites
+arthropods <- arthropods_jun_raw %>%
+    group_by(fun_group)%>%
+    summarise(n.obs = n())
 
+    #mutate(fun_group = replace_na(fun_group, "Unknown"))
+arthropods 
+```
+```{r}
+#Plot of functional groups
+fun_plot <- ggplot(data = arthropods, aes(x = reorder(fun_group, n.obs), y = n.obs))+
+    geom_bar(stat = "identity")+
+     coord_flip()+
+    theme_classic()+
+    labs(x = "",
+         y = "Number of arthropods collected",
+         title = "Arthropod Functional Groups",
+         caption = "\n The number of arthropods (insects and arachnids) we collected in each functional \n group in vane and pitfall traps across 21 garden sites in June 2025.")
+fun_plot
+```
+### Common Taxa
+```{r}
+arthropods_taxa_fam <- arthropods_jun_raw %>%
+    group_by(fam)%>%
+    summarise(n.obs = n())
+arthropods_taxa_fam
+
+arthropods_taxa_order <- arthropods_jun_raw %>%
+    group_by(order)%>%
+    summarise(n.obs = n())%>%
+    filter(n.obs > 100)
+arthropods_taxa_order
+```
+
+```{r}
+taxa_plot <- ggplot(data = arthropods_taxa_order, aes(x = reorder(order, n.obs), y = n.obs))+
+    geom_bar(stat = "identity", width = 0.5)+
+     coord_flip()+
+    theme_classic()+
+    labs(x = "",
+         y = "",
+         title = "Most Common Taxa")+
+    theme(plot.title = element_text(size = 20),
+          axis.text.x = element_text(size = 20),
+          axis.text.y = element_text(size = 20))
+taxa_plot
+
+ggsave("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/figures/June_TopTaxa_plot.png", taxa_plot, width = 6, height = 10, units = "in")
+```
 
