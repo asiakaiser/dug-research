@@ -41,7 +41,10 @@ garden_coords <- st_as_sf(sites, coords = c("Long", "Lat"), crs = 4326) # Use EP
 
 Extract Raster CRS
 ```{r}
-# Get the CRS of the rasters (assuming both rasters have the same CRS)
+# Force imperv_ras into the same CRS as tcc_ras
+imperv_ras <- project(imperv_ras, tcc_ras)
+
+# Save the CRS of the rasters
 crs_rasters <- crs(tcc_ras)
 ```
 

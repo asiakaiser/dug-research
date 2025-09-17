@@ -7,6 +7,8 @@ date: "2025-08-29"
 # Load Packages
 ```{r}
 library("tidyverse")
+library("lme4")
+library("lmerTest")
 ```
 
 # Read in the Data
@@ -19,8 +21,6 @@ setwd("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research")
 arthropods_jun_raw <- read.csv("data/arthropod_data_june.csv", na.strings = c("", " "))
 cucumbers_raw <- read.csv("data/cucumber_data.csv", na.strings = c("", " "))
 sites_raw <- read.csv("data/DUG_sites.csv", na.strings = c("", " "))
-beebox_raw <- read.csv("data/cavitynesters_data.csv", na.strings = c("", " "))
-predation <- read.csv("data/predation_data.csv", na.strings = c("", " "))
 ```
 
 # Explore the data
@@ -28,8 +28,6 @@ predation <- read.csv("data/predation_data.csv", na.strings = c("", " "))
 str(arthropods_jun_raw)
 str(cucumbers_raw)
 str(sites_raw)
-str(beebox_raw)
-str(predation)
 ```
 # Data Cleaning 
 
@@ -40,25 +38,37 @@ sites <- sites_raw %>%
     select(site_code, Area_m2, WealthIndex, tcc200m, imp200m, tcc500m, imp500m)
 ```
 
-## Final Predation Dataset
+## Cucumber data
 ```{r}
-#adding site level variables to predation data set
-predation <- left_join(predation, sites, by = "site_code")
-predation
-```
+#Average cucumber values by treatment by site
+cucumbers_avg <- cucumbers_raw %>%
+    mutate(seed_mass_ratio = no_seeds/mass_g)%>%
+    group_by(site_code, treatment) %>%
+    summarise(
+        avg_mass = mean(mass_g, na.rm = TRUE),
+        avg_seeds = mean(no_seeds, na.rm = TRUE),
+        avg_length = mean(length_mm, na.rm = TRUE),
+        avg_width = mean(width, na.rm = TRUE),
+        avg_volume = mean(volume_mL, na.rm = TRUE),
+        prop_cylindrical = mean(cylindrical == "Yes", na.rm = TRUE),
+        avg_seed_mass_ratio = mean(seed_mass_ratio, na.rm = TRUE))
+    
+cucumbers_avg
+ 
+#Difference (Pollinated - Control) for cucumber values by site
+cucumbers_delta <-  cucumbers_avg %>%
+   arrange(site_code, treatment) %>% 
+    group_by(site_code) %>%
+  summarise(
+    delta_mass  = diff(avg_mass),
+    delta_seeds = diff(avg_seeds),
+    delta_length = diff(avg_length),
+    delta_width = diff(avg_width),
+    delta_volume = diff(avg_volume),
+    delta_cylindrical = diff(prop_cylindrical),
+    delta_seed_mass_ratio = diff(avg_seed_mass_ratio))
+cucumbers_delta
 
-## Final Bee Box Dataset
-```{r}
-#Pivot bee box data long to get in proper format and add site data
-beebox <- beebox_raw %>%
-  pivot_longer(
-    cols = starts_with("C."),             # all the temperature columns
-    names_to = c("location", "size"),     # new columns
-    names_pattern = "C\\._(top|bot|cent)_(s|b)", # regex groups to extract
-    values_to = "temp"
-  )%>%
-    left_join(sites, by = "site_code") #add site data
-beebox
 ```
 
 ## Arthropod Data (June Preliminary Data)
@@ -112,5 +122,14 @@ taxa_plot <- ggplot(data = arthropods_taxa_order, aes(x = reorder(order, n.obs),
 taxa_plot
 
 ggsave("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/figures/June_TopTaxa_plot.png", taxa_plot, width = 6, height = 10, units = "in")
+```
+
+Predation Analyses
+```{r}
+pred.mod <- lmer(Predation ~ Treatment + imp200m + (1|site_code),
+                data = predation)
+
+pred.mod.sum <- summary(pred.mod)
+pred.mod.sum
 ```
 

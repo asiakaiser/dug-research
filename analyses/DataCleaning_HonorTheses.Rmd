@@ -1,0 +1,108 @@
+---
+title: "DataCleaning_HonorTheses"
+output: html_document
+date: "2025-09-17"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Load Packages
+```{r}
+library("tidyverse")
+library("lme4")
+library("lmerTest")
+```
+
+# Read in the Data
+```{r}
+#Clear environment
+rm(list = ls())
+
+#Load in all datasets
+setwd("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research")
+arthropods_jun_raw <- read.csv("data/arthropod_data_june.csv", na.strings = c("", " "))
+cucumbers_raw <- read.csv("data/cucumber_data.csv", na.strings = c("", " "))
+sites_raw <- read.csv("data/DUG_sites.csv", na.strings = c("", " "))
+beebox_raw <- read.csv("data/cavitynesters_data.csv", na.strings = c("", " "))
+predation <- read.csv("data/predation_data.csv", na.strings = c("", " "))
+```
+
+# Explore the data
+```{r}
+str(arthropods_jun_raw)
+str(cucumbers_raw)
+str(sites_raw)
+str(beebox_raw)
+str(predation)
+```
+# Data Cleaning 
+
+Select subset of site variables
+```{r}
+#Select which site level variables you want to keep in dataframe
+sites <- sites_raw %>%
+    select(site_code, Area_m2, WealthIndex, tcc200m, imp200m, tcc500m, imp500m)
+```
+
+## Final Bee Box Dataset
+```{r}
+#Pivot bee box data long to get in proper format and add site data
+beebox <- beebox_raw %>%
+  pivot_longer(
+    cols = starts_with("C."),             # all the temperature columns
+    names_to = c("location", "size"),     # new columns
+    names_pattern = "C\\._(top|bot|cent)_(s|b)", # regex groups to extract
+    values_to = "temp"
+  )%>%
+    left_join(sites, by = "site_code") #add site data
+beebox
+```
+
+
+## Arthropod Data (June Preliminary Data)
+### Functional Groups
+```{r}
+#Functional groups across sites
+arthropods <- arthropods_jun_raw %>%
+    group_by(fun_group,site_code)%>%
+    summarise(n.obs = n())
+
+    #mutate(fun_group = replace_na(fun_group, "Unknown"))
+arthropods 
+```
+```{r}
+#Plot of functional groups
+fun_plot <- ggplot(data = arthropods, aes(x = reorder(fun_group, n.obs), y = n.obs))+
+    geom_bar(stat = "identity")+
+     coord_flip()+
+    theme_classic()+
+    labs(x = "",
+         y = "Number of arthropods collected",
+         title = "Arthropod Functional Groups",
+         caption = "\n The number of arthropods (insects and arachnids) we collected in each functional \n group in vane and pitfall traps across 21 garden sites in June 2025.")
+fun_plot
+```
+
+
+
+# Predation Analyses
+
+
+## Final Predation Dataset
+```{r}
+#adding site level variables to predation data set
+predation <- predation %>%
+    left_join(sites, by = "site_code")%>%
+    
+predation
+```
+
+```{r}
+pred.mod <- lmer(Predation ~ Treatment + imp200m + (1|site_code),
+                data = predation)
+
+pred.mod.sum <- summary(pred.mod)
+pred.mod.sum
+```
