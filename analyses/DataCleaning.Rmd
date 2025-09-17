@@ -124,12 +124,5 @@ taxa_plot
 ggsave("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/figures/June_TopTaxa_plot.png", taxa_plot, width = 6, height = 10, units = "in")
 ```
 
-Predation Analyses
-```{r}
-pred.mod <- lmer(Predation ~ Treatment + imp200m + (1|site_code),
-                data = predation)
 
-pred.mod.sum <- summary(pred.mod)
-pred.mod.sum
-```
 

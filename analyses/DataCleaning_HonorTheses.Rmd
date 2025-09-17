@@ -93,15 +93,19 @@ fun_plot
 ## Final Predation Dataset
 ```{r}
 #adding site level variables to predation data set
-predation <- predation %>%
+predation.test <- predation %>%
     left_join(sites, by = "site_code")%>%
-    
-predation
+    left_join(arthropods, by = "site_code")%>%
+    pivot_wider(
+        names_from = fun_group,
+        values_from = n.obs
+    )
+predation.test
 ```
 
 ```{r}
-pred.mod <- lmer(Predation ~ Treatment + imp200m + (1|site_code),
-                data = predation)
+pred.mod <- lmer(Predation ~ Treatment + Herbivore + Predator + (1|site_code) + (1|Date_deployed),
+                data = predation.test)
 
 pred.mod.sum <- summary(pred.mod)
 pred.mod.sum
