@@ -10,7 +10,6 @@ library("tidyverse")
 library("lme4")
 library("lmerTest")
 ```
-
 # Read in the Data
 ```{r}
 #Clear environment
@@ -35,7 +34,22 @@ Select subset of site variables
 ```{r}
 #Select which site level variables you want to keep in dataframe
 sites <- sites_raw %>%
-    select(site_code, Area_m2, WealthIndex, tcc200m, imp200m, tcc500m, imp500m)
+    select(Site, site_code, Area_m2, Plots, WealthIndex, tcc200m, imp200m, tcc500m, imp500m)
+str(sites)
+```
+
+Descriptive statistics of site level variables
+```{r}
+site_statistics <- sites %>%
+  summarise(across(c(Area_m2, Plots, WealthIndex, tcc200m, imp200m),
+                   list(mean = ~mean(.x, na.rm = TRUE),
+                        sd   = ~sd(.x, na.rm = TRUE)),
+                   .names = "{.fn}_{.col}"))%>%
+    pivot_longer(everything(),
+               names_to = c("stat", "variable"),
+               names_sep = "_") %>%
+    pivot_wider(names_from = variable, values_from = value)
+site_statistics 
 ```
 
 ## Cucumber data
@@ -76,7 +90,7 @@ cucumbers_delta
 ```{r}
 #Functional groups across sites
 arthropods <- arthropods_jun_raw %>%
-    group_by(fun_group)%>%
+    group_by(fun_group, site_code)%>%
     summarise(n.obs = n())
 
     #mutate(fun_group = replace_na(fun_group, "Unknown"))
