@@ -10,6 +10,7 @@ library("tidyverse")
 library("lme4")
 library("lmerTest")
 ```
+
 # Read in the Data
 ```{r}
 #Clear environment
@@ -17,16 +18,21 @@ rm(list = ls())
 
 #Load in all datasets
 setwd("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research")
-arthropods_jun_raw <- read.csv("data/arthropod_data_june.csv", na.strings = c("", " "))
+arthropods_jun_raw <- read.csv("data/Arthropod Data - June - Traps.csv", na.strings = c("", " "))
+arthropods_jul_raw <- read.csv("data/Arthropod Data - July - Traps.csv", na.strings = c("", " "))
 cucumbers_raw <- read.csv("data/cucumber_data.csv", na.strings = c("", " "))
 sites_raw <- read.csv("data/DUG_sites.csv", na.strings = c("", " "))
+
+#Joining arthropod month datasets
+arthropods <- rbind(arthropods_jun_raw, arthropods_jul_raw)
 ```
 
 # Explore the data
 ```{r}
-str(arthropods_jun_raw)
-str(cucumbers_raw)
-str(sites_raw)
+#str(arthropods_jun_raw)
+#str(arthropods_jul_raw)
+#str(cucumbers_raw)
+#str(sites_raw)
 ```
 # Data Cleaning 
 
@@ -52,7 +58,7 @@ site_statistics <- sites %>%
 site_statistics 
 ```
 
-## Cucumber data
+## Cucumber Data
 ```{r}
 #Average cucumber values by treatment by site
 cucumbers_avg <- cucumbers_raw %>%
@@ -84,21 +90,21 @@ cucumbers_delta <-  cucumbers_avg %>%
 cucumbers_delta
 
 ```
-
 ## Arthropod Data (June Preliminary Data)
+
 ### Functional Groups
 ```{r}
 #Functional groups across sites
-arthropods <- arthropods_jun_raw %>%
+arthropods_fun <- arthropods %>%
     group_by(fun_group, site_code)%>%
     summarise(n.obs = n())
 
     #mutate(fun_group = replace_na(fun_group, "Unknown"))
-arthropods 
+arthropods_fun 
 ```
 ```{r}
 #Plot of functional groups
-fun_plot <- ggplot(data = arthropods, aes(x = reorder(fun_group, n.obs), y = n.obs))+
+fun_plot <- ggplot(data = arthropods_fun, aes(x = reorder(fun_group, n.obs), y = n.obs))+
     geom_bar(stat = "identity")+
      coord_flip()+
     theme_classic()+
@@ -109,13 +115,14 @@ fun_plot <- ggplot(data = arthropods, aes(x = reorder(fun_group, n.obs), y = n.o
 fun_plot
 ```
 ### Common Taxa
+
 ```{r}
-arthropods_taxa_fam <- arthropods_jun_raw %>%
+arthropods_taxa_fam <- arthropods %>%
     group_by(fam)%>%
     summarise(n.obs = n())
 arthropods_taxa_fam
 
-arthropods_taxa_order <- arthropods_jun_raw %>%
+arthropods_taxa_order <- arthropods %>%
     group_by(order)%>%
     summarise(n.obs = n())%>%
     filter(n.obs > 100)
@@ -135,7 +142,7 @@ taxa_plot <- ggplot(data = arthropods_taxa_order, aes(x = reorder(order, n.obs),
           axis.text.y = element_text(size = 20))
 taxa_plot
 
-ggsave("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/figures/June_TopTaxa_plot.png", taxa_plot, width = 6, height = 10, units = "in")
+ggsave("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/figures/TopTaxa_plot.png", taxa_plot, width = 6, height = 10, units = "in")
 ```
 
 
