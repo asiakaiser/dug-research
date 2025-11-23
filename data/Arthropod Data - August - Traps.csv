@@ -1,4 +1,4 @@
-,spec_code,site_code,trap_type,spec_no,spec_notes,class,order,fam,genus,specie,fun_group,month,start_date,end_date,lat,long,elevation_m,county
+Site,spec_code,site_code,trap_type,spec_no,spec_notes,class,order,fam,genus,specie,fun_group,month,start_date,end_date,lat,long,elevation_m,county
 Applewood Community Garden,APP-V-1,APP,vane,1,bumblebee,Insecta,Hymenoptera,Apidae,Bombus,,Pollinator,August,11-08-2025,14-08-2025,39.76071279,-105.1446095,1687.57,Jefferson
 Applewood Community Garden,APP-V-2,APP,vane,2,squashbee,Insecta,Hymenoptera,Apidae,Eucera,pruinosa,Pollinator,August,11-08-2025,14-08-2025,39.76071279,-105.1446095,1687.57,Jefferson
 Applewood Community Garden,APP-V-3,APP,vane,3,squashbee,Insecta,Hymenoptera,Apidae,Eucera,pruinosa,Pollinator,August,11-08-2025,14-08-2025,39.76071279,-105.1446095,1687.57,Jefferson

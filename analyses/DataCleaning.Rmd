@@ -20,19 +20,20 @@ rm(list = ls())
 setwd("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research")
 arthropods_jun_raw <- read.csv("data/Arthropod Data - June - Traps.csv", na.strings = c("", " "))
 arthropods_jul_raw <- read.csv("data/Arthropod Data - July - Traps.csv", na.strings = c("", " "))
+arthropods_aug_raw <- read.csv("data/Arthropod Data - August - Traps.csv", na.strings = c("", " "))
 cucumbers_raw <- read.csv("data/cucumber_data.csv", na.strings = c("", " "))
-sites_raw <- read.csv("data/DUG_sites.csv", na.strings = c("", " "))
+sites_raw <- read.csv("data/DUG_data - fall_data.csv", na.strings = c("", " "))
 
 #Joining arthropod month datasets
 arthropods <- rbind(arthropods_jun_raw, arthropods_jul_raw)
+arthropods <-rbind(arthropods,arthropods_aug_raw)
 ```
 
 # Explore the data
 ```{r}
-#str(arthropods_jun_raw)
-#str(arthropods_jul_raw)
-#str(cucumbers_raw)
-#str(sites_raw)
+str(arthropods)
+str(cucumbers_raw)
+str(sites_raw)
 ```
 # Data Cleaning 
 
@@ -40,7 +41,7 @@ Select subset of site variables
 ```{r}
 #Select which site level variables you want to keep in dataframe
 sites <- sites_raw %>%
-    select(Site, site_code, Area_m2, Plots, WealthIndex, tcc200m, imp200m, tcc500m, imp500m)
+    select(Site, site_code, Area_m2, Plots, WealthIndex, tcc200m, imp200m, tcc500m, imp500m,CWD_m2,wood_m2,FWD_m2,logs,bareground_m2)
 str(sites)
 ```
 
@@ -96,60 +97,59 @@ ggplot(data = cucumbers_delta, aes(x = imp200m, y = delta_seed_mass_ratio))+ geo
 ```
 
 
-## Arthropod Data (June Preliminary Data)
+## Arthropod Data
+
+### Arthropod Abundance
+Total number of arthropod observations by site and month
+```{r}
+arthropods_n <- arthropods %>%
+    group_by(site_code,month)%>%
+    summarise(n.obs = n())
+arthropods_n
+```
 
 ### Functional Groups
 ```{r}
 #Functional groups across sites
 arthropods_fun <- arthropods %>%
-    group_by(fun_group, site_code)%>%
-    summarise(n.obs = n())
-
-    #mutate(fun_group = replace_na(fun_group, "Unknown"))
+    group_by(fun_group, site_code,month)%>%
+    summarise(n.obs = n())%>%
+    mutate(fun_group = replace_na(fun_group, "Unknown"))
 arthropods_fun 
 ```
+Functional Group Richness Analysis
 ```{r}
-#Plot of functional groups
-fun_plot <- ggplot(data = arthropods_fun, aes(x = reorder(fun_group, n.obs), y = n.obs))+
-    geom_bar(stat = "identity")+
-     coord_flip()+
-    theme_classic()+
-    labs(x = "",
-         y = "Number of arthropods collected",
-         title = "Arthropod Functional Groups",
-         caption = "\n The number of arthropods (insects and arachnids) we collected in each functional \n group in vane and pitfall traps across 21 garden sites in June 2025.")
-fun_plot
-```
-### Common Taxa
 
-```{r}
-arthropods_taxa_fam <- arthropods %>%
-    group_by(fam)%>%
-    summarise(n.obs = n())
-arthropods_taxa_fam
-
-arthropods_taxa_order <- arthropods %>%
-    group_by(order)%>%
-    summarise(n.obs = n())%>%
-    filter(n.obs > 100)
-arthropods_taxa_order
 ```
 
+## Final Datasets
+Adding the abundance of each functional group, pollinator species richness, and functional group diversity to site dataset
 ```{r}
-taxa_plot <- ggplot(data = arthropods_taxa_order, aes(x = reorder(order, n.obs), y = n.obs))+
-    geom_bar(stat = "identity", width = 0.5)+
-     coord_flip()+
-    theme_classic()+
-    labs(x = "",
-         y = "",
-         title = "Most Common Taxa")+
-    theme(plot.title = element_text(size = 20),
-          axis.text.x = element_text(size = 20),
-          axis.text.y = element_text(size = 20))
-taxa_plot
+#Pollinator abundance by site by month
+n.pol <- arthropods %>%
+    filter(fun_group == "Pollinator")%>%
+    group_by(month, site_code)%>%
+    summarise(n.pol = n())
 
-ggsave("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/figures/TopTaxa_plot.png", taxa_plot, width = 6, height = 10, units = "in")
+#Predator abundance by site by month
+n.pred <- arthropods %>%
+    filter(fun_group == "Predator" | fun_group == "Predator/Scavenger" | fun_group == "Parasitoid")%>%
+    group_by(month, site_code)%>%
+    summarise(n.pred = n())
+
+#Herbivore abundance by site by month
+n.herb <- n.pol <- arthropods %>%
+    filter(fun_group == "Herbivore")%>%
+    group_by(month, site_code)%>%
+    summarise(n.herb = n())
+
+#Detritivore abundance by site by month
+n.det <- n.pol <- arthropods %>%
+    filter(fun_group == "Detritivore")%>%
+    group_by(month, site_code)%>%
+    summarise(n.det = n())
 ```
+
 
 
 
