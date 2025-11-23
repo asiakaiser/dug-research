@@ -72,7 +72,6 @@ cucumbers_avg <- cucumbers_raw %>%
         avg_volume = mean(volume_mL, na.rm = TRUE),
         prop_cylindrical = mean(cylindrical == "Yes", na.rm = TRUE),
         avg_seed_mass_ratio = mean(seed_mass_ratio, na.rm = TRUE))
-    
 cucumbers_avg
  
 #Difference (Pollinated - Control) for cucumber values by site
@@ -89,7 +88,14 @@ cucumbers_delta <-  cucumbers_avg %>%
     delta_seed_mass_ratio = diff(avg_seed_mass_ratio))
 cucumbers_delta
 
+cucumbers_delta <- full_join(cucumbers_delta, sites, join_by("site_code"))
 ```
+
+```{r}
+ggplot(data = cucumbers_delta, aes(x = imp200m, y = delta_seed_mass_ratio))+ geom_point()
+```
+
+
 ## Arthropod Data (June Preliminary Data)
 
 ### Functional Groups

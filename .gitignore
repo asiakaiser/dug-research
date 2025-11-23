@@ -7,3 +7,6 @@ data/arthropod_data_june.csv
 data/site_data.csv
 data/NLCD_mf5qnksxr8tzfi/
 data/NLCD_mf5qnt9vt9mx4o/
+analyses/CodeTemplate_HonorTheses.Rmd
+analyses/DataCleaning_HonorTheses.Rmd
+analyses/DataCleaning_Rene_HonorTheses.Rmd
