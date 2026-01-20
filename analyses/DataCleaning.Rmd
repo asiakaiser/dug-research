@@ -9,6 +9,9 @@ date: "2025-08-29"
 library("tidyverse")
 library("lme4")
 library("lmerTest")
+library("iNEXT")
+library("sf")
+library("units")
 ```
 
 # Read in the Data
@@ -23,6 +26,7 @@ arthropods_jul_raw <- read.csv("data/Arthropod Data - July - Traps.csv", na.stri
 arthropods_aug_raw <- read.csv("data/Arthropod Data - August - Traps.csv", na.strings = c("", " "))
 cucumbers_raw <- read.csv("data/cucumber_data.csv", na.strings = c("", " "))
 sites_raw <- read.csv("data/DUG_data - fall_data.csv", na.strings = c("", " "))
+inat_raw <- read.csv("data/observations-670835.csv", na.strings = c("", " "))
 
 #Joining arthropod month datasets
 arthropods <- rbind(arthropods_jun_raw, arthropods_jul_raw)
@@ -31,8 +35,8 @@ arthropods <-rbind(arthropods,arthropods_aug_raw)
 
 # Explore the data
 ```{r}
-str(arthropods)
-str(cucumbers_raw)
+#str(arthropods)
+#str(cucumbers_raw)
 str(sites_raw)
 ```
 # Data Cleaning 
@@ -41,7 +45,7 @@ Select subset of site variables
 ```{r}
 #Select which site level variables you want to keep in dataframe
 sites <- sites_raw %>%
-    select(Site, site_code, Area_m2, Plots, WealthIndex, tcc200m, imp200m, tcc500m, imp500m,CWD_m2,wood_m2,FWD_m2,logs,bareground_m2)
+    select(Site, site_code, Area_m2, Plots, WealthIndex, tcc200m, imp200m, tcc500m, imp500m,CWD_m2,wood_m2,FWD_m2,logs,bareground_m2,floral_area_m2)
 str(sites)
 ```
 
@@ -58,6 +62,98 @@ site_statistics <- sites %>%
     pivot_wider(names_from = variable, values_from = value)
 site_statistics 
 ```
+Assign iNaturalist floral observations to sites
+```{r}
+#Convert iNaturalist data to an sf object
+#Create buffer distances
+
+#Convert gbif to sf points
+sf_data <- st_as_sf(inat_raw, coords = c("longitude", "latitude"), crs = 4326)
+
+#Convert cities.test to sf points
+gardens.sf <- st_as_sf(sites_raw, coords = c("Long", "Lat"), crs = 4326)
+
+#Create 45 km buffers around all cities
+buffer_distance <- set_units(500, "m")  # 45 km in meters
+gardens.buffer <- st_buffer(gardens.sf, dist = buffer_distance)
+```
+
+Assign all observations to a city
+```{r}
+# Perform spatial join: assign City to points within buffer
+sf_data <- st_join(sf_data, gardens.buffer["site_code"], join = st_within)
+
+# Fill points outside any city buffer
+sf_data$site_code <- sf_data$site_code            # Copy joined column
+
+#Assigning remainig observations to city
+sf_data$site_code[sf_data$private_place_guess == "Grape St, Denver, CO, US"] <- "PAL"
+sf_data$site_code[sf_data$private_place_guess == "S Vincennes Ct, Denver, CO, US"] <- "SAM"
+sf_data$site_code[183] <- "PAL"
+sf_data$site_code[619] <- "SLA"
+sf_data$site_code[894] <- "EDI"
+sf_data$site_code[974] <- "SHO"
+sf_data$site_code[994] <- "GW"
+sf_data$site_code[1002] <- "GW"
+sf_data$site_code[1347] <- "RUB"
+sf_data$site_code[1349] <- "RUB"
+sf_data$site_code[1839] <- "APP"
+
+# Convert back to data frame if needed
+inat_data <- as.data.frame(sf_data)
+
+# Check unique city assignments
+unique(inat_data$site_code)
+```
+
+Add floral observation abundance to site data
+```{r}
+## Group Summaries
+
+# No. of observations
+inat.obs.all <- inat_data %>%
+  group_by(site_code) %>%
+  summarise(floral.obs = n())
+
+# Merge into site datasheet
+sites <- sites %>%
+  left_join(inat.obs.all, by = "site_code")
+
+# Quick check
+summary(sites)
+```
+
+### Floral Biodiversity Metrics
+### Extracting Biodiversity Values
+
+* Summarize species counts per site
+* Pivot dataframe wide to get into correct format for iNEXT
+* Run iNEXT for estimated richness and diversity values
+* Add values back to city dataframe
+
+```{r}
+
+# Prepare iNaturalist data and convert to wide format
+inat_wide <- inat_data %>%
+  count(site_code,scientific_name) %>%
+  pivot_wider(names_from = site_code, values_from = n, values_fill = 0)
+
+# Prepare iNEXT input data
+inat.iNEXTinput <- as.data.frame(inat_wide[,-1])
+
+# Run iNEXT to find richness data
+inat.iNEXT <- iNEXT(inat.iNEXTinput, q = 0, datatype = "abundance")
+
+# Extract richness and diversity data
+inat_richness <-  inat.iNEXT$AsyEst[inat.iNEXT$AsyEst$Diversity == "Species richness",]
+inat_shannon <-  inat.iNEXT$AsyEst[inat.iNEXT$AsyEst$Diversity == "Shannon diversity",]
+inat_simpson <-  inat.iNEXT$AsyEst[inat.iNEXT$AsyEst$Diversity == "Simpson diversity",]
+
+sites$flor.rich <- inat_richness$Estimator
+sites$flor.shannon <- inat_shannon$Estimator
+sites$flor.simpson <- inat_simpson$Estimator
+```
+
 
 ## Cucumber Data
 ```{r}
@@ -95,7 +191,6 @@ cucumbers_delta <- full_join(cucumbers_delta, sites, join_by("site_code"))
 ```{r}
 ggplot(data = cucumbers_delta, aes(x = imp200m, y = delta_seed_mass_ratio))+ geom_point()
 ```
-
 
 ## Arthropod Data
 

@@ -3,10 +3,13 @@
 .RData
 .Ruserdata
 data/DenverGardens_Sites.csv
-data/arthropod_data_june.csv
+data/Arthropod Data - June - Traps.csv
+data/Arthropod Data - July - Traps.csv
+data/Arthropod Data - August - Traps.csv
 data/site_data.csv
 data/NLCD_mf5qnksxr8tzfi/
 data/NLCD_mf5qnt9vt9mx4o/
+data/observations-670835.csv
 analyses/CodeTemplate_HonorTheses.Rmd
 analyses/DataCleaning_HonorTheses.Rmd
 analyses/DataCleaning_Rene_HonorTheses.Rmd
