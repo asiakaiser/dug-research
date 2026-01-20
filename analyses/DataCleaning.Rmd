@@ -12,6 +12,7 @@ library("lmerTest")
 library("iNEXT")
 library("sf")
 library("units")
+library("vegan")
 ```
 
 # Read in the Data
@@ -123,7 +124,7 @@ sites <- sites %>%
 summary(sites)
 ```
 
-### Floral Biodiversity Metrics
+# Floral Biodiversity Metrics
 ### Extracting Biodiversity Values
 
 * Summarize species counts per site
@@ -132,7 +133,6 @@ summary(sites)
 * Add values back to city dataframe
 
 ```{r}
-
 # Prepare iNaturalist data and convert to wide format
 inat_wide <- inat_data %>%
   count(site_code,scientific_name) %>%
@@ -154,8 +154,7 @@ sites$flor.shannon <- inat_shannon$Estimator
 sites$flor.simpson <- inat_simpson$Estimator
 ```
 
-
-## Cucumber Data
+# Cucumber Data
 ```{r}
 #Average cucumber values by treatment by site
 cucumbers_avg <- cucumbers_raw %>%
@@ -192,7 +191,7 @@ cucumbers_delta <- full_join(cucumbers_delta, sites, join_by("site_code"))
 ggplot(data = cucumbers_delta, aes(x = imp200m, y = delta_seed_mass_ratio))+ geom_point()
 ```
 
-## Arthropod Data
+# Arthropod Data
 
 ### Arthropod Abundance
 Total number of arthropod observations by site and month
@@ -245,6 +244,15 @@ n.det <- n.pol <- arthropods %>%
     summarise(n.det = n())
 ```
 
+Saving Data frames to Use in Analyses
+```{r}
+#Floral iNaturalist Data Wide format
+write.csv(inat_wide, "/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/data/inat_wide.csv", row.names = FALSE)
+
+#Site level data
+
+#Arthropod data wide format
+```
 
 
 

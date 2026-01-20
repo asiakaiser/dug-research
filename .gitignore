@@ -3,9 +3,9 @@
 .RData
 .Ruserdata
 data/DenverGardens_Sites.csv
-data/Arthropod Data - June - Traps.csv
-data/Arthropod Data - July - Traps.csv
-data/Arthropod Data - August - Traps.csv
+data/"Arthropod Data - June - Traps.csv"
+data/"Arthropod Data - July - Traps.csv"
+data/"Arthropod Data - August - Traps.csv"
 data/site_data.csv
 data/NLCD_mf5qnksxr8tzfi/
 data/NLCD_mf5qnt9vt9mx4o/
