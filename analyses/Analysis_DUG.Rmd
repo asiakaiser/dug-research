@@ -1,0 +1,47 @@
+---
+title: "Analyses - Community Composition and Structural Equation Modelling"
+output: html_document
+date: "2026-01-20"
+---
+
+# Load Packages
+```{r}
+
+```
+
+# Read in the Data
+```{r}
+
+```
+
+# Explore the Data
+```{r}
+
+```
+
+# Community Composition
+## Floral NMDS
+```{r}
+
+```
+
+## Arthropod Functional Group NMDS
+```{r}
+
+```
+
+## Bee Species NMDS
+```{r}
+
+```
+
+# Habitat Quality Index
+```{r}
+
+```
+
+#Structural Equation Modelling
+```{r}
+
+```
+
