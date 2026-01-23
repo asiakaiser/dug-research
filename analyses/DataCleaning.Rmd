@@ -186,7 +186,7 @@ cucumbers_delta <- full_join(cucumbers_delta, sites, join_by("site_code"))
 ```
 
 ```{r}
-ggplot(data = cucumbers_delta, aes(x = imp200m, y = delta_seed_mass_ratio))+ geom_point()
+ggplot(data = cucumbers_delta, aes(x = imp200m, y = delta_mass))+ geom_point()
 ```
 
 # Arthropod Data
@@ -208,10 +208,18 @@ arthropods_fun <- arthropods %>%
     summarise(n.obs = n())%>%
     mutate(fun_group = replace_na(fun_group, "Unknown"))
 arthropods_fun 
+unique(arthropods_fun$fun_group)
 ```
+
 Functional Group Richness Analysis
 ```{r}
-
+arthropods_wide <- arthropods_fun %>%
+  mutate(site_month = paste(site_code, month, sep = "_"))%>%
+    pivot_wider(
+    names_from = site_month,
+    values_from = n.obs,
+    values_fill = 0  # fill missing combinations with 0
+  )
 ```
 
 ## Final Datasets
@@ -250,6 +258,9 @@ write.csv(inat_wide, "/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-researc
 #Site level data
 
 #Arthropod data wide format
+
+#Arthropod functional groups wide format
+write.csv(arthropods_wide, "/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/data/arthropods_wide.csv", row.names = FALSE)
 ```
 
 
