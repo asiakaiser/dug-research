@@ -27,7 +27,7 @@ arthropods_jul_raw <- read.csv("data/Arthropod Data - July - Traps.csv", na.stri
 arthropods_aug_raw <- read.csv("data/Arthropod Data - August - Traps.csv", na.strings = c("", " "))
 cucumbers_raw <- read.csv("data/cucumber_data.csv", na.strings = c("", " "))
 sites_raw <- read.csv("data/DUG_data - fall_data.csv", na.strings = c("", " "))
-inat_raw <- read.csv("data/observations-670835.csv", na.strings = c("", " "))
+inat_raw <- read.csv("data/observations-672273.csv", na.strings = c("", " "))
 
 #Joining arthropod month datasets
 arthropods <- rbind(arthropods_jun_raw, arthropods_jul_raw)
@@ -85,20 +85,17 @@ Assign all observations to a city
 sf_data <- st_join(sf_data, gardens.buffer["site_code"], join = st_within)
 
 # Fill points outside any city buffer
-sf_data$site_code <- sf_data$site_code            # Copy joined column
+sf_data$site_code <- sf_data$site_code # Copy joined column
 
-#Assigning remainig observations to city
-sf_data$site_code[sf_data$private_place_guess == "Grape St, Denver, CO, US"] <- "PAL"
-sf_data$site_code[sf_data$private_place_guess == "S Vincennes Ct, Denver, CO, US"] <- "SAM"
-sf_data$site_code[183] <- "PAL"
-sf_data$site_code[619] <- "SLA"
-sf_data$site_code[894] <- "EDI"
-sf_data$site_code[974] <- "SHO"
-sf_data$site_code[994] <- "GW"
-sf_data$site_code[1002] <- "GW"
-sf_data$site_code[1347] <- "RUB"
-sf_data$site_code[1349] <- "RUB"
-sf_data$site_code[1839] <- "APP"
+#Adding site codes for all chive (allium) observations manually since it was geo-obscured by iNat
+manual_sites <- c(`81`="PAL", `183`="PAL", `202`="PAL", `637`="SLA", `649`="EDI",
+                  `664`="EDI", `905`="EDI", `985`="SHO", `1005`="GW", `1012`="GW",
+                  `1354`="RUB", `1356`="RUB", `1578`="SAM", `1640`="GABL",
+                  `2101`="APP", `2202`="SLA", `2211`="SLA", `2214`="SLA",
+                  `2446`="SHO", `2486`="CHA", `2511`="CHA")
+
+sf_data$site_code[as.integer(names(manual_sites))] <- manual_sites
+
 
 # Convert back to data frame if needed
 inat_data <- as.data.frame(sf_data)
@@ -149,9 +146,10 @@ inat_richness <-  inat.iNEXT$AsyEst[inat.iNEXT$AsyEst$Diversity == "Species rich
 inat_shannon <-  inat.iNEXT$AsyEst[inat.iNEXT$AsyEst$Diversity == "Shannon diversity",]
 inat_simpson <-  inat.iNEXT$AsyEst[inat.iNEXT$AsyEst$Diversity == "Simpson diversity",]
 
-sites$flor.rich <- inat_richness$Estimator
-sites$flor.shannon <- inat_shannon$Estimator
-sites$flor.simpson <- inat_simpson$Estimator
+# Match site_code to Assemblage
+sites$flor.rich    <- inat_richness$Observed[match(sites$site_code, inat_richness$Assemblage)]
+sites$flor.shannon <- inat_shannon$Observed[match(sites$site_code, inat_shannon$Assemblage)]
+sites$flor.simpson <- inat_simpson$Observed[match(sites$site_code, inat_simpson$Assemblage)]
 ```
 
 # Cucumber Data
