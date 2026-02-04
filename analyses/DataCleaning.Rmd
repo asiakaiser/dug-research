@@ -38,7 +38,7 @@ arthropods <-rbind(arthropods,arthropods_aug_raw)
 ```{r}
 #str(arthropods)
 #str(cucumbers_raw)
-str(sites_raw)
+#str(sites_raw)
 ```
 # Data Cleaning 
 
