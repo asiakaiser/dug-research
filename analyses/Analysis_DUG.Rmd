@@ -5,13 +5,20 @@ date: "2026-01-20"
 ---
 
 # Load Packages
-```{r}
+```{r, message=FALSE}
 
 ```
 
 # Read in the Data
 ```{r}
+setwd("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research")
 
+#all site data
+sites_all <- read.csv("data/sites_all.csv")
+
+#matrix data for community analyses
+inat_wide <- read.csv("data/inat_wide.csv")
+arthropods_wide <- read.csv("data/arthropods_wide.csv")
 ```
 
 # Explore the Data

@@ -5,7 +5,7 @@ date: "2025-08-29"
 ---
 
 # Load Packages
-```{r}
+```{r, message=FALSE}
 library("tidyverse")
 library("lme4")
 library("lmerTest")
@@ -165,7 +165,12 @@ cucumbers_avg <- cucumbers_raw %>%
         avg_width = mean(width, na.rm = TRUE),
         avg_volume = mean(volume_mL, na.rm = TRUE),
         prop_cylindrical = mean(cylindrical == "Yes", na.rm = TRUE),
-        avg_seed_mass_ratio = mean(seed_mass_ratio, na.rm = TRUE))
+        avg_seed_mass_ratio = mean(seed_mass_ratio, na.rm = TRUE),
+        n_cucumbers = n(),.groups = "drop")%>%
+        complete(
+    site_code = c(unique(cucumbers_raw$site_code), "JEF"),
+    treatment,
+    fill = list(n_cucumbers = 0))
 cucumbers_avg
  
 #Difference (Pollinated - Control) for cucumber values by site
@@ -179,14 +184,11 @@ cucumbers_delta <-  cucumbers_avg %>%
     delta_width = diff(avg_width),
     delta_volume = diff(avg_volume),
     delta_cylindrical = diff(prop_cylindrical),
-    delta_seed_mass_ratio = diff(avg_seed_mass_ratio))
+    delta_seed_mass_ratio = diff(avg_seed_mass_ratio),
+    delta_no = diff(n_cucumbers))
 cucumbers_delta
 
-cucumbers_delta <- full_join(cucumbers_delta, sites, join_by("site_code"))
-```
-
-```{r}
-ggplot(data = cucumbers_delta, aes(x = imp200m, y = delta_mass))+ geom_point()
+cucumbers_avg <- full_join(cucumbers_avg, sites, join_by("site_code"))
 ```
 
 # Arthropod Data
@@ -225,29 +227,25 @@ arthropods_wide <- arthropods_fun %>%
 ## Final Datasets
 Adding the abundance of each functional group, pollinator species richness, and functional group diversity to site dataset
 ```{r}
-#Pollinator abundance by site by month
-n.pol <- arthropods %>%
-    filter(fun_group == "Pollinator")%>%
-    group_by(month, site_code)%>%
-    summarise(n.pol = n())
-
-#Predator abundance by site by month
-n.pred <- arthropods %>%
-    filter(fun_group == "Predator" | fun_group == "Predator/Scavenger" | fun_group == "Parasitoid")%>%
-    group_by(month, site_code)%>%
-    summarise(n.pred = n())
-
-#Herbivore abundance by site by month
-n.herb <- n.pol <- arthropods %>%
-    filter(fun_group == "Herbivore")%>%
-    group_by(month, site_code)%>%
-    summarise(n.herb = n())
-
-#Detritivore abundance by site by month
-n.det <- n.pol <- arthropods %>%
-    filter(fun_group == "Detritivore")%>%
-    group_by(month, site_code)%>%
-    summarise(n.det = n())
+sites_final <- arthropods %>%
+  mutate(
+    fun_group = case_when(
+      fun_group == "Pollinator" ~ "pol",
+      fun_group %in% c("Predator", "Predator/Scavenger", "Parasitoid") ~ "pred",
+      fun_group == "Herbivore" ~ "herb",
+      fun_group == "Detritivore" ~ "det"
+    )
+  ) %>%
+  group_by(site_code, month, fun_group) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  tidyr::pivot_wider(
+    names_from = fun_group,
+    values_from = n,
+    names_prefix = "n.",
+    values_fill = 0
+  ) %>%
+  left_join(sites, by = "site_code") %>%
+  left_join(cucumbers_delta, by = "site_code")
 ```
 
 Saving Data frames to Use in Analyses
@@ -256,8 +254,12 @@ Saving Data frames to Use in Analyses
 write.csv(inat_wide, "/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/data/inat_wide.csv", row.names = FALSE)
 
 #Site level data
+write.csv(sites_final, "/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/data/sites_all.csv", row.names = FALSE)
 
-#Arthropod data wide format
+#Cucumber averages data
+write.csv(cucumbers_avg, "/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/data/cucumbers_avg.csv", row.names = FALSE)
+
+#Bee data wide format
 
 #Arthropod functional groups wide format
 write.csv(arthropods_wide, "/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/data/arthropods_wide.csv", row.names = FALSE)
