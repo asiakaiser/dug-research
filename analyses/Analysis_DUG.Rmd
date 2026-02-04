@@ -6,7 +6,9 @@ date: "2026-01-20"
 
 # Load Packages
 ```{r, message=FALSE}
-
+library("tidyverse")
+library("lme4")
+library("lmerTest")
 ```
 
 # Read in the Data

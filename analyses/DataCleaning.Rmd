@@ -7,8 +7,6 @@ date: "2025-08-29"
 # Load Packages
 ```{r, message=FALSE}
 library("tidyverse")
-library("lme4")
-library("lmerTest")
 library("iNEXT")
 library("sf")
 library("units")
@@ -127,7 +125,7 @@ summary(sites)
 * Summarize species counts per site
 * Pivot dataframe wide to get into correct format for iNEXT
 * Run iNEXT for estimated richness and diversity values
-* Add values back to city dataframe
+* Add values back to garden sites dataframe
 
 ```{r}
 # Prepare iNaturalist data and convert to wide format
@@ -151,6 +149,12 @@ sites$flor.rich    <- inat_richness$Observed[match(sites$site_code, inat_richnes
 sites$flor.shannon <- inat_shannon$Observed[match(sites$site_code, inat_shannon$Assemblage)]
 sites$flor.simpson <- inat_simpson$Observed[match(sites$site_code, inat_simpson$Assemblage)]
 ```
+
+# Bee Biodiversity Metrics
+```{r}
+
+```
+
 
 # Cucumber Data
 ```{r}
