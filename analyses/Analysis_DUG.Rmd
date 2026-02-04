@@ -12,7 +12,10 @@ library("lmerTest")
 ```
 
 # Read in the Data
-```{r}
+```{r, warning=FALSE}
+#Clear environment
+rm(list = ls())
+
 setwd("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research")
 
 #all site data
@@ -49,7 +52,7 @@ arthropods_wide <- read.csv("data/arthropods_wide.csv")
 
 ```
 
-#Structural Equation Modelling
+# Structural Equation Modelling
 ```{r}
 
 ```

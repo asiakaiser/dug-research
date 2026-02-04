@@ -11,24 +11,31 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Load Packages
 ```{r}
-library(terra)
-library(sf)
+#Clear environment
+rm(list = ls())
+
+library(raster)
 library(sp)
-library(tidyverse)
+library(exactextractr)
+library(dplyr)
+library(tidyr)
+library(purrr)
 ```
 
 
 ## Read in the Data
 ```{r}
 setwd("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research")
-sites <- read.csv("data/site_data.csv")
+sites <- read.csv("data/DUG_data - fall_data.csv")
 
 imperv_path <- "data/NLCD_mf5qnksxr8tzfi/Annual_NLCD_FctImp_2024_CU_C1V1_mf5qnksxr8tzfi.tiff"
 tcc_path <- "data/NLCD_mf5qnksxr8tzfi/nlcd_tcc_conus_wgs84_v2023-5_20230101_20231231_mf5qnksxr8tzfi.tiff"
+nlcd_path <- "data/NLCD_mf5qnt9vt9mx4o/Annual_NLCD_LndCov_2024_CU_C1V1_mf5qnt9vt9mx4o.tiff"
 
 # Load rasters into R
 tcc_ras <- rast(tcc_path)  # Tree canopy cover raster
 imperv_ras <- rast(imperv_path)
+nlcd <- rast(nlcd_path)
 ```
 
 # Extract Raster Data
@@ -43,6 +50,7 @@ Extract Raster CRS
 ```{r}
 # Force imperv_ras into the same CRS as tcc_ras
 imperv_ras <- project(imperv_ras, tcc_ras)
+nlcd_ras <- project(nlcd_ras, tcc_ras)
 
 # Save the CRS of the rasters
 crs_rasters <- crs(tcc_ras)
@@ -75,6 +83,106 @@ for (i in buffer_radius) {
   sites[[imp_col]] <- extract_raster_mean(imperv_ras, garden_buffer)
 }
 ```
+
+# Land Cover Classes Code
+```{r}
+## --------------------------------------------------
+## Inputs
+## --------------------------------------------------
+# Load NLCD raster (RasterLayer)
+nlcd <- raster("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/data/NLCD_mf5qnt9vt9mx4o/Annual_NLCD_LndCov_2024_CU_C1V1_mf5qnt9vt9mx4o.tiff")
+
+# Load site coordinates: data frame with site_code, lon, lat
+# Replace 'sites' with your actual data frame
+# Convert to SpatialPointsDataFrame
+coordinates(sites) <- ~Long+Lat
+proj4string(sites) <- CRS("+init=epsg:4326")  # WGS84
+
+# Reproject sites to NLCD CRS
+sites <- sp::spTransform(sites, crs(nlcd))
+
+## --------------------------------------------------
+## Buffer sizes (meters)
+## --------------------------------------------------
+buffer_sizes <- c(200, 500, 1000)
+
+## --------------------------------------------------
+## Function: extract NLCD and calculate proportions
+## --------------------------------------------------
+extract_nlcd_buffer <- function(buffer_m, sites, nlcd) {
+  
+  # Convert SpatialPointsDataFrame to SpatVector
+  sites_vect <- terra::vect(sites)
+  
+  # Create buffers
+  buffers_vect <- terra::buffer(sites_vect, width = buffer_m)
+  
+  # Convert back to Spatial* object for exactextractr
+  buffers_sp <- as(buffers_vect, "Spatial")
+  
+  # Extract NLCD values
+  exact_list <- exact_extract(nlcd, buffers_sp)
+  
+  # Combine into tibble with site codes
+  df <- map2_dfr(exact_list, sites$site_code, function(vals, site) {
+    tibble(
+      site_code = site,
+      nlcd = vals$value
+    )
+  })
+  
+  # Collapse NLCD codes and compute proportions
+  df %>%
+    mutate(
+      lc_group = case_when(
+        nlcd == 11 ~ "water",
+        nlcd %in% c(21, 22) ~ "dev_low",
+        nlcd %in% c(23, 24) ~ "dev_high",
+        nlcd %in% c(41, 42, 43) ~ "forest",
+        nlcd %in% c(52, 71) ~ "shrub_grass",
+        nlcd %in% c(81, 82) ~ "agriculture",
+        nlcd %in% c(90, 95) ~ "wetland",
+        nlcd == 31 ~ "barren",
+        TRUE ~ NA_character_
+      )
+    ) %>%
+    filter(!is.na(lc_group)) %>%
+    group_by(site_code, lc_group) %>%
+    summarise(n = n(), .groups = "drop") %>%
+    group_by(site_code) %>%
+    mutate(prop = n / sum(n)) %>%
+    ungroup() %>%
+    mutate(buffer_label = paste0(lc_group, buffer_m, "m")) %>%
+    dplyr::select(site_code, buffer_label, prop)
+}
+
+## --------------------------------------------------
+## Run extraction for all buffer sizes
+## --------------------------------------------------
+landcover_list <- map(buffer_sizes, ~ extract_nlcd_buffer(.x, sites, nlcd))
+landcover_all <- bind_rows(landcover_list)
+
+## --------------------------------------------------
+## Pivot to wide format (one row per site)
+## --------------------------------------------------
+landcover_wide <- landcover_all %>%
+  pivot_wider(
+    names_from = buffer_label,
+    values_from = prop,
+    values_fill = 0
+  )
+
+## --------------------------------------------------
+## Join to site-level dataset
+## --------------------------------------------------
+sites_data_full <- left_join(sites, landcover_wide, by = "site_code")
+
+# Check the result
+head(sites_data_full)
+
+colnames(landcover_wide)
+```
+
 
 Final dataframe
 ```{r}
