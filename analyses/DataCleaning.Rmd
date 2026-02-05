@@ -39,8 +39,8 @@ arthropods <-rbind(arthropods,arthropods_aug_raw)
 #str(cucumbers_raw)
 #str(sites_raw)
 ```
-# Data Cleaning 
 
+# Data Cleaning 
 Select subset of site variables
 ```{r}
 #Select which site level variables you want to keep in dataframe
@@ -152,8 +152,24 @@ sites$flor.simpson <- inat_simpson$Observed[match(sites$site_code, inat_simpson$
 ```
 
 # Bee Biodiversity Metrics
+Total number of each bee species observed by site and month
 ```{r}
+bees <- arthropods %>%
+    filter(fam == "Apidae" |fam == "Halictidae"|fam == "Megachilidae"|fam == "Andrenidae"|fam == "Melittidae"| fam == "Colletidae")%>%
+    mutate(spec_ID = paste(genus,specie, sep = " "))%>%
+    group_by(spec_ID, site_code, month)%>%
+    summarise(spec.obs = n())
+```
 
+Bee Diversity Analysis
+```{r}
+bees_wide <- bees %>%
+  mutate(site_month = paste(site_code, month, sep = "_"))%>%
+    pivot_wider(
+    names_from = site_month,
+    values_from = spec.obs,
+    values_fill = 0  # fill missing combinations with 0
+  )
 ```
 
 
@@ -265,6 +281,7 @@ write.csv(sites_final, "/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-resea
 write.csv(cucumbers_avg, "/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/data/cucumbers_avg.csv", row.names = FALSE)
 
 #Bee data wide format
+write.csv(bees_wide, "/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/data/bees_wide.csv", row.names = FALSE)
 
 #Arthropod functional groups wide format
 write.csv(arthropods_wide, "/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/data/arthropods_wide.csv", row.names = FALSE)
