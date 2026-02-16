@@ -173,8 +173,8 @@ Bee Diversity Analysis
 bees_wide <- bees %>%
   mutate(site_month = paste(site_code, month, sep = "_"))%>%
     pivot_wider(
-    id_cols = spec_ID,
-    names_from = site_month,
+    id_cols = site_month,
+    names_from = spec_ID,
     values_from = spec.obs,
     values_fill = 0  # fill missing combinations with 0
   )
@@ -252,8 +252,8 @@ Functional Group Richness Analysis
 arthropods_wide <- arthropods_fun %>%
   mutate(site_month = paste(site_code, month, sep = "_")) %>%
   pivot_wider(
-    id_cols = fun_group,
-    names_from = site_month,
+    id_cols = site_month,
+    names_from = fun_group,
     values_from = n.obs,
     values_fill = 0
   )
