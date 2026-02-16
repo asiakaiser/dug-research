@@ -9,6 +9,7 @@ date: "2026-01-20"
 library("tidyverse")
 library("lme4")
 library("lmerTest")
+library("vegan")
 ```
 
 # Read in the Data
@@ -31,15 +32,29 @@ arthropods_wide <- read.csv("data/arthropods_wide.csv")
 
 ```
 
+GGplot Theme
+```{r}
+Asia_Theme <- theme(
+  plot.title = element_text(size = 16),
+  plot.caption = element_text(size = 16),
+  axis.title = element_text(size = 20),
+  axis.text = element_text(size = 16),
+  axis.text.x = element_text(size = 20),
+  legend.text = element_text(size= 20))
+```
+
 # Community Composition
 ## Floral NMDS
 ```{r}
-
+set.seed(0)
+florNMDS_input <- inat_wide[,-1]
+flor.mds <- metaMDS(florNMDS_input, trymax = 50)
 ```
 
-## Arthropod Functional Group NMDS
+## Arthropod Functional Groups
 ```{r}
-
+arthropodsNMDS_input <- arthropods_wide[,-1]
+arthropods.mds <- metaMDS(arthropodsNMDS_input, trymax = 50)
 ```
 
 ## Bee Species NMDS

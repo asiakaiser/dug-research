@@ -115,9 +115,6 @@ inat.obs.all <- inat_data %>%
 # Merge into site datasheet
 sites <- sites %>%
   left_join(inat.obs.all, by = "site_code")
-
-# Quick check
-summary(sites)
 ```
 
 # Floral Biodiversity Metrics
@@ -151,12 +148,22 @@ sites$flor.shannon <- inat_shannon$Observed[match(sites$site_code, inat_shannon$
 sites$flor.simpson <- inat_simpson$Observed[match(sites$site_code, inat_simpson$Assemblage)]
 ```
 
+iNaturalist data summarized at the genus level for NMDS
+```{r}
+# Prepare iNaturalist data at the genus level
+inat_wide <- inat_data %>%
+  count(site_code,taxon_genus_name) %>%
+  pivot_wider(names_from = site_code, values_from = n, values_fill = 0)
+```
+
+
 # Bee Biodiversity Metrics
 Total number of each bee species observed by site and month
 ```{r}
 bees <- arthropods %>%
     filter(fam == "Apidae" |fam == "Halictidae"|fam == "Megachilidae"|fam == "Andrenidae"|fam == "Melittidae"| fam == "Colletidae")%>%
-    mutate(spec_ID = paste(genus,specie, sep = " "))%>%
+    mutate(specie = tidyr::replace_na(specie, "spp."),
+        spec_ID = paste(genus,specie, sep = " "))%>%
     group_by(spec_ID, site_code, month)%>%
     summarise(spec.obs = n())
 ```
@@ -166,6 +173,7 @@ Bee Diversity Analysis
 bees_wide <- bees %>%
   mutate(site_month = paste(site_code, month, sep = "_"))%>%
     pivot_wider(
+    id_cols = spec_ID,
     names_from = site_month,
     values_from = spec.obs,
     values_fill = 0  # fill missing combinations with 0
@@ -225,6 +233,11 @@ arthropods_n
 
 ### Functional Groups
 ```{r}
+#Total arthropods each functional group (manuscript)
+arthropods_fun_total <- arthropods %>%
+    group_by(fun_group)%>%
+    summarise(n.obs = n())
+
 #Functional groups across sites
 arthropods_fun <- arthropods %>%
     group_by(fun_group, site_code,month)%>%
@@ -237,11 +250,12 @@ unique(arthropods_fun$fun_group)
 Functional Group Richness Analysis
 ```{r}
 arthropods_wide <- arthropods_fun %>%
-  mutate(site_month = paste(site_code, month, sep = "_"))%>%
-    pivot_wider(
+  mutate(site_month = paste(site_code, month, sep = "_")) %>%
+  pivot_wider(
+    id_cols = fun_group,
     names_from = site_month,
     values_from = n.obs,
-    values_fill = 0  # fill missing combinations with 0
+    values_fill = 0
   )
 ```
 
@@ -269,7 +283,7 @@ sites_final <- arthropods %>%
   left_join(cucumbers_delta, by = "site_code")
 ```
 
-Saving Data frames to Use in Analyses
+#Saving Data frames
 ```{r}
 #Floral iNaturalist Data Wide format
 write.csv(inat_wide, "/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/data/inat_wide.csv", row.names = FALSE)
