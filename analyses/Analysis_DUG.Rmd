@@ -45,17 +45,31 @@ Asia_Theme <- theme(
 
 # Community Composition
 ## Floral NMDS
-```{r}
-set.seed(0)
+```{r, echo=FALSE}
+set.seed(10)
 florNMDS_input <- inat_wide[,-1]
-flor.mds <- metaMDS(florNMDS_input, trymax = 50)
+florNMDS_input <- florNMDS_input[rowSums(florNMDS_input > 0) >= 3, ]
+
+flor.mds <- metaMDS(florNMDS_input,k = 3, trymax = 175)
+flor.mds
 ```
 
 ## Arthropod Functional Groups
-```{r}
+```{r, echo=FALSE}
+set.seed(10)
 arthropodsNMDS_input <- arthropods_wide[,-1]
-arthropods.mds <- metaMDS(arthropodsNMDS_input, trymax = 50)
+arthropods.mds <- metaMDS(arthropodsNMDS_input, trymax = 175)
+arthropods.mds
+
+#make nmds into datafram for plotting
+arthropods.scores <- as.data.frame(scores(arthropods.mds))
+arthropods.scores$site <- rownames(data.scores) 
 ```
+
+```{r}
+
+```
+
 
 ## Bee Species NMDS
 ```{r}

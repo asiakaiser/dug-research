@@ -153,7 +153,7 @@ iNaturalist data summarized at the genus level for NMDS
 # Prepare iNaturalist data at the genus level
 inat_wide <- inat_data %>%
   count(site_code,taxon_genus_name) %>%
-  pivot_wider(names_from = site_code, values_from = n, values_fill = 0)
+  pivot_wider(names_from = taxon_genus_name, values_from = n, values_fill = 0)
 ```
 
 
