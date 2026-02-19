@@ -10,6 +10,8 @@ library("tidyverse")
 library("lme4")
 library("lmerTest")
 library("vegan")
+library("corrplot")
+library("Hmisc")
 ```
 
 # Read in the Data
@@ -20,7 +22,7 @@ rm(list = ls())
 setwd("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research")
 
 #all site data
-sites_all <- read.csv("data/sites_all.csv")
+sites <- read.csv("data/sites_all.csv")
 
 #matrix data for community analyses
 inat_wide <- read.csv("data/inat_wide.csv")
@@ -43,33 +45,110 @@ Asia_Theme <- theme(
   legend.text = element_text(size= 20))
 ```
 
+# Habitat Quality and Environmental Variables
+
+Select variables of interest
+```{r}
+#Aggregated values across months
+site_cov <- sites %>%
+    filter(month == "June")%>%
+    select(Site, site_code, Area_m2, Plots, WealthIndex, tcc200m, imp200m, tcc500m,imp500m,CWD_m2,wood_m2,FWD_m2,logs,bareground_m2,floral_area_m2,dev_high500m, dev_low500m,wetland500m, water500m,	dev_high1000m, dev_low1000m, water1000m, wetland1000m, shrub_grass1000m)
+```
+
+## Landscape Level Variables
+
+Landscape Correlations
+```{r}
+site.landscape.input <- site_cov %>% select(-c(Site,site_code)) %>%
+    select(WealthIndex, tcc200m, imp200m, tcc500m,imp500m,water1000m, wetland1000m, shrub_grass1000m)
+```
+
+Landscape Correlation Plot
+```{r}
+#Test for significant correlations
+landscape.rcorr = rcorr(as.matrix(site.landscape.input))
+landscape.pvals <- landscape.rcorr$P
+
+
+
+landscape.cor.plot <- corrplot(landscape.rcorr$r)
+```
+
+# Arthropod Data Full Summer
+```{r}
+site_cov <- sites %>%
+    filter(month == "June")%>%
+    select(c("site_code","tcc200m","imp200m","tcc500m","imp500m","WealthIndex","floral_area_m2","flor.rich"))
+```
+
 # Community Composition
 ## Floral NMDS
 ```{r, echo=FALSE}
 set.seed(10)
 florNMDS_input <- inat_wide[,-1]
-florNMDS_input <- florNMDS_input[rowSums(florNMDS_input > 0) >= 3, ]
+florNMDS_input <- florNMDS_input[, colSums(florNMDS_input > 0) >= 5]
 
-flor.mds <- metaMDS(florNMDS_input,k = 3, trymax = 175)
+flor.mds <- metaMDS(florNMDS_input, k = 2, trymax = 20)
 flor.mds
+
+#Make nmds into dataframe for plotting
+flor.mds.scores <- as.data.frame(scores(flor.mds, display = "sites"))
+flor.mds.scores <- cbind(flor.mds.scores, site_cov)
+```
+
+Floral Community NMDS Plot
+```{r}
+flor.mds.plot <- 
+    ggplot(flor.mds.scores, aes(x = NMDS1, y = NMDS2)) +
+  geom_point(aes(color = WealthIndex), size = 3) +
+  theme_minimal() +
+  labs(
+    title = "NMDS Ordination of Floral Genera",
+    x = "NMDS1",
+    y = "NMDS2",
+    color = "[Env Covariate]"
+  ) +
+  coord_fixed()
+flor.mds.plot
 ```
 
 ## Arthropod Functional Groups
 ```{r, echo=FALSE}
-set.seed(10)
+set.seed(100)
 arthropodsNMDS_input <- arthropods_wide[,-1]
-arthropods.mds <- metaMDS(arthropodsNMDS_input, trymax = 175)
+arthropodsNMDS_input <- arthropodsNMDS_input[, colSums(arthropodsNMDS_input > 0) >= 30] # remove uncommon taxa to reduce stress
+arthropodsNMDS_input <- arthropodsNMDS_input %>% select(-Unknown)
+
+arthropods.mds <- metaMDS(arthropodsNMDS_input, trymax = 50)
 arthropods.mds
 
-#make nmds into datafram for plotting
-arthropods.scores <- as.data.frame(scores(arthropods.mds))
-arthropods.scores$site <- rownames(data.scores) 
+#make nmds into dataframe for plotting
+arthropods.mds.scores <- as.data.frame(scores(arthropods.mds, display = "sites"))
+arthropods_columns <- arthropods_wide %>%
+    separate(site_month, into = c("site", "month"), sep = "_")%>%
+    select(site,month)%>%
+    mutate(site_code = site)
+
+arthropods.mds.scores$site_code <- arthropods_columns$site_code
+arthropods.mds.scores$month <- arthropods_columns$month
+arthropods.mds.scores <-left_join(arthropods.mds.scores, site_cov, by = "site_code")
 ```
 
+Arthropod Functional Groups NMDS Plot
 ```{r}
-
+arthropods.mds.plot <- 
+    ggplot(arthropods.mds.scores, aes(x = NMDS1, y = NMDS2)) +
+  geom_point(aes(color = imp200m), size = 3) +
+  theme_minimal() +
+  labs(
+    title = "NMDS Ordination of Arthropod Functional Groups",
+    x = "NMDS1",
+    y = "NMDS2",
+    color = "[Env Covariate]"
+  ) +
+  coord_fixed()
+arthropods.mds.plot
 ```
-
 
 ## Bee Species NMDS
 ```{r}

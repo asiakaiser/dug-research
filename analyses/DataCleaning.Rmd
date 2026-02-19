@@ -45,7 +45,7 @@ Select subset of site variables
 ```{r}
 #Select which site level variables you want to keep in dataframe
 sites <- sites_raw %>%
-    dplyr::select(Site, site_code, Area_m2, Plots, WealthIndex, tcc200m, imp200m, tcc500m,imp500m,CWD_m2,wood_m2,FWD_m2,logs,bareground_m2,floral_area_m2,dev_high500m, dev_low500m,	wetland500m, water500m,	dev_high1000m, dev_low1000m, water1000m, wetland1000m, shrub_grass1000m)
+    dplyr::select(Site, site_code, Area_m2, Plots, WealthIndex, tcc200m, imp200m, tcc500m,imp500m,CWD_m2,wood_m2,FWD_m2,logs,bareground_m2,floral_area_m2,dev_high500m, dev_low500m,wetland500m, water500m,	dev_high1000m, dev_low1000m, water1000m, wetland1000m, shrub_grass1000m)
 str(sites)
 ```
 
@@ -268,7 +268,8 @@ sites_final <- arthropods %>%
       fun_group == "Pollinator" ~ "pol",
       fun_group %in% c("Predator", "Predator/Scavenger", "Parasitoid") ~ "pred",
       fun_group == "Herbivore" ~ "herb",
-      fun_group == "Detritivore" ~ "det"
+      fun_group == "Detritivore" ~ "det",
+      fun_group == "Omnivore" ~ "omn"
     )
   ) %>%
   group_by(site_code, month, fun_group) %>%
@@ -280,7 +281,8 @@ sites_final <- arthropods %>%
     values_fill = 0
   ) %>%
   left_join(sites, by = "site_code") %>%
-  left_join(cucumbers_delta, by = "site_code")
+  left_join(cucumbers_delta, by = "site_code")%>%
+    left_join(arthropods_n, by = c("site_code","month"))
 ```
 
 #Saving Data frames
