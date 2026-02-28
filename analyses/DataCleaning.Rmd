@@ -73,17 +73,17 @@ sf_data <- st_as_sf(inat_raw, coords = c("longitude", "latitude"), crs = 4326)
 #Convert cities.test to sf points
 gardens.sf <- st_as_sf(sites_raw, coords = c("Long", "Lat"), crs = 4326)
 
-#Create 45 km buffers around all cities
+#Create 45 km buffers around all gardens
 buffer_distance <- set_units(500, "m")  # 45 km in meters
 gardens.buffer <- st_buffer(gardens.sf, dist = buffer_distance)
 ```
 
-Assign all observations to a city
+Assign all observations to a garden site
 ```{r}
-# Perform spatial join: assign City to points within buffer
+# Perform spatial join: assign gardens to points within buffer
 sf_data <- st_join(sf_data, gardens.buffer["site_code"], join = st_within)
 
-# Fill points outside any city buffer
+# Fill points outside any garden buffer
 sf_data$site_code <- sf_data$site_code # Copy joined column
 
 #Adding site codes for all chive (allium) observations manually since it was geo-obscured by iNat

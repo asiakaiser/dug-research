@@ -1,0 +1,104 @@
+---
+title: "Data Extraction - GBIF"
+output: html_document
+date: "2026-02-28"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Load Packages
+```{r}
+library("tidyverse")
+library("sf")
+library("units")
+library("vegan")
+library("iNEXT")
+```
+
+# Load Data
+```{r}
+#Clear environment
+rm(list = ls())
+
+#Load in GBIF and site datasets
+setwd("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research")
+
+gbif_raw <- read_tsv("data/0003154-260226173443078.csv") 
+sites_raw <- read.csv("data/DUG_data - fall_data.csv", na.strings = c("", " "))
+```
+
+Select variables of interest in GBIF dataset
+```{r}
+gbif <- gbif_raw %>%
+    dplyr::select(decimalLatitude,decimalLongitude,coordinateUncertaintyInMeters,year,recordedBy,
+                  order,family,genus,species)%>%
+    filter(year >= 2020)
+```
+
+Assign iNaturalist floral observations in surrounding neighborhood to sites
+```{r}
+#Convert iNaturalist data to an sf object
+#Create buffer distances
+
+#Convert gbif to sf points
+sf_data <- st_as_sf(gbif, coords = c("decimalLongitude", "decimalLatitude"), crs = 4326)
+
+#Convert cities.test to sf points
+gardens.sf <- st_as_sf(sites_raw, coords = c("Long", "Lat"), crs = 4326)
+
+#Create 45 km buffers around all cities
+buffer_distance <- set_units(1000, "m")  # 45 km in meters
+gardens.buffer <- st_buffer(gardens.sf, dist = buffer_distance)
+```
+
+Assign all observations to a garden site
+```{r}
+# Perform spatial join: assign gardens to points within buffer
+sf_data <- st_join(sf_data, gardens.buffer["site_code"], join = st_within)
+
+# Fill points outside any garden buffer
+sf_data$site_code <- sf_data$site_code # Copy joined column
+
+
+# Convert back to data frame if needed
+gbif_data <- as.data.frame(sf_data)
+
+# Check unique city assignments
+unique(gbif_data$site_code)
+
+gbif_data <- gbif_data %>% filter(!is.na(site_code))
+```
+
+# Extract biodiversity metrics
+```{r}
+# Prepare GBIF data and convert to wide format
+gbif_wide <- gbif_data %>%
+  count(site_code,species) %>%
+  pivot_wider(names_from = site_code, values_from = n, values_fill = 0)
+
+# Prepare iNEXT input data
+gbif.iNEXTinput <- as.data.frame(gbif_wide[,-1])
+
+# Run iNEXT to find richness data
+gbif.iNEXT <- iNEXT(gbif.iNEXTinput, q = 0, datatype = "abundance")
+
+# Extract richness and diversity data
+gbif_richness <-  gbif.iNEXT$AsyEst[gbif.iNEXT$AsyEst$Diversity == "Species richness",]
+gbif_shannon <-  gbif.iNEXT$AsyEst[gbif.iNEXT$AsyEst$Diversity == "Shannon diversity",]
+gbif_simpson <-  gbif.iNEXT$AsyEst[gbif.iNEXT$AsyEst$Diversity == "Simpson diversity",]
+
+# Match site_code to Assemblage
+sites_raw$gbif.rich   <- gbif_richness$Estimator[match(sites_raw$site_code, gbif_richness$Assemblage)]
+sites_raw$gbif.shannon <- gbif_shannon$Estimator[match(sites_raw$site_code, gbif_shannon$Assemblage)]
+sites_raw$gbif.simpson <- gbif_simpson$Estimator[match(sites_raw$site_code, gbif_simpson$Assemblage)]
+```
+
+#Save dataframe
+```{r}
+#Site level data with landscape level rarefied GBIF floral data added 
+write.csv(sites_raw,"/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/data/DUG_data - fall_data.csv", row.names = FALSE)
+
+```
+
