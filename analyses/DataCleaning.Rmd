@@ -73,8 +73,8 @@ sf_data <- st_as_sf(inat_raw, coords = c("longitude", "latitude"), crs = 4326)
 #Convert cities.test to sf points
 gardens.sf <- st_as_sf(sites_raw, coords = c("Long", "Lat"), crs = 4326)
 
-#Create 45 km buffers around all gardens
-buffer_distance <- set_units(500, "m")  # 45 km in meters
+#Buffer to catch all observations associated with our project at each garden site
+buffer_distance <- set_units(500, "m")  # 500 m in meters
 gardens.buffer <- st_buffer(gardens.sf, dist = buffer_distance)
 ```
 
@@ -167,6 +167,7 @@ bees <- arthropods %>%
     group_by(spec_ID, site_code, month)%>%
     summarise(spec.obs = n())
 ```
+
 
 Bee Diversity Analysis
 ```{r}

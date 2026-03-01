@@ -49,7 +49,7 @@ sf_data <- st_as_sf(gbif, coords = c("decimalLongitude", "decimalLatitude"), crs
 gardens.sf <- st_as_sf(sites_raw, coords = c("Long", "Lat"), crs = 4326)
 
 #Create 45 km buffers around all cities
-buffer_distance <- set_units(1000, "m")  # 45 km in meters
+buffer_distance <- set_units(1000, "m")  # 1 km in meters
 gardens.buffer <- st_buffer(gardens.sf, dist = buffer_distance)
 ```
 
@@ -95,10 +95,22 @@ sites_raw$gbif.shannon <- gbif_shannon$Estimator[match(sites_raw$site_code, gbif
 sites_raw$gbif.simpson <- gbif_simpson$Estimator[match(sites_raw$site_code, gbif_simpson$Assemblage)]
 ```
 
+Family Level Data for NMDS 
+```{r}
+# Prepare GBIF genus level data and convert to wide format
+gbif_fam_wide <- gbif_data %>%
+  count(site_code,family) %>%
+  pivot_wider(names_from = family, values_from = n, values_fill = 0)
+```
+
 #Save dataframe
 ```{r}
 #Site level data with landscape level rarefied GBIF floral data added 
 write.csv(sites_raw,"/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/data/DUG_data - fall_data.csv", row.names = FALSE)
+
+#Landscape Level iNat data from GBIF wide format
+write.csv(gbif_fam_wide,"/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/data/gbif_fam,_wide.csv", row.names = FALSE)
+
 
 ```
 
