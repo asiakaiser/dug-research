@@ -1,0 +1,368 @@
+---
+title: "Analyses - Community Composition"
+output: html_document
+date: "2026-01-20"
+---
+
+# Load Packages
+```{r, message=FALSE}
+library("tidyverse")
+library("lme4")
+library("lmerTest")
+library("vegan")
+library("corrplot")
+library("Hmisc")
+library("viridis")
+library("ggpubr")
+```
+
+# Read in the Data
+```{r, warning=FALSE}
+#Clear environment
+rm(list = ls())
+
+setwd("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research")
+
+#all site data
+sites <- read.csv("data/sites_all.csv")
+
+#matrix data for community analyses
+inat_wide <- read.csv("data/inat_wide.csv")
+arthropods_wide <- read.csv("data/arthropods_wide.csv")
+gbif_wide <- read.csv("data/gbif_fam_wide.csv")
+bees <- read.csv("data/bees.csv")
+bees_agg <- read.csv("data/bees_agg.csv")
+```
+
+# Explore the Data
+```{r}
+
+```
+
+GGplot Theme
+```{r}
+Asia_Theme <- theme(
+  plot.title = element_text(size = 16),
+  plot.caption = element_text(size = 16),
+  axis.title = element_text(size = 20),
+  axis.text = element_text(size = 16),
+  axis.text.x = element_text(size = 20),
+  legend.text = element_text(size= 11))
+```
+
+
+
+# Community Composition
+
+Site covariates of interest for NMDS plots & mantel test
+```{r}
+site_cov <- sites %>%
+    filter(month == "June")%>%
+    select(c("site_code","tcc200m","imp200m","tcc500m","imp500m","WealthIndex","floral_area_m2","flor.rich"))
+```
+
+## Garden Floral NMDS
+```{r, echo=FALSE}
+set.seed(10)
+florNMDS_input <- inat_wide[,-1]
+florNMDS_input <- florNMDS_input[, colSums(florNMDS_input > 0) >= 10]
+
+flor.mds <- metaMDS(florNMDS_input, k = 2, trymax = 20)
+flor.mds
+
+#Make nmds into dataframe for plotting
+flor.mds.scores <- as.data.frame(scores(flor.mds, display = "sites"))
+flor.mds.scores <- cbind(flor.mds.scores, site_cov)
+```
+
+Garden Floral Community NMDS Plot
+```{r}
+flor.mds.scores$WealthStrata <- cut(
+  flor.mds.scores$WealthIndex,
+  breaks = c(-Inf, 100, 150, Inf),
+  labels = c("Low wealth (< 100)", "Moderate wealth (100 - 150)", "High wealth (>150)"),
+  include.lowest = TRUE)
+
+
+flor.mds.plot <- 
+  ggplot(flor.mds.scores, aes(NMDS1, NMDS2)) +
+  geom_polygon(data = flor.mds.scores %>%
+    group_by(WealthStrata) %>%
+    slice(chull(NMDS1, NMDS2)),aes(fill = WealthStrata, group = WealthStrata), alpha = 0.22, color = NA, show.legend = FALSE) +
+  geom_point(aes(fill = WealthStrata, shape = WealthStrata),
+    color = "black",
+    size = 3,
+    stroke = 0.6) +
+  scale_fill_viridis_d(
+    option = "viridis",
+    limits = c("Low wealth (< 100)","Moderate wealth (100 - 150)","High wealth (>150)"),
+    begin = 0,
+    end = 1,
+    name = "Wealth Index") +
+    scale_shape_manual(
+    values = c(21, 22, 24),   # all filled shapes
+    limits = c(
+      "Low wealth (< 100)","Moderate wealth (100 - 150)","High wealth (>150)"),
+    name = "Wealth Index") +
+  theme_minimal() +
+  labs(title = "Local",
+    x = "NMDS1",
+    y = "NMDS2") +
+    Asia_Theme+
+    theme(legend.position = "none")+
+    coord_fixed(xlim = c(-0.8, 0.8), ylim = c(-0.7, 0.7), ratio = 1)
+flor.mds.plot
+```
+
+## Landscape NMDS Floral Families
+```{r, echo=FALSE}
+set.seed(10)
+landNMDS_input <- gbif_wide[,-1]
+landNMDS_input <- landNMDS_input[, colSums(landNMDS_input > 0) >= 7]
+
+land.mds <- metaMDS(landNMDS_input, k = 2, trymax = 20)
+land.mds
+
+#Make nmds into dataframe for plotting
+land.mds.scores <- as.data.frame(scores(land.mds, display = "sites"))
+land.mds.scores <- cbind(land.mds.scores, site_cov)
+```
+
+Landscape Level Floral Community NMDS Plot
+```{r}
+land.mds.scores$WealthStrata <- cut(
+  land.mds.scores$WealthIndex,
+  breaks = c(-Inf, 100, 150, Inf),
+  labels = c("Low wealth (< 100)", "Moderate wealth (100 - 150)", "High wealth (>150)"),
+  include.lowest = TRUE)
+
+
+land.mds.plot <- 
+  ggplot(land.mds.scores, aes(NMDS1, NMDS2)) +
+  geom_polygon(data = land.mds.scores %>%
+    group_by(WealthStrata) %>%
+    slice(chull(NMDS1, NMDS2)),aes(fill = WealthStrata, group = WealthStrata), alpha = 0.22, color = NA,show.legend = FALSE) +
+  geom_point(aes(fill = WealthStrata, shape = WealthStrata),
+    color = "black",
+    size = 3,
+    stroke = 0.6) +
+  scale_fill_viridis_d(
+    option = "viridis",
+    limits = c("Low wealth (< 100)","Moderate wealth (100 - 150)","High wealth (>150)"),
+    begin = 0,
+    end = 1,
+    name = "Wealth Index") +
+    scale_shape_manual(
+    values = c(21, 22, 24),   # all filled shapes
+    limits = c(
+      "Low wealth (< 100)","Moderate wealth (100 - 150)","High wealth (>150)"),
+    name = "Wealth Index") +
+  theme_minimal() +
+  labs(title = "Landscape",
+    x = "NMDS1",
+    y = "NMDS2") +
+    Asia_Theme+
+    theme(legend.position = "none")
+    coord_fixed()
+land.mds.plot
+```
+
+## Arthropod Functional Groups NMDS
+```{r, echo=FALSE}
+set.seed(100)
+arthropodsNMDS_input <- arthropods_wide[,-1]
+arthropodsNMDS_input <- arthropodsNMDS_input[, colSums(arthropodsNMDS_input > 0) >= 30] # remove uncommon taxa to reduce stress
+arthropodsNMDS_input <- arthropodsNMDS_input %>% select(-Unknown)
+
+arthropods.mds <- metaMDS(arthropodsNMDS_input, trymax = 50)
+arthropods.mds
+
+#make nmds into dataframe for plotting
+arthropods.mds.scores <- as.data.frame(scores(arthropods.mds, display = "sites"))
+arthropods_columns <- arthropods_wide %>%
+    separate(site_month, into = c("site", "month"), sep = "_")%>%
+    select(site,month)%>%
+    mutate(site_code = site)
+
+arthropods.mds.scores$site_code <- arthropods_columns$site_code
+arthropods.mds.scores$month <- arthropods_columns$month
+arthropods.mds.scores <-left_join(arthropods.mds.scores, site_cov, by = "site_code")
+```
+
+Arthropod Functional Groups NMDS Plot by Month
+```{r}
+arthropods.mds.plot <- 
+  ggplot(arthropods.mds.scores, aes(NMDS1, NMDS2)) +
+  geom_polygon(data = arthropods.mds.scores %>%
+    group_by(month) %>%
+    slice(chull(NMDS1, NMDS2)),aes(fill = month, group = month), alpha = 0.22, color = NA,show.legend = FALSE) +
+  geom_point(aes(fill = month, shape = month),
+    color = "black",
+    size = 3,
+    stroke = 0.6) +
+  scale_fill_viridis_d(
+    option = "magma",
+    limits = c("June","July","August"),
+    begin = 0.1,
+    end = .9,
+    name = "Month") +
+    scale_shape_manual(
+    values = c(21, 22, 24),   # all filled shapes
+    limits = c("June","July","August"),
+    name = "Month") +
+  theme_minimal() +
+  labs(title = "NMDS Ordination of Arthropod Functional Groups",
+    x = "NMDS1",
+    y = "NMDS2") +
+    coord_fixed()
+arthropods.mds.plot
+```
+
+## Bee Species NMDS
+```{r}
+set.seed(10)
+bees_wide <- bees %>%
+  mutate(site_month = paste(site_code, month, sep = "_"))%>%
+    pivot_wider(
+    id_cols = site_month,
+    names_from = spec_ID,
+    values_from = spec.obs,
+    values_fill = 0)
+
+beesNMDS_input <- bees_wide[,-1]
+
+bees.mds <- metaMDS(beesNMDS_input, k = 2, trymax = 20)
+
+bees.mds
+
+bees.mds.scores <- as.data.frame(scores(bees.mds, display = "sites"))
+bees_columns <- bees_wide %>%
+    separate(site_month, into = c("site", "month"), sep = "_")%>%
+    select(site,month)%>%
+    mutate(site_code = site)
+
+#Make nmds into dataframe for plotting
+bees.mds.scores$site_code <- bees_columns$site_code
+bees.mds.scores$month <- bees_columns$month
+bees.mds.scores <-left_join(bees.mds.scores, site_cov, by = "site_code")
+```
+Bees NMDS Plot by Month
+```{r}
+bees.mds.plot <- 
+  ggplot(bees.mds.scores, aes(NMDS1, NMDS2)) +
+  geom_polygon(data = bees.mds.scores %>%
+    group_by(month) %>%
+    slice(chull(NMDS1, NMDS2)),aes(fill = month, group = month), alpha = 0.22, color = NA,show.legend = FALSE) +
+  geom_point(aes(fill = month, shape = month),
+    color = "black",
+    size = 3,
+    stroke = 0.6) +
+  scale_fill_viridis_d(
+    option = "magma",
+    limits = c("June","July","August"),
+    begin = 0.1,
+    end = .9,
+    name = "Month") +
+    scale_shape_manual(
+    values = c(21, 22, 24),   # all filled shapes
+    limits = c("June","July","August"),
+    name = "Month") +
+  theme_minimal() +
+  labs(title = "NMDS Ordination of Bee Species",
+    x = "NMDS1",
+    y = "NMDS2") +
+    coord_fixed()
+bees.mds.plot
+```
+
+Bee NMDS for Aggregated Summer Data
+```{r}
+set.seed(10)
+bees_agg_wide <- bees_agg %>%
+    pivot_wider(
+    id_cols = site_code,
+    names_from = spec_ID,
+    values_from = spec.obs,
+    values_fill = 0)
+
+bees.agg.NMDS_input <- bees_agg_wide[,-1]
+bees.agg.NMDS_input <- bees.agg.NMDS_input[, colSums(bees.agg.NMDS_input > 0) >= 2]
+
+bees.agg.mds <- metaMDS(bees.agg.NMDS_input, k = 2, trymax = 30)
+bees.agg.mds
+
+bees.agg.mds.scores <- as.data.frame(scores(bees.agg.mds, display = "sites"))
+
+#Make nmds into dataframe for plotting
+bees.agg.mds.scores$site_code <- bees_agg_wide$site_code
+bees.agg.mds.scores <-left_join(bees.agg.mds.scores, site_cov, by = "site_code")
+```
+
+Bee NMDS Plot for Full Summer Data
+```{r}
+bees.agg.mds.scores$WealthStrata <- cut(
+  bees.agg.mds.scores$WealthIndex,
+  breaks = c(-Inf, 100, 150, Inf),
+  labels = c("Low wealth (< 100)", "Moderate wealth (100 - 150)", "High wealth (>150)"),
+  include.lowest = TRUE)
+
+
+bees.agg.mds.plot <- 
+  ggplot(bees.agg.mds.scores, aes(NMDS1, NMDS2)) +
+  geom_polygon(data = bees.agg.mds.scores %>%
+    group_by(WealthStrata) %>%
+    slice(chull(NMDS1, NMDS2)),aes(fill = WealthStrata, group = WealthStrata), alpha = 0.22, color = NA, show.legend = FALSE) +
+  geom_point(aes(fill = WealthStrata, shape = WealthStrata),
+    color = "black",
+    size = 3,
+    stroke = 0.6) +
+  scale_fill_viridis_d(
+    option = "viridis",
+    limits = c("Low wealth (< 100)","Moderate wealth (100 - 150)","High wealth (>150)"),
+    begin = 0,
+    end = 1,
+    name = "Wealth Index") +
+    scale_shape_manual(
+    values = c(21, 22, 24),   # all filled shapes
+    limits = c(
+      "Low wealth (< 100)","Moderate wealth (100 - 150)","High wealth (>150)"),
+    name = "Wealth Index") +
+  theme_minimal() +
+  labs(title = "Local",
+    x = "NMDS1",
+    y = "NMDS2") +
+    Asia_Theme+
+    coord_fixed()
+bees.agg.mds.plot
+```
+
+# Mantel Tests
+To test for significant correlations between continuous variables and site matrices (community data)
+
+Garden-Level Floral Community
+```{r}
+
+```
+
+Landscape Level Floral Community
+```{r}
+
+```
+
+Arthropod Functional Group Community
+```{r}
+
+```
+
+Bee Species Community
+```{r}
+
+```
+
+# Save Figures
+```{r}
+Floral.nmds.plots <- ggarrange(flor.mds.plot,land.mds.plot,
+                    labels = c("A","B"), nrow = 1, ncol = 2)
+ggsave("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/figures/FloralNMDSFig.png", plot = Floral.nmds.plots, height = 7, width = 13)
+```
+
