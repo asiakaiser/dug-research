@@ -140,7 +140,7 @@ Charles Hay,CHA-V-57,CHA,vane,57,sweatbee,Insecta,Hymenoptera,Halictidae,Agapost
 Charles Hay,CHA-V-58,CHA,vane,58,sweatbee,Insecta,Hymenoptera,Halictidae,Agapostemon,virescens,Pollinator,June,17-06-2025,20-06-2025,39.65845813,-104.9720575,1635,Arapahoe
 Charles Hay,CHA-V-59,CHA,vane,59,bee,Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.65845813,-104.9720575,1635,Arapahoe
 Charles Hay,CHA-V-60,CHA,vane,60,bee,Insecta,Hymenoptera,Halictidae,Halictus,rubicundus,Pollinator,June,17-06-2025,20-06-2025,39.65845813,-104.9720575,1635,Arapahoe
-Charles Hay,CHA-V-61,CHA,vane,61,bee,Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.65845813,-104.9720575,1635,Arapahoe
+Charles Hay,CHA-V-61,CHA,vane,61,bee,Insecta,Hymenoptera,Apidae,Melissodes,niveus,Pollinator,June,17-06-2025,20-06-2025,39.65845813,-104.9720575,1635,Arapahoe
 Charles Hay,CHA-V-62,CHA,vane,62,fly,Insecta,Diptera,Muscidae,Musca,domestica,Detritivore,June,17-06-2025,20-06-2025,39.65845813,-104.9720575,1635,Arapahoe
 Charles Hay,CHA-V-63,CHA,vane,63,unk hemi,Insecta,Hemiptera,,,,,June,17-06-2025,20-06-2025,39.65845813,-104.9720575,1635,Arapahoe
 Charles Hay,CHA-V-55,CHA,vane,55,Springtails,Entognatha,Collembola,,,,Detritivore,June,17-06-2025,20-06-2025,39.65845813,-104.9720575,1635,Arapahoe
@@ -334,21 +334,21 @@ Edison School Community Garden,EDI-V-4,EDI,vane,4,thrips,Insecta,Thysanoptera,,,
 Edison School Community Garden,EDI-V-5,EDI,vane,5,thrips,Insecta,Thysanoptera,,,,Herbivore,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
 Edison School Community Garden,EDI-V-6,EDI,vane,6,thrips,Insecta,Thysanoptera,,,,Herbivore,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
 Edison School Community Garden,EDI-V-7,EDI,vane,7,paperwasp,Insecta,Hymenoptera,Vespidae,Polistes,dominula,Predator,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
-Edison School Community Garden,EDI-V-8,EDI,vane,8,bee,Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
+Edison School Community Garden,EDI-V-8,EDI,vane,8,bee,Insecta,Hymenoptera,Apidae,Diadasia,australis,Pollinator,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
 Edison School Community Garden,EDI-V-9,EDI,vane,9,bumblebee,Insecta,Hymenoptera,Apidae,Bombus,fervidus,Pollinator,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
 Edison School Community Garden,EDI-V-10,EDI,vane,10,bee,Insecta,Hymenoptera,Apidae,Melissodes,bimaculatus,Pollinator,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
-Edison School Community Garden,EDI-V-11,EDI,vane,11,longhorn bee,Insecta,Hymenoptera,Apidae,Melissodes,,Pollinator,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
+Edison School Community Garden,EDI-V-11,EDI,vane,11,longhorn bee,Insecta,Hymenoptera,Apidae,Melissodes,agilis,Pollinator,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
 Edison School Community Garden,EDI-V-12,EDI,vane,12,bee,Insecta,Hymenoptera,Halictidae,Halictus,rubicundus,Pollinator,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
-Edison School Community Garden,EDI-V-13,EDI,vane,13,longhorn bee,Insecta,Hymenoptera,Apidae,,,Pollinator,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
-Edison School Community Garden,EDI-V-14,EDI,vane,14,longhorn bee,Insecta,Hymenoptera,Apidae,,,Pollinator,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
+Edison School Community Garden,EDI-V-13,EDI,vane,13,longhorn bee,Insecta,Hymenoptera,Apidae,Melissodes,agilis,Pollinator,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
+Edison School Community Garden,EDI-V-14,EDI,vane,14,longhorn bee,Insecta,Hymenoptera,Apidae,Melissodes,agilis,Pollinator,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
 Edison School Community Garden,EDI-V-15,EDI,vane,15,bee,Insecta,Hymenoptera,Halictidae,Halictus,rubicundus,Pollinator,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
-Edison School Community Garden,EDI-V-16,EDI,vane,16,longhorn bee,Insecta,Hymenoptera,Apidae,,,Pollinator,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
-Edison School Community Garden,EDI-V-17,EDI,vane,17,bee,Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
-Edison School Community Garden,EDI-V-18,EDI,vane,18,bee,Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
-Edison School Community Garden,EDI-V-19,EDI,vane,19,bee,Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
-Edison School Community Garden,EDI-V-20,EDI,vane,20,longhorn bee,Insecta,Hymenoptera,Apidae,,,Pollinator,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
+Edison School Community Garden,EDI-V-16,EDI,vane,16,longhorn bee,Insecta,Hymenoptera,Apidae,Melissodes,agilis,Pollinator,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
+Edison School Community Garden,EDI-V-17,EDI,vane,17,bee,Insecta,Hymenoptera,Halictidae,Lasioglossum Evylaeus,,Pollinator,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
+Edison School Community Garden,EDI-V-18,EDI,vane,18,bee,Insecta,Hymenoptera,Halictidae,Lasioglossum Evylaeus,,Pollinator,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
+Edison School Community Garden,EDI-V-19,EDI,vane,19,bee,Insecta,Hymenoptera,Halictidae,Lasioglossum Evylaeus,,Pollinator,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
+Edison School Community Garden,EDI-V-20,EDI,vane,20,longhorn bee,Insecta,Hymenoptera,Apidae,Melissodes,agilis,Pollinator,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
 Edison School Community Garden,EDI-V-21,EDI,vane,21,bee,Insecta,Hymenoptera,Halictidae,Halictus,rubicundus,Pollinator,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
-Edison School Community Garden,EDI-V-22,EDI,vane,22,longhorn bee,Insecta,Hymenoptera,Apidae,,,Pollinator,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
+Edison School Community Garden,EDI-V-22,EDI,vane,22,longhorn bee,Insecta,Hymenoptera,Apidae,Melissodes,agilis,Pollinator,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
 Edison School Community Garden,EDI-V-23,EDI,vane,23,green lacewing,Insecta,Neuroptera,Chrysopidae,,,Predator,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
 Edison School Community Garden,EDI-V-24,EDI,vane,24,weevil,Insecta,Coleoptera,Curculionidae,,,Herbivore,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
 Edison School Community Garden,EDI-V-25,EDI,vane,25,weevil,Insecta,Coleoptera,Curculionidae,,,Herbivore,June,17-06-2025,20-06-2025,39.76548756,-105.0395583,1659,Denver
@@ -402,7 +402,7 @@ Eiber School Community Garden,EIB-V-10,EIB,vane,10,Beetle,Insecta,Coleoptera,,,,
 Eiber School Community Garden,EIB-V-11,EIB,vane,11,bumblebee,Insecta,Hymenoptera,Apidae,Bombus,fervidus,Pollinator,June,17-06-2025,20-06-2025,39.7370155,-105.1062374,1691,Jefferson
 Eiber School Community Garden,EIB-V-12,EIB,vane,12,sweatbee,Insecta,Hymenoptera,Halictidae,Agapostemon,femoratus,Pollinator,June,17-06-2025,20-06-2025,39.7370155,-105.1062374,1691,Jefferson
 Eiber School Community Garden,EIB-V-13,EIB,vane,13,sweatbee,Insecta,Hymenoptera,Halictidae,Halictus,rubicundus,Pollinator,June,17-06-2025,20-06-2025,39.7370155,-105.1062374,1691,Jefferson
-Eiber School Community Garden,EIB-V-14,EIB,vane,14,sweatbee,Insecta,Hymenoptera,Halictidae,,,Pollinator,June,17-06-2025,20-06-2025,39.7370155,-105.1062374,1691,Jefferson
+Eiber School Community Garden,EIB-V-14,EIB,vane,14,sweatbee,Insecta,Hymenoptera,Halictidae,Halictus,tripartitus,Pollinator,June,17-06-2025,20-06-2025,39.7370155,-105.1062374,1691,Jefferson
 Eiber School Community Garden,EIB-V-15,EIB,vane,15,sweatbee,Insecta,Hymenoptera,Halictidae,Halictus,rubicundus,Pollinator,June,17-06-2025,20-06-2025,39.7370155,-105.1062374,1691,Jefferson
 Eiber School Community Garden,EIB-V-16,EIB,vane,16,click beetle,Insecta,Coleoptera,Elateridae,,,Herbivore,June,17-06-2025,20-06-2025,39.7370155,-105.1062374,1691,Jefferson
 Eiber School Community Garden,EIB-V-17,EIB,vane,17,click beetle,Insecta,Coleoptera,Elateridae,,,Herbivore,June,17-06-2025,20-06-2025,39.7370155,-105.1062374,1691,Jefferson
@@ -465,21 +465,21 @@ Gables School and Community Garden,GABL-V-16,GABL,vane,16,Thrips,Insecta,Thysano
 Gables School and Community Garden,GABL-V-17,GABL,vane,17,Thrips,Insecta,Thysanoptera,,,,Herbivore,June,17-06-2025,20-06-2025,39.67926421,-105.0937713,1700,Jefferson
 Gables School and Community Garden,GABL-V-18,GABL,vane,18,Thrips,Insecta,Thysanoptera,,,,Herbivore,June,17-06-2025,20-06-2025,39.67926421,-105.0937713,1700,Jefferson
 Gables School and Community Garden,GABL-V-19,GABL,vane,19,Bee,Insecta,Hymenoptera,Halictidae,Halictus,rubicundus,Pollinator,June,17-06-2025,20-06-2025,39.67926421,-105.0937713,1700,Jefferson
-Gables School and Community Garden,GABL-V-20,GABL,vane,20,Bee,Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.67926421,-105.0937713,1700,Jefferson
-Gables School and Community Garden,GABL-V-21,GABL,vane,21,Bee,Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.67926421,-105.0937713,1700,Jefferson
+Gables School and Community Garden,GABL-V-20,GABL,vane,20,Bee,Insecta,Hymenoptera,Apidae,Melissodes,niveus,Pollinator,June,17-06-2025,20-06-2025,39.67926421,-105.0937713,1700,Jefferson
+Gables School and Community Garden,GABL-V-21,GABL,vane,21,Bee,Insecta,Hymenoptera,Apidae,Diadasia,enavata,Pollinator,June,17-06-2025,20-06-2025,39.67926421,-105.0937713,1700,Jefferson
 Gables School and Community Garden,GABL-V-22,GABL,vane,22,wasp,Insecta,Hymenoptera,,,,Predator,June,17-06-2025,20-06-2025,39.67926421,-105.0937713,1700,Jefferson
-Gables School and Community Garden,GABL-V-23,GABL,vane,23,Bee,Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.67926421,-105.0937713,1700,Jefferson
+Gables School and Community Garden,GABL-V-23,GABL,vane,23,Bee,Insecta,Hymenoptera,Apidae,Melissodes,niveus,Pollinator,June,17-06-2025,20-06-2025,39.67926421,-105.0937713,1700,Jefferson
 Gables School and Community Garden,GABL-V-24,GABL,vane,24,? - check box,,,,,,,June,17-06-2025,20-06-2025,39.67926421,-105.0937713,1700,Jefferson
 Gables School and Community Garden,GABL-V-25,GABL,vane,25,Bee,Insecta,Hymenoptera,Halictidae,Halictus,rubicundus,Pollinator,June,17-06-2025,20-06-2025,39.67926421,-105.0937713,1700,Jefferson
 Gables School and Community Garden,GABL-V-26,GABL,vane,26,Bee,Insecta,Hymenoptera,Halictidae,Agapostemon,angelicus/texanus,Pollinator,June,17-06-2025,20-06-2025,39.67926421,-105.0937713,1700,Jefferson
-Gables School and Community Garden,GABL-V-27,GABL,vane,27,Bee,Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.67926421,-105.0937713,1700,Jefferson
+Gables School and Community Garden,GABL-V-27,GABL,vane,27,Bee,Insecta,Hymenoptera,Megachilidae,,,Pollinator,June,17-06-2025,20-06-2025,39.67926421,-105.0937713,1700,Jefferson
 Gables School and Community Garden,GABL-V-28,GABL,vane,28,Bug,Insecta,,,,,,June,17-06-2025,20-06-2025,39.67926421,-105.0937713,1700,Jefferson
 Gables School and Community Garden,GABL-V-29,GABL,vane,29,Bug,Insecta,,,,,,June,17-06-2025,20-06-2025,39.67926421,-105.0937713,1700,Jefferson
 Gables School and Community Garden,GABL-V-30,GABL,vane,30,Bee,Insecta,Hymenoptera,Halictidae,Halictus,rubicundus,Pollinator,June,17-06-2025,20-06-2025,39.67926421,-105.0937713,1700,Jefferson
 Gables School and Community Garden,GABL-V-31,GABL,vane,31,Bee,Insecta,Hymenoptera,Halictidae,Halictus,rubicundus,Pollinator,June,17-06-2025,20-06-2025,39.67926421,-105.0937713,1700,Jefferson
-Gables School and Community Garden,GABL-V-32,GABL,vane,32,Bee,Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.67926421,-105.0937713,1700,Jefferson
+Gables School and Community Garden,GABL-V-32,GABL,vane,32,Bee,Insecta,Hymenoptera,Halictidae,Lasioglossum Evylaeus,,,June,17-06-2025,20-06-2025,39.67926421,-105.0937713,1700,Jefferson
 Gables School and Community Garden,GABL-V-33,GABL,vane,33,Bug,Insecta,Hemiptera,,,,,June,17-06-2025,20-06-2025,39.67926421,-105.0937713,1700,Jefferson
-Gables School and Community Garden,GABL-V-34,GABL,vane,34,Bug,Insecta,Hemiptera,,,,,June,17-06-2025,20-06-2025,39.67926421,-105.0937713,1700,Jefferson
+Gables School and Community Garden,GABL-V-34,GABL,vane,34,Bee,Insecta,Hymenoptera,Halictidae,Halictus,tripartitus,Pollinator,June,17-06-2025,20-06-2025,39.67926421,-105.0937713,1700,Jefferson
 Gables School and Community Garden,GABL-V-35,GABL,vane,35,Thrips,Insecta,Thysanoptera,,,,Herbivore,June,17-06-2025,20-06-2025,39.67926421,-105.0937713,1700,Jefferson
 Gables School and Community Garden,GABL-V-36,GABL,vane,36,leaf hopper,Insecta,Hemiptera,Cicadellidae,Agallia,,Herbivore,June,17-06-2025,20-06-2025,39.67926421,-105.0937713,1700,Jefferson
 Gables School and Community Garden,GABL-V-37,GABL,vane,37,leaf hopper,Insecta,Hemiptera,Cicadellidae,Agallia,,Herbivore,June,17-06-2025,20-06-2025,39.67926421,-105.0937713,1700,Jefferson
@@ -520,9 +520,9 @@ Gabriel Cam Memorial Community Garden,GABR-V-19,GABR,vane,19,Beetle,Insecta,Cole
 Gabriel Cam Memorial Community Garden,GABR-V-30,GABR,vane,30,Beetle,Insecta,Coleoptera,,,,,June,17-06-2025,20-06-2025,39.72381522,-104.8309439,1655,Arapahoe
 Gabriel Cam Memorial Community Garden,GABR-V-21,GABR,vane,21,Beetle,Insecta,Coleoptera,,,,,June,17-06-2025,20-06-2025,39.72381522,-104.8309439,1655,Arapahoe
 Gabriel Cam Memorial Community Garden,GABR-V-22,GABR,vane,22,Mosquito,Insecta,Diptera,Culicidae,,,Sanguivore,June,17-06-2025,20-06-2025,39.72381522,-104.8309439,1655,Arapahoe
-Gabriel Cam Memorial Community Garden,GABR-V-23,GABR,vane,23,Bee mimic,Insecta,Diptera,,,,,June,17-06-2025,20-06-2025,39.72381522,-104.8309439,1655,Arapahoe
+Gabriel Cam Memorial Community Garden,GABR-V-23,GABR,vane,23,Bee mimic,Insecta,Diptera,Syrphidae,,,Pollinator,June,17-06-2025,20-06-2025,39.72381522,-104.8309439,1655,Arapahoe
 Gabriel Cam Memorial Community Garden,GABR-V-24,GABR,vane,24,Aphids,Insecta,Hemiptera,Aphididae,,,Herbivore,June,17-06-2025,20-06-2025,39.72381522,-104.8309439,1655,Arapahoe
-Gabriel Cam Memorial Community Garden,GABR-V-25,GABR,vane,25,anthophora bee?,Insecta,Hymenoptera,Apidae,,,Pollinator,June,17-06-2025,20-06-2025,39.72381522,-104.8309439,1655,Arapahoe
+Gabriel Cam Memorial Community Garden,GABR-V-25,GABR,vane,25,anthophora bee?,Insecta,Hymenoptera,Apidae,Anthophora,montana,Pollinator,June,17-06-2025,20-06-2025,39.72381522,-104.8309439,1655,Arapahoe
 Gabriel Cam Memorial Community Garden,GABR-V-26,GABR,vane,26,sweatbee,Insecta,Hymenoptera,Halictidae,Halictus,rubicundus,Pollinator,June,17-06-2025,20-06-2025,39.72381522,-104.8309439,1655,Arapahoe
 Gabriel Cam Memorial Community Garden,GABR-V-27,GABR,vane,27,green lacewing,Insecta,Neuroptera,Chrysopidae,,,Predator,June,17-06-2025,20-06-2025,39.72381522,-104.8309439,1655,Arapahoe
 Gabriel Cam Memorial Community Garden,GABR-V-28,GABR,vane,28,beetle,Insecta,Coleoptera,,,,,June,17-06-2025,20-06-2025,39.72381522,-104.8309439,1655,Arapahoe
@@ -588,9 +588,9 @@ Greenway Community Garden,GRE-V-20,GRE,vane,20,Springtail,Entognatha,Collembola,
 Greenway Community Garden,GRE-V-21,GRE,vane,21,Mites,Arachnida,,,,,Predator,June,17-06-2025,20-06-2025,39.75074088,-104.8969895,1625,Denver
 Greenway Community Garden,GRE-V-22,GRE,vane,22,Mites,Arachnida,,,,,Predator,June,17-06-2025,20-06-2025,39.75074088,-104.8969895,1625,Denver
 Greenway Community Garden,GRE-V-23,GRE,vane,23,Mites,Arachnida,,,,,Predator,June,17-06-2025,20-06-2025,39.75074088,-104.8969895,1625,Denver
-Greenway Community Garden,GRE-V-24,GRE,vane,24,Bee,Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.75074088,-104.8969895,1625,Denver
+Greenway Community Garden,GRE-V-24,GRE,vane,24,Bee,Insecta,Hymenoptera,Halictidae,Lasioglossum Evylaeus,,Pollinator,June,17-06-2025,20-06-2025,39.75074088,-104.8969895,1625,Denver
 Greenway Community Garden,GRE-V-25,GRE,vane,25,Bee,Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.75074088,-104.8969895,1625,Denver
-Greenway Community Garden,GRE-V-26,GRE,vane,26,Bee,Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.75074088,-104.8969895,1625,Denver
+Greenway Community Garden,GRE-V-26,GRE,vane,26,Bee,Insecta,Hymenoptera,Halictidae,Lasioglossum Evylaeus,,Pollinator,June,17-06-2025,20-06-2025,39.75074088,-104.8969895,1625,Denver
 Greenway Community Garden,GRE-V-27,GRE,vane,27,lace wing,Insecta,Neuroptera,Chrysopidae,,,Predator,June,17-06-2025,20-06-2025,39.75074088,-104.8969895,1625,Denver
 Greenway Community Garden,GRE-V-28,GRE,vane,28,Unk hemi,Insecta,Hemiptera,,,,,June,17-06-2025,20-06-2025,39.75074088,-104.8969895,1625,Denver
 Greenway Community Garden,GRE-V-29,GRE,vane,29,Unk hemi,Insecta,Hemiptera,,,,,June,17-06-2025,20-06-2025,39.75074088,-104.8969895,1625,Denver
@@ -637,7 +637,7 @@ GW School and Community Garden,GW-V-9,GW,vane,9,thrips,Insecta,Thysanoptera,,,,H
 GW School and Community Garden,GW-V-10,GW,vane,10,UNK hemi,Insecta,Hemiptera,,,,,June,17-06-2025,20-06-2025,39.70479323,-104.9149051,1644,Denver
 GW School and Community Garden,GW-V-11,GW,vane,11,UNK hemi,Insecta,Hemiptera,,,,,June,17-06-2025,20-06-2025,39.70479323,-104.9149051,1644,Denver
 GW School and Community Garden,GW-V-12,GW,vane,12,bumblebee,Insecta,Hymenoptera,Apidae,Bombus,fervidus,Pollinator,June,17-06-2025,20-06-2025,39.70479323,-104.9149051,1644,Denver
-GW School and Community Garden,GW-V-13,GW,vane,13,bee,Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.70479323,-104.9149051,1644,Denver
+GW School and Community Garden,GW-V-13,GW,vane,13,bee,Insecta,Hymenoptera,Apidae,Melissodes,niveus,Pollinator,June,17-06-2025,20-06-2025,39.70479323,-104.9149051,1644,Denver
 GW School and Community Garden,GW-V-14,GW,vane,14,sweatbee,Insecta,Hymenoptera,Halictidae,Agapostemon,virescens,Pollinator,June,17-06-2025,20-06-2025,39.70479323,-104.9149051,1644,Denver
 GW School and Community Garden,GW-V-15,GW,vane,15,green sweatbee,Insecta,Hymenoptera,Halictidae,Agapostemon,angelicus/texanus,Pollinator,June,17-06-2025,20-06-2025,39.70479323,-104.9149051,1644,Denver
 GW School and Community Garden,GW-V-16,GW,vane,16,fly,Insecta,Diptera,,,,,June,17-06-2025,20-06-2025,39.70479323,-104.9149051,1644,Denver
@@ -700,7 +700,7 @@ Jefferson Green Community Garden,JEF-V-16,JEF,vane,16,Bug,Insecta,Hemiptera,,,,,
 Jefferson Green Community Garden,JEF-V-17,JEF,vane,17,Bug,Insecta,Hemiptera,,,,,June,17-06-2025,20-06-2025,39.65720004,-105.0984888,1671,Jefferson
 Jefferson Green Community Garden,JEF-V-18,JEF,vane,18,Fly,Insecta,Diptera,,,,,June,17-06-2025,20-06-2025,39.65720004,-105.0984888,1671,Jefferson
 Jefferson Green Community Garden,JEF-V-19,JEF,vane,19,Bug,Insecta,Hemiptera,,,,,June,17-06-2025,20-06-2025,39.65720004,-105.0984888,1671,Jefferson
-Jefferson Green Community Garden,JEF-V-22,JEF,vane,22,Bee,Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.65720004,-105.0984888,1671,Jefferson
+Jefferson Green Community Garden,JEF-V-22,JEF,vane,22,Bee,Insecta,Hymenoptera,Halictidae,Lasioglossum Evylaeus,,Pollinator,June,17-06-2025,20-06-2025,39.65720004,-105.0984888,1671,Jefferson
 Jefferson Green Community Garden,JEF-V-23,JEF,vane,23,Margined Cal.,Insecta,Diptera,Syrphidae,Toxomerus,marginatus,Pollinator,June,17-06-2025,20-06-2025,39.65720004,-105.0984888,1671,Jefferson
 Jefferson Green Community Garden,JEF-V-24,JEF,vane,24,hemipteran,Insecta,Hemiptera,,,,,June,17-06-2025,20-06-2025,39.65720004,-105.0984888,1671,Jefferson
 Jefferson Green Community Garden,JEF-V-25,JEF,vane,25,fly,Insecta,Diptera,Muscidae,,,Detritivore,June,17-06-2025,20-06-2025,39.65720004,-105.0984888,1671,Jefferson
@@ -728,12 +728,12 @@ KCAA Community Studio Garden,KCA-V-7,KCA,vane,7,Aphids,Insecta,Hemiptera,Aphidid
 KCAA Community Studio Garden,KCA-V-8,KCA,vane,8,Beetle,Insecta,Coleoptera,,,,,June,17-06-2025,20-06-2025,39.67568994,-105.038795,1666,Denver
 KCAA Community Studio Garden,KCA-V-9,KCA,vane,9,Thrips,Insecta,Thysanoptera,,,,Herbivore,June,17-06-2025,20-06-2025,39.67568994,-105.038795,1666,Denver
 KCAA Community Studio Garden,KCA-V-10,KCA,vane,10,Long-bodied fly,Insecta,Diptera,,,,,June,17-06-2025,20-06-2025,39.67568994,-105.038795,1666,Denver
-KCAA Community Studio Garden,KCA-V-11,KCA,vane,11,Long-bodied fly,Insecta,Diptera,,,,,June,17-06-2025,20-06-2025,39.67568994,-105.038795,1666,Denver
+KCAA Community Studio Garden,KCA-V-11,KCA,vane,11,Bee,Insecta,Hymenoptera,Megachilidae,Megachile,inermis,Pollinator,June,17-06-2025,20-06-2025,39.67568994,-105.038795,1666,Denver
 KCAA Community Studio Garden,KCA-V-12,KCA,vane,12,Long-bodied fly,Insecta,Diptera,,,,,June,17-06-2025,20-06-2025,39.67568994,-105.038795,1666,Denver
 KCAA Community Studio Garden,KCA-V-13,KCA,vane,13,Long-bodied fly,Insecta,Diptera,,,,,June,17-06-2025,20-06-2025,39.67568994,-105.038795,1666,Denver
 KCAA Community Studio Garden,KCA-V-14,KCA,vane,14,Beetle,Insecta,Coleoptera,,,,,June,17-06-2025,20-06-2025,39.67568994,-105.038795,1666,Denver
 KCAA Community Studio Garden,KCA-V-15,KCA,vane,15,Bee( maybe sp frater?),Insecta,Hymenoptera,Apidae,Eucera,pruinosa,Pollinator,June,17-06-2025,20-06-2025,39.67568994,-105.038795,1666,Denver
-KCAA Community Studio Garden,KCA-V-16,KCA,vane,16,Bee,Insecta,Hymenoptera,Megachilidae,Megachile,inermis,Pollinator,June,17-06-2025,20-06-2025,39.67568994,-105.038795,1666,Denver
+KCAA Community Studio Garden,KCA-V-16,KCA,vane,16,Long-bodied fly,Insecta,Diptera,,,,,June,17-06-2025,20-06-2025,39.67568994,-105.038795,1666,Denver
 KCAA Community Studio Garden,KCA-V-17,KCA,vane,17,Bee ( female),Insecta,Hymenoptera,Halictidae,Agapostemon,virescens,Pollinator,June,17-06-2025,20-06-2025,39.67568994,-105.038795,1666,Denver
 KCAA Community Studio Garden,KCA-V-18,KCA,vane,18,Bee,Insecta,Hymenoptera,Megachilidae,Megachile,inermis,Pollinator,June,17-06-2025,20-06-2025,39.67568994,-105.038795,1666,Denver
 KCAA Community Studio Garden,KCA-V-19,KCA,vane,19,bee(super family),Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.67568994,-105.038795,1666,Denver
@@ -762,9 +762,9 @@ Market Station Community Garden,MAR-V-3,MAR,vane,3,Aphids,Insecta,Hemiptera,Aphi
 Market Station Community Garden,MAR-V-4,MAR,vane,4,Aphids,Insecta,Hemiptera,Aphididae,,,Herbivore,June,17-06-2025,20-06-2025,39.75069957,-104.9979256,1584,Denver
 Market Station Community Garden,MAR-V-5,MAR,vane,5,Aphids,Insecta,Hemiptera,Aphididae,,,Herbivore,June,17-06-2025,20-06-2025,39.75069957,-104.9979256,1584,Denver
 Market Station Community Garden,MAR-V-6,MAR,vane,6,thrips,Insecta,Thysanoptera,,,,Herbivore,June,17-06-2025,20-06-2025,39.75069957,-104.9979256,1584,Denver
-Market Station Community Garden,MAR-V-7,MAR,vane,7,bee,Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.75069957,-104.9979256,1584,Denver
+Market Station Community Garden,MAR-V-7,MAR,vane,7,bee,Insecta,Hymenoptera,Megachilidae,,,Pollinator,June,17-06-2025,20-06-2025,39.75069957,-104.9979256,1584,Denver
 Market Station Community Garden,MAR-V-8,MAR,vane,8,Hemipteran,Insecta,Hemiptera,Miridae,Lygus,,Herbivore,June,17-06-2025,20-06-2025,39.75069957,-104.9979256,1584,Denver
-Market Station Community Garden,MAR-V-9,MAR,vane,9,small bee,Insecta,Hymenoptera,Halictidae,Lasioglossum,,Pollinator,June,17-06-2025,20-06-2025,39.75069957,-104.9979256,1584,Denver
+Market Station Community Garden,MAR-V-9,MAR,vane,9,small bee,Insecta,Hymenoptera,Halictidae,Lasioglossum Dialictus,,Pollinator,June,17-06-2025,20-06-2025,39.75069957,-104.9979256,1584,Denver
 Market Station Community Garden,MAR-V-10,MAR,vane,10,thrips,Insecta,Thysanoptera,,,,Herbivore,June,17-06-2025,20-06-2025,39.75069957,-104.9979256,1584,Denver
 Market Station Community Garden,MAR-V-11,MAR,vane,11,Big- eyed- bug,Insecta,Hemiptera,Geocoridae,Geocoris,pallens,Predator,June,17-06-2025,20-06-2025,39.75069957,-104.9979256,1584,Denver
 Palmer School Community Garden,PAL-V-1,PAL,vane,1,Bug,Insecta,Hemiptera,,,,,June,17-06-2025,20-06-2025,39.73170041,-104.9249383,1632,Denver
@@ -775,13 +775,13 @@ Palmer School Community Garden,PAL-V-5,PAL,vane,5,Springtail,Entognatha,Collembo
 Palmer School Community Garden,PAL-V-6,PAL,vane,6,fly,Insecta,Diptera,,,,,June,17-06-2025,20-06-2025,39.73170041,-104.9249383,1632,Denver
 Palmer School Community Garden,PAL-V-7,PAL,vane,7,beetle,Insecta,Coleoptera,,,,,June,17-06-2025,20-06-2025,39.73170041,-104.9249383,1632,Denver
 Palmer School Community Garden,PAL-V-8,PAL,vane,8,mosquito,Insecta,Diptera,Culicidae,,,Sanguivore,June,17-06-2025,20-06-2025,39.73170041,-104.9249383,1632,Denver
-Palmer School Community Garden,PAL-V-9,PAL,vane,9,small bee,Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.73170041,-104.9249383,1632,Denver
-Palmer School Community Garden,PAL-V-10,PAL,vane,10,small bee,Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.73170041,-104.9249383,1632,Denver
-Palmer School Community Garden,PAL-V-11,PAL,vane,11,small bee,Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.73170041,-104.9249383,1632,Denver
-Palmer School Community Garden,PAL-V-12,PAL,vane,12,bee,Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.73170041,-104.9249383,1632,Denver
-Palmer School Community Garden,PAL-V-13,PAL,vane,13,bee,Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.73170041,-104.9249383,1632,Denver
-Palmer School Community Garden,PAL-V-14,PAL,vane,14,bee,Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.73170041,-104.9249383,1632,Denver
-Palmer School Community Garden,PAL-V-15,PAL,vane,15,bee,Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.73170041,-104.9249383,1632,Denver
+Palmer School Community Garden,PAL-V-9,PAL,vane,9,small bee,Insecta,Hymenoptera,Halictidae,Lasioglossum Dialictus,,Pollinator,June,17-06-2025,20-06-2025,39.73170041,-104.9249383,1632,Denver
+Palmer School Community Garden,PAL-V-10,PAL,vane,10,small bee,Insecta,Hymenoptera,Halictidae,Halictus,tripartitus,Pollinator,June,17-06-2025,20-06-2025,39.73170041,-104.9249383,1632,Denver
+Palmer School Community Garden,PAL-V-11,PAL,vane,11,small bee,Insecta,Hymenoptera,Halictidae,Halictus,tripartitus,Pollinator,June,17-06-2025,20-06-2025,39.73170041,-104.9249383,1632,Denver
+Palmer School Community Garden,PAL-V-12,PAL,vane,12,bee,Insecta,Hymenoptera,Apidae,Diadasia,australis,Pollinator,June,17-06-2025,20-06-2025,39.73170041,-104.9249383,1632,Denver
+Palmer School Community Garden,PAL-V-13,PAL,vane,13,bee,Insecta,Hymenoptera,Halictidae,Lasioglossum Evylaeus,,Pollinator,June,17-06-2025,20-06-2025,39.73170041,-104.9249383,1632,Denver
+Palmer School Community Garden,PAL-V-14,PAL,vane,14,bee,Insecta,Hymenoptera,Halictidae,Lasioglossum Evylaeus,,Pollinator,June,17-06-2025,20-06-2025,39.73170041,-104.9249383,1632,Denver
+Palmer School Community Garden,PAL-V-15,PAL,vane,15,bee,Insecta,Hymenoptera,Halictidae,Lasioglossum Evylaeus,,Pollinator,June,17-06-2025,20-06-2025,39.73170041,-104.9249383,1632,Denver
 Palmer School Community Garden,PAL-V-16,PAL,vane,16,beetle,Insecta,Coleoptera,,,,,June,17-06-2025,20-06-2025,39.73170041,-104.9249383,1632,Denver
 Palmer School Community Garden,PAL-V-17,PAL,vane,17,syrphid fly,Insecta,Diptera,Syrphidae,,,Pollinator,June,17-06-2025,20-06-2025,39.73170041,-104.9249383,1632,Denver
 Palmer School Community Garden,PAL-V-18,PAL,vane,18,House fly,Insecta,Diptera,Muscidae,Musca,domestica,Detritivore,June,17-06-2025,20-06-2025,39.73170041,-104.9249383,1632,Denver
@@ -843,7 +843,7 @@ Park Hill School Garden,PAR-V-15,PAR,vane,15,Aphid,Insecta,Hemiptera,Cicadellida
 Park Hill School Garden,PAR-V-16,PAR,vane,16,Beetle,Insecta,Coleoptera,,,,,June,17-06-2025,20-06-2025,39.74455504,-104.9288718,1623,Denver
 Park Hill School Garden,PAR-V-17,PAR,vane,17,Aphid,Insecta,Hemiptera,Aphididae,,,Herbivore,June,17-06-2025,20-06-2025,39.74455504,-104.9288718,1623,Denver
 Park Hill School Garden,PAR-V-18,PAR,vane,18,Bee,Insecta,Hymenoptera,Apidae,Apis,mellifera,Pollinator,June,17-06-2025,20-06-2025,39.74455504,-104.9288718,1623,Denver
-Park Hill School Garden,PAR-V-19,PAR,vane,19,Bee,Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.74455504,-104.9288718,1623,Denver
+Park Hill School Garden,PAR-V-19,PAR,vane,19,Bee,Insecta,Hymenoptera,Halictidae,Lasioglossum Evylaeus,,Pollinator,June,17-06-2025,20-06-2025,39.74455504,-104.9288718,1623,Denver
 Park Hill School Garden,PAR-V-20,PAR,vane,20,bee ( maybe agilis),Insecta,Hymenoptera,Apidae,Melissodes,agilis,Pollinator,June,17-06-2025,20-06-2025,39.74455504,-104.9288718,1623,Denver
 Park Hill School Garden,PAR-V-21,PAR,vane,21,lacewing,Insecta,Neuroptera,Chrysopidae,,,Predator,June,17-06-2025,20-06-2025,39.74455504,-104.9288718,1623,Denver
 Park Hill School Garden,PAR-V-22,PAR,vane,22,Unk him,Insecta,Hemiptera,,,,,June,17-06-2025,20-06-2025,39.74455504,-104.9288718,1623,Denver
@@ -1036,7 +1036,7 @@ Samuels School Community Garden,SAM-V-15,SAM,vane,15,bumblebee,Insecta,Hymenopte
 Samuels School Community Garden,SAM-V-16,SAM,vane,16,bumblebee,Insecta,Hymenoptera,Apidae,Bombus,fervidus,Pollinator,June,17-06-2025,20-06-2025,39.6434894,-104.8925304,1696,Denver
 Samuels School Community Garden,SAM-V-17,SAM,vane,17,bee,Insecta,Hymenoptera,Apidae,Eucera,pruinosa,Pollinator,June,17-06-2025,20-06-2025,39.6434894,-104.8925304,1696,Denver
 Samuels School Community Garden,SAM-V-18,SAM,vane,18,bee,Insecta,Hymenoptera,Apidae,Eucera,pruinosa,Pollinator,June,17-06-2025,20-06-2025,39.6434894,-104.8925304,1696,Denver
-Samuels School Community Garden,SAM-V-19,SAM,vane,19,bee,Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.6434894,-104.8925304,1696,Denver
+Samuels School Community Garden,SAM-V-19,SAM,vane,19,bee,Insecta,Hymenoptera,Apidae,Diadasia,enavata,Pollinator,June,17-06-2025,20-06-2025,39.6434894,-104.8925304,1696,Denver
 Samuels School Community Garden,SAM-V-20,SAM,vane,20,bee,Insecta,Hymenoptera,Apidae,Eucera,pruinosa,Pollinator,June,17-06-2025,20-06-2025,39.6434894,-104.8925304,1696,Denver
 Samuels School Community Garden,SAM-V-21,SAM,vane,21,longhorn bee,Insecta,Hymenoptera,Apidae,Melissodes,bimaculatus,Pollinator,June,17-06-2025,20-06-2025,39.6434894,-104.8925304,1696,Denver
 Samuels School Community Garden,SAM-V-22,SAM,vane,22,sweat bee,Insecta,Hymenoptera,Halictidae,Agapostemon,virescens,Pollinator,June,17-06-2025,20-06-2025,39.6434894,-104.8925304,1696,Denver
@@ -1046,8 +1046,8 @@ Samuels School Community Garden,SAM-V-25,SAM,vane,25,bee,Insecta,Hymenoptera,Hal
 Samuels School Community Garden,SAM-V-26,SAM,vane,26,bee,Insecta,Hymenoptera,Halictidae,Halictus,rubicundus,Pollinator,June,17-06-2025,20-06-2025,39.6434894,-104.8925304,1696,Denver
 Samuels School Community Garden,SAM-V-27,SAM,vane,27,bee,Insecta,Hymenoptera,Halictidae,Halictus,rubicundus,Pollinator,June,17-06-2025,20-06-2025,39.6434894,-104.8925304,1696,Denver
 Samuels School Community Garden,SAM-V-28,SAM,vane,28,bee,Insecta,Hymenoptera,Halictidae,Halictus,rubicundus,Pollinator,June,17-06-2025,20-06-2025,39.6434894,-104.8925304,1696,Denver
-Samuels School Community Garden,SAM-V-29,SAM,vane,29,sweat bee,Insecta,Hymenoptera,Halictidae,Halictus,,Pollinator,June,17-06-2025,20-06-2025,39.6434894,-104.8925304,1696,Denver
-Samuels School Community Garden,SAM-V-30,SAM,vane,30,sweat bee,Insecta,Hymenoptera,Halictidae,,,Pollinator,June,17-06-2025,20-06-2025,39.6434894,-104.8925304,1696,Denver
+Samuels School Community Garden,SAM-V-29,SAM,vane,29,sweat bee,Insecta,Hymenoptera,Halictidae,Halictus,tripartitus,Pollinator,June,17-06-2025,20-06-2025,39.6434894,-104.8925304,1696,Denver
+Samuels School Community Garden,SAM-V-30,SAM,vane,30,sweat bee,Insecta,Hymenoptera,Halictidae,Lasioglossum Dialictus,,Pollinator,June,17-06-2025,20-06-2025,39.6434894,-104.8925304,1696,Denver
 Samuels School Community Garden,SAM-V-31,SAM,vane,31,green lace wing,Insecta,Neuroptera,Chrysopidae,,,Predator,June,17-06-2025,20-06-2025,39.6434894,-104.8925304,1696,Denver
 Samuels School Community Garden,SAM-V-32,SAM,vane,32,small hemiptera,Insecta,Hemiptera,,,,,June,17-06-2025,20-06-2025,39.6434894,-104.8925304,1696,Denver
 Samuels School Community Garden,SAM-V-33,SAM,vane,33,weevil,Insecta,Coleoptera,Curculionidae,,,Herbivore,June,17-06-2025,20-06-2025,39.6434894,-104.8925304,1696,Denver
@@ -1106,8 +1106,8 @@ Slater Elementary School Community Garden,SLA-V-5,SLA,vane,5,Aphids,Insecta,Hemi
 Slater Elementary School Community Garden,SLA-V-6,SLA,vane,6,Aphids,Insecta,Hemiptera,Aphididae,,,Herbivore,June,17-06-2025,20-06-2025,39.75227273,-105.0928071,1685,Jefferson
 Slater Elementary School Community Garden,SLA-V-7,SLA,vane,7,Aphids,Insecta,Hemiptera,Aphididae,,,Herbivore,June,17-06-2025,20-06-2025,39.75227273,-105.0928071,1685,Jefferson
 Slater Elementary School Community Garden,SLA-V-8,SLA,vane,8,Aphids,Insecta,Hemiptera,Aphididae,,,Herbivore,June,17-06-2025,20-06-2025,39.75227273,-105.0928071,1685,Jefferson
-Slater Elementary School Community Garden,SLA-V-9,SLA,vane,9,leafcutter bee,Insecta,Hymenoptera,Megachilidae,,,Pollinator,June,17-06-2025,20-06-2025,39.75227273,-105.0928071,1685,Jefferson
-Slater Elementary School Community Garden,SLA-V-10,SLA,vane,10,leafcutter bee,Insecta,Hymenoptera,Megachilidae,,,Pollinator,June,17-06-2025,20-06-2025,39.75227273,-105.0928071,1685,Jefferson
+Slater Elementary School Community Garden,SLA-V-9,SLA,vane,9,leafcutter bee,Insecta,Hymenoptera,Megachilidae,Osmia,inermis,Pollinator,June,17-06-2025,20-06-2025,39.75227273,-105.0928071,1685,Jefferson
+Slater Elementary School Community Garden,SLA-V-10,SLA,vane,10,leafcutter bee,Insecta,Hymenoptera,Megachilidae,Osmia,inermis,Pollinator,June,17-06-2025,20-06-2025,39.75227273,-105.0928071,1685,Jefferson
 Slater Elementary School Community Garden,SLA-V-11,SLA,vane,11,Bee,Insecta,Hymenoptera,Apidae,Bombus,fervidus,Pollinator,June,17-06-2025,20-06-2025,39.75227273,-105.0928071,1685,Jefferson
 Slater Elementary School Community Garden,SLA-V-12,SLA,vane,12,Bee,Insecta,Hymenoptera,Halictidae,Halictus,rubicundus,Pollinator,June,17-06-2025,20-06-2025,39.75227273,-105.0928071,1685,Jefferson
 Slater Elementary School Community Garden,SLA-V-13,SLA,vane,13,Beetle,Insecta,Coleoptera,,,,,June,17-06-2025,20-06-2025,39.75227273,-105.0928071,1685,Jefferson
@@ -1115,7 +1115,7 @@ Slater Elementary School Community Garden,fervidus,SLA,vane,14,Bumblebee,Insecta
 Slater Elementary School Community Garden,SLA-V-15,SLA,vane,15,halictid,Insecta,Hymenoptera,Halictidae,Halictus,rubicundus,Pollinator,June,17-06-2025,20-06-2025,39.75227273,-105.0928071,1685,Jefferson
 Slater Elementary School Community Garden,SLA-V-16,SLA,vane,16,click beetle,Insecta,Coleoptera,Elateridae,,,Herbivore,June,17-06-2025,20-06-2025,39.75227273,-105.0928071,1685,Jefferson
 Slater Elementary School Community Garden,SLA-V-17,SLA,vane,17,Bee,Insecta,Hymenoptera,Halictidae,Augochlorella,aurata,Pollinator,June,17-06-2025,20-06-2025,39.75227273,-105.0928071,1685,Jefferson
-Slater Elementary School Community Garden,SLA-V-18,SLA,vane,18,Bee,Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.75227273,-105.0928071,1685,Jefferson
+Slater Elementary School Community Garden,SLA-V-18,SLA,vane,18,Bee,Insecta,Hymenoptera,Apidae,Melissodes,sp2,Pollinator,June,17-06-2025,20-06-2025,39.75227273,-105.0928071,1685,Jefferson
 Slater Elementary School Community Garden,SLA-V-19,SLA,vane,19,Whirligig mite,Arachnida,Acari,Anystidae,,,Predator,June,17-06-2025,20-06-2025,39.75227273,-105.0928071,1685,Jefferson
 Slater Elementary School Community Garden,SLA-V-20,SLA,vane,20,Thin bodied fly,Insecta,Diptera,,,,,June,17-06-2025,20-06-2025,39.75227273,-105.0928071,1685,Jefferson
 Slater Elementary School Community Garden,SLA-V-21,SLA,vane,21,Thin bodied fly,Insecta,Diptera,,,,,June,17-06-2025,20-06-2025,39.75227273,-105.0928071,1685,Jefferson
@@ -1172,8 +1172,8 @@ Steck School Community Garden,STE-V-11,STE,vane,11,Beetle,Insecta,Coleoptera,,,,
 Steck School Community Garden,STE-V-12,STE,vane,12,Thrips,Insecta,Thysanoptera,,,,Herbivore,June,17-06-2025,20-06-2025,39.72417131,-104.9382635,1647,Denver
 Steck School Community Garden,STE-V-13,STE,vane,13,Thrips,Insecta,Thysanoptera,,,,Herbivore,June,17-06-2025,20-06-2025,39.72417131,-104.9382635,1647,Denver
 Steck School Community Garden,STE-V-14,STE,vane,14,Springtails,Entognatha,Collembola,,,,Detritivore,June,17-06-2025,20-06-2025,39.72417131,-104.9382635,1647,Denver
-Steck School Community Garden,STE-V-15,STE,vane,15,Bee,Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.72417131,-104.9382635,1647,Denver
-Steck School Community Garden,STE-V-16,STE,vane,16,Bee,Insecta,Hymenoptera,Megachilidae,,,Pollinator,June,17-06-2025,20-06-2025,39.72417131,-104.9382635,1647,Denver
+Steck School Community Garden,STE-V-15,STE,vane,15,Bee,Insecta,Hymenoptera,Megachilidae,,,Pollinator,June,17-06-2025,20-06-2025,39.72417131,-104.9382635,1647,Denver
+Steck School Community Garden,STE-V-16,STE,vane,16,Bee,Insecta,Hymenoptera,Megachilidae,Megachile,sp1,Pollinator,June,17-06-2025,20-06-2025,39.72417131,-104.9382635,1647,Denver
 Steck School Community Garden,STE-V-17,STE,vane,17,Bee,Insecta,Hymenoptera,Halictidae,Agapostemon,virescens,Pollinator,June,17-06-2025,20-06-2025,39.72417131,-104.9382635,1647,Denver
 Steck School Community Garden,STE-V-18,STE,vane,18,Bee,Insecta,Hymenoptera,,,,Pollinator,June,17-06-2025,20-06-2025,39.72417131,-104.9382635,1647,Denver
 Steck School Community Garden,STE-V-19,STE,vane,19,Green lacewing,Insecta,Neuroptera,Chrysopidae,,,Predator,June,17-06-2025,20-06-2025,39.72417131,-104.9382635,1647,Denver
@@ -1261,7 +1261,7 @@ West Colfax Community Urban Garden,WES-V-47,WES,vane,47,bumblebee,Insecta,Hymeno
 West Colfax Community Urban Garden,WES-V-48,WES,vane,48,longhorn bee,Insecta,Hymenoptera,Apidae,Melissodes,bimaculatus,Pollinator,June,17-06-2025,20-06-2025,39.73521415,-105.0458772,1616,Denver
 West Colfax Community Urban Garden,WES-V-49,WES,vane,49,longhorn bee,Insecta,Hymenoptera,Apidae,Melissodes,bimaculatus,Pollinator,June,17-06-2025,20-06-2025,39.73521415,-105.0458772,1616,Denver
 West Colfax Community Urban Garden,WES-V-50,WES,vane,50,sweat bee,Insecta,Hymenoptera,Halictidae,Agapostemon,virescens,Pollinator,June,17-06-2025,20-06-2025,39.73521415,-105.0458772,1616,Denver
-West Colfax Community Urban Garden,WES-V-51,WES,vane,51,longhorn bee,Insecta,Hymenoptera,Apidae,,,Pollinator,June,17-06-2025,20-06-2025,39.73521415,-105.0458772,1616,Denver
+West Colfax Community Urban Garden,WES-V-51,WES,vane,51,longhorn bee,Insecta,Hymenoptera,Apidae,Melissodes,agilis,Pollinator,June,17-06-2025,20-06-2025,39.73521415,-105.0458772,1616,Denver
 West Colfax Community Urban Garden,WES-V-52,WES,vane,52,sweat bee,Insecta,Hymenoptera,Halictidae,Halictus,ligatus,Pollinator,June,17-06-2025,20-06-2025,39.73521415,-105.0458772,1616,Denver
 West Colfax Community Urban Garden,WES-V-53,WES,vane,53,ladybird,Insecta,Coleoptera,Coccinellidae,,,Predator,June,17-06-2025,20-06-2025,39.73521415,-105.0458772,1616,Denver
 West Colfax Community Urban Garden,WES-V-54,WES,vane,54,green lace wing,Insecta,Neuroptera,Chrysopidae,,,Predator,June,17-06-2025,20-06-2025,39.73521415,-105.0458772,1616,Denver
