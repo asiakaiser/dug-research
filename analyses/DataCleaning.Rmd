@@ -199,11 +199,6 @@ bees.iNEXT <- iNEXT(bees.iNEXTinput, q = 0, datatype = "abundance")
 bees_richness <-  bees.iNEXT$AsyEst[bees.iNEXT$AsyEst$Diversity == "Species richness",]
 bees_shannon <-  bees.iNEXT$AsyEst[bees.iNEXT$AsyEst$Diversity == "Shannon diversity",]
 bees_simpson <-  bees.iNEXT$AsyEst[bees.iNEXT$AsyEst$Diversity == "Simpson diversity",]
-
-# Match site_code to Assemblage
-sites$bee.rich    <- bees_richness$Estimator[match(sites$site_code, bees_richness$Assemblage)]
-sites$bee.shannon <- bees_shannon$Estimator[match(sites$site_code, bees_shannon$Assemblage)]
-sites$bee.simpson <- bees_simpson$Estimator[match(sites$site_code, bees_simpson$Assemblage)]
 ```
 
 
@@ -320,6 +315,22 @@ sites_final <- arthropods %>%
   left_join(sites, by = "site_code") %>%
   left_join(cucumbers_delta, by = "site_code")%>%
     left_join(arthropods_n, by = c("site_code","month"))
+
+
+sites_final <- sites_final %>%
+  mutate(site_month = paste(site_code, month, sep = "_")) %>%
+  left_join(bees_richness %>% select(Assemblage, Estimator),
+            by = c("site_month" = "Assemblage")) %>%
+  rename(bee.rich = Estimator)%>%
+    mutate(bee.rich = if_else(is.na(bee.rich) & site_month !="EDI_August",0,bee.rich))%>%
+      left_join(bees_shannon %>% select(Assemblage, Estimator),
+            by = c("site_month" = "Assemblage")) %>%
+  rename(bee.shannon = Estimator)%>%
+    mutate(bee.shannon = if_else(is.na(bee.shannon) & site_month !="EDI_August",0,bee.shannon))%>%
+    left_join(bees_simpson %>% select(Assemblage, Estimator),
+            by = c("site_month" = "Assemblage")) %>%
+  rename(bee.simpson = Estimator)%>%
+    mutate(bee.simpson = if_else(is.na(bee.simpson) & site_month !="EDI_August",0,bee.simpson))
 ```
 
 #Saving Data frames
