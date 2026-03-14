@@ -23,23 +23,23 @@ setwd("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research")
 
 #all site data
 sites <- read.csv("data/sites_all.csv")
-
-#matrix data for community analyses
-inat_wide <- read.csv("data/inat_wide.csv")
-arthropods_wide <- read.csv("data/arthropods_wide.csv")
 ```
 
-# Explore the Data
+Making needed variables
 ```{r}
-
+sites <- sites %>%
+    mutate(water_wetland_1000m = water1000m + wetland1000m,
+           n.enemy = n.pred + n.omn,
+           species_per_m2 = flor.rich/floral_area_m2)
 ```
+
 
 GGplot Theme
 ```{r}
 Asia_Theme <- theme(
   plot.title = element_text(size = 16),
   plot.caption = element_text(size = 16),
-  axis.title = element_text(size = 20),
+  axis.title = element_text(size = 18),
   axis.text = element_text(size = 16),
   axis.text.x = element_text(size = 20),
   legend.text = element_text(size= 20))
@@ -47,114 +47,212 @@ Asia_Theme <- theme(
 
 # Habitat Quality and Environmental Variables
 
-Select variables of interest
-```{r}
-#Aggregated values across months
-site_cov <- sites %>%
-    filter(month == "June")%>%
-    select(Site, site_code, Area_m2, Plots, WealthIndex, tcc200m, imp200m, tcc500m,imp500m,CWD_m2,wood_m2,FWD_m2,logs,bareground_m2,floral_area_m2,dev_high500m, dev_low500m,wetland500m, water500m,	dev_high1000m, dev_low1000m, water1000m, wetland1000m, shrub_grass1000m)
-```
-
 ## Landscape Level Variables
 
-Landscape Correlations
+Landscape Level Correlations
 ```{r}
-site.landscape.input <- site_cov %>% select(-c(Site,site_code)) %>%
+#Landscape variables
+site.landscape.input <- sites %>% select(-c(Site,site_code)) %>%
     select(WealthIndex, tcc200m, imp200m, tcc500m,imp500m,water1000m, wetland1000m, shrub_grass1000m)
-```
 
-Landscape Correlation Plot
-```{r}
-#Test for significant correlations
+#Landscape correlation test
 landscape.rcorr = rcorr(as.matrix(site.landscape.input))
 landscape.pvals <- landscape.rcorr$P
 
-
-
+#Correlation plot
 landscape.cor.plot <- corrplot(landscape.rcorr$r)
 ```
 
-# Arthropod Data Full Summer
+## Wealth and Landscape Variables Relationships
 ```{r}
-site_cov <- sites %>%
-    filter(month == "June")%>%
-    select(c("site_code","tcc200m","imp200m","tcc500m","imp500m","WealthIndex","floral_area_m2","flor.rich"))
+#GBIF Landscape floral richness
+wealth.land.plot1 <- ggplot(sites, aes(x = WealthIndex, y = gbif.rich))+
+    geom_point()+
+    ylab("Landscape floral richness (1 km)")+
+    xlab("Wealth Index (500 m)")+
+    theme_minimal()+
+    Asia_Theme
+wealth.land.plot1
+
+#Tree canopy cover
+wealth.land.plot2 <- ggplot(sites, aes(x = WealthIndex, y = tcc500m))+
+    geom_point()+
+    ylab("Tree Canopy Cover (500 m)")+
+    xlab("Wealth Index (500 m)")+
+    theme_minimal()+
+    Asia_Theme
+wealth.land.plot2
+
+#Shrubland Cover
+wealth.land.plot3 <- ggplot(sites, aes(x = WealthIndex, y = shrub_grass1000m))+
+    geom_point()+
+    ylab("Shrub & Grassland (1 km)")+
+    xlab("Wealth Index (500 m)")+
+    theme_minimal()+
+    Asia_Theme
+wealth.land.plot3
+
+#Wetland Cover
+wealth.land.plot4 <- ggplot(sites, aes(x = WealthIndex, y = water_wetland_1000m))+
+    geom_point()+
+    ylab("Water and Wetland (1 km)")+
+    xlab("Wealth Index (500 m)")+
+    theme_minimal()+
+    Asia_Theme
+wealth.land.plot4
 ```
 
-# Community Composition
-## Floral NMDS
-```{r, echo=FALSE}
-set.seed(10)
-florNMDS_input <- inat_wide[,-1]
-florNMDS_input <- florNMDS_input[, colSums(florNMDS_input > 0) >= 5]
-
-flor.mds <- metaMDS(florNMDS_input, k = 2, trymax = 20)
-flor.mds
-
-#Make nmds into dataframe for plotting
-flor.mds.scores <- as.data.frame(scores(flor.mds, display = "sites"))
-flor.mds.scores <- cbind(flor.mds.scores, site_cov)
-```
-
-Floral Community NMDS Plot
+## Wealth and Local Variables Relationships
 ```{r}
-flor.mds.plot <- 
-    ggplot(flor.mds.scores, aes(x = NMDS1, y = NMDS2)) +
-  geom_point(aes(color = WealthIndex), size = 3) +
-  theme_minimal() +
-  labs(
-    title = "NMDS Ordination of Floral Genera",
-    x = "NMDS1",
-    y = "NMDS2",
-    color = "[Env Covariate]"
-  ) +
-  coord_fixed()
-flor.mds.plot
+#Garden floral richness
+wealth.loc.plot1 <- ggplot(sites, aes(x = WealthIndex, y = flor.simpson))+
+    geom_point()+
+    ylab("Garden floral richness")+
+    xlab("Wealth Index (500 m)")+
+    theme_minimal()+
+    Asia_Theme
+wealth.loc.plot1
+
+#Garden Tree and Shrub Cover
+wealth.loc.plot2 <- ggplot(sites, aes(x = WealthIndex, y = wood_m2))+
+    geom_point()+
+    ylab("Garden Tree and Shrub Cover")+
+    xlab("Wealth Index (500 m)")+
+    theme_minimal()+
+    Asia_Theme
+wealth.loc.plot2
+
+#Garden Bareground Cover
+wealth.loc.plot3 <- ggplot(sites, aes(x = WealthIndex, y = bareground_m2))+
+    geom_point()+
+    ylab("Garden Bareground Cover")+
+    xlab("Wealth Index (500 m)")+
+    theme_minimal()+
+    Asia_Theme
+wealth.loc.plot3
+
+#Garden Bareground Cover
+wealth.loc.plot4 <- ggplot(sites, aes(x = WealthIndex, y = species_per_m2))+
+    geom_point()+
+    ylab("Garden Floral Species/m2")+
+    xlab("Wealth Index (500 m)")+
+    theme_minimal()+
+    Asia_Theme
+wealth.loc.plot4
 ```
+# Arthropod Abundance
 
-## Arthropod Functional Groups
-```{r, echo=FALSE}
-set.seed(100)
-arthropodsNMDS_input <- arthropods_wide[,-1]
-arthropodsNMDS_input <- arthropodsNMDS_input[, colSums(arthropodsNMDS_input > 0) >= 30] # remove uncommon taxa to reduce stress
-arthropodsNMDS_input <- arthropodsNMDS_input %>% select(-Unknown)
-
-arthropods.mds <- metaMDS(arthropodsNMDS_input, trymax = 50)
-arthropods.mds
-
-#make nmds into dataframe for plotting
-arthropods.mds.scores <- as.data.frame(scores(arthropods.mds, display = "sites"))
-arthropods_columns <- arthropods_wide %>%
-    separate(site_month, into = c("site", "month"), sep = "_")%>%
-    select(site,month)%>%
-    mutate(site_code = site)
-
-arthropods.mds.scores$site_code <- arthropods_columns$site_code
-arthropods.mds.scores$month <- arthropods_columns$month
-arthropods.mds.scores <-left_join(arthropods.mds.scores, site_cov, by = "site_code")
-```
-
-Arthropod Functional Groups NMDS Plot
+## Total Arthropod Abundance & Landscape Variables
 ```{r}
-arthropods.mds.plot <- 
-    ggplot(arthropods.mds.scores, aes(x = NMDS1, y = NMDS2)) +
-  geom_point(aes(color = imp200m), size = 3) +
-  theme_minimal() +
-  labs(
-    title = "NMDS Ordination of Arthropod Functional Groups",
-    x = "NMDS1",
-    y = "NMDS2",
-    color = "[Env Covariate]"
-  ) +
-  coord_fixed()
-arthropods.mds.plot
-```
+#Total arthropod abundance and Impervious Surface
+total.arth.imp.plot <- ggplot(sites, aes(x = imp200m, y = n.obs))+
+    geom_point()+
+    facet_wrap(vars(month), ncol = 3)+
+    ylab("Total arthropod abundance")+
+    xlab("Impervious surface (200 m)")+
+    theme_minimal()+
+    Asia_Theme
+total.arth.imp.plot
 
-## Bee Species NMDS
+#Total arthropod abundance and Wealth Index
+total.arth.wealth.plot <- ggplot(sites, aes(x = WealthIndex, y = n.obs))+
+    geom_point()+
+    facet_wrap(vars(month), ncol = 3)+
+    ylab("Total arthropod abundance")+
+    xlab("Wealth Index (500 m)")+
+    theme_minimal()+
+    Asia_Theme
+total.arth.wealth.plot
+```
+### Pollinator Abundance and Landscape Variables
 ```{r}
+#Pollinator abundance and Impervious Surface
+pol.imp.plot <- ggplot(sites, aes(x = imp200m, y = n.pol))+
+    geom_point()+
+    facet_wrap(vars(month), ncol = 3)+
+    ylab("Pollinator abundance")+
+    xlab("Impervious surface (200 m)")+
+    theme_minimal()+
+    Asia_Theme
+pol.imp.plot
 
+#Pollinator abundance and Wealth Index
+pol.wealth.plot <- ggplot(sites, aes(x = WealthIndex, y = n.pol))+
+    geom_point()+
+    facet_wrap(vars(month), ncol = 3)+
+    ylab("Pollinator abundance")+
+    xlab("Wealth Index (500 m)")+
+    theme_minimal()+
+    Asia_Theme
+pol.wealth.plot
+```
+### Herbivore Abundance and Landscape Variables
+```{r}
+#Pollinator abundance and Impervious Surface
+herb.imp.plot <- ggplot(sites, aes(x = imp200m, y = n.herb))+
+    geom_point()+
+    facet_wrap(vars(month), ncol = 3)+
+    ylab("Herbivore abundance")+
+    xlab("Impervious surface (200 m)")+
+    theme_minimal()+
+    Asia_Theme
+herb.imp.plot
+
+#Pollinator abundance and Wealth Index
+herb.wealth.plot <- ggplot(sites, aes(x = WealthIndex, y = n.herb))+
+    geom_point()+
+    facet_wrap(vars(month), ncol = 3)+
+    ylab("Herbivore abundance")+
+    xlab("Wealth Index (500 m)")+
+    theme_minimal()+
+    Asia_Theme
+herb.wealth.plot
 ```
 
+### Natural Enemy Abundance and Landscape Variables
+```{r}
+#Pollinator abundance and Impervious Surface
+enemy.imp.plot <- ggplot(sites, aes(x = imp200m, y = n.enemy))+
+    geom_point()+
+    facet_wrap(vars(month), ncol = 3)+
+    ylab("Natural enemy abundance")+
+    xlab("Impervious surface (200 m)")+
+    theme_minimal()+
+    Asia_Theme
+enemy.imp.plot
+
+#Pollinator abundance and Wealth Index
+enemy.wealth.plot <- ggplot(sites, aes(x = WealthIndex, y = n.enemy))+
+    geom_point()+
+    facet_wrap(vars(month), ncol = 3)+
+    ylab("Natural enemy abundance")+
+    xlab("Wealth Index (500 m)")+
+    theme_minimal()+
+    Asia_Theme
+enemy.wealth.plot
+```
+### Detritivore Abundance and Landscape Variables
+```{r}
+#Pollinator abundance and Impervious Surface
+det.imp.plot <- ggplot(sites, aes(x = imp200m, y = n.det))+
+    geom_point()+
+    facet_wrap(vars(month), ncol = 3)+
+    ylab("Detritivore abundance")+
+    xlab("Impervious surface (200 m)")+
+    theme_minimal()+
+    Asia_Theme
+det.imp.plot
+
+#Pollinator abundance and Wealth Index
+det.wealth.plot <- ggplot(sites, aes(x = WealthIndex, y = n.det))+
+    geom_point()+
+    facet_wrap(vars(month), ncol = 3)+
+    ylab("Natural enemy abundance")+
+    xlab("Wealth Index (500 m)")+
+    theme_minimal()+
+    Asia_Theme
+det.wealth.plot
+```
 # Habitat Quality Index
 ```{r}
 

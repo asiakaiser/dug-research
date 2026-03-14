@@ -80,8 +80,8 @@ Garden Floral Community NMDS Plot
 ```{r}
 flor.mds.scores$WealthStrata <- cut(
   flor.mds.scores$WealthIndex,
-  breaks = c(-Inf, 100, 150, Inf),
-  labels = c("Low wealth (< 100)", "Moderate wealth (100 - 150)", "High wealth (>150)"),
+  breaks = c(-Inf, 98, 160, Inf),
+  labels = c("Low wealth (< 99)", "Moderate wealth (99 - 160)", "High wealth (>160)"),
   include.lowest = TRUE)
 
 
@@ -96,14 +96,14 @@ flor.mds.plot <-
     stroke = 0.6) +
   scale_fill_viridis_d(
     option = "viridis",
-    limits = c("Low wealth (< 100)","Moderate wealth (100 - 150)","High wealth (>150)"),
+    limits = c("Low wealth (< 99)","Moderate wealth (99 - 160)","High wealth (>160)"),
     begin = 0,
     end = 1,
     name = "Wealth Index") +
     scale_shape_manual(
     values = c(21, 22, 24),   # all filled shapes
     limits = c(
-      "Low wealth (< 100)","Moderate wealth (100 - 150)","High wealth (>150)"),
+      "Low wealth (< 99)","Moderate wealth (99 - 160)","High wealth (>160)"),
     name = "Wealth Index") +
   theme_minimal() +
   labs(title = "Local Flora",
@@ -133,8 +133,8 @@ Landscape Level Floral Community NMDS Plot
 ```{r}
 land.mds.scores$WealthStrata <- cut(
   land.mds.scores$WealthIndex,
-  breaks = c(-Inf, 100, 150, Inf),
-  labels = c("Low wealth (< 100)", "Moderate wealth (100 - 150)", "High wealth (>150)"),
+  breaks = c(-Inf, 98, 160, Inf),
+  labels = c("Low wealth (< 99)","Moderate wealth (99 - 160)","High wealth (>160)"),
   include.lowest = TRUE)
 
 
@@ -149,14 +149,14 @@ land.mds.plot <-
     stroke = 0.6) +
   scale_fill_viridis_d(
     option = "viridis",
-    limits = c("Low wealth (< 100)","Moderate wealth (100 - 150)","High wealth (>150)"),
+    limits = c("Low wealth (< 99)","Moderate wealth (99 - 160)","High wealth (>160)"),
     begin = 0,
     end = 1,
     name = "Wealth Index") +
     scale_shape_manual(
     values = c(21, 22, 24),   # all filled shapes
     limits = c(
-      "Low wealth (< 100)","Moderate wealth (100 - 150)","High wealth (>150)"),
+      "Low wealth (< 99)","Moderate wealth (99 - 160)","High wealth (>160)"),
     name = "Wealth Index") +
   theme_minimal() +
   labs(title = "Landscape Flora",
@@ -242,8 +242,8 @@ Arthropods NMDS Plot for Full Summer Data
 ```{r}
 arthropods.sum.mds.scores$WealthStrata <- cut(
   arthropods.sum.mds.scores$WealthIndex,
-  breaks = c(-Inf, 100, 150, Inf),
-  labels = c("Low wealth (< 100)", "Moderate wealth (100 - 150)", "High wealth (>150)"),
+  breaks = c(-Inf, 98, 160, Inf),
+  labels = c("Low wealth (< 99)","Moderate wealth (99 - 160)","High wealth (>160)"),
   include.lowest = TRUE)
 
 
@@ -258,14 +258,14 @@ arthropods.sum.mds.plot <-
     stroke = 0.6) +
   scale_fill_viridis_d(
     option = "viridis",
-    limits = c("Low wealth (< 100)","Moderate wealth (100 - 150)","High wealth (>150)"),
+    limits = c("Low wealth (< 99)","Moderate wealth (99 - 160)","High wealth (>160)"),
     begin = 0,
     end = 1,
     name = "Wealth Index") +
     scale_shape_manual(
     values = c(21, 22, 24),   # all filled shapes
     limits = c(
-      "Low wealth (< 100)","Moderate wealth (100 - 150)","High wealth (>150)"),
+      "Low wealth (< 99)","Moderate wealth (99 - 160)","High wealth (>160)"),
     name = "Wealth Index") +
   theme_minimal() +
   labs(title = "Arthropod Functional Groups",
@@ -363,8 +363,8 @@ Bee NMDS Plot for Full Summer Data
 ```{r}
 bees.agg.mds.scores$WealthStrata <- cut(
   bees.agg.mds.scores$WealthIndex,
-  breaks = c(-Inf, 100, 150, Inf),
-  labels = c("Low wealth (< 100)", "Moderate wealth (100 - 150)", "High wealth (>150)"),
+  breaks = c(-Inf, 98, 160, Inf),
+  labels = c("Low wealth (< 99)","Moderate wealth (99 - 160)","High wealth (>160)"),
   include.lowest = TRUE)
 
 
@@ -379,14 +379,14 @@ bees.agg.mds.plot <-
     stroke = 0.6) +
   scale_fill_viridis_d(
     option = "viridis",
-    limits = c("Low wealth (< 100)","Moderate wealth (100 - 150)","High wealth (>150)"),
+    limits = c("Low wealth (< 99)","Moderate wealth (99 - 160)","High wealth (>160)"),
     begin = 0,
     end = 1,
     name = "Wealth Index") +
     scale_shape_manual(
     values = c(21, 22, 24),   # all filled shapes
     limits = c(
-      "Low wealth (< 100)","Moderate wealth (100 - 150)","High wealth (>150)"),
+      "Low wealth (< 99)","Moderate wealth (99 - 160)","High wealth (>160)"),
     name = "Wealth Index") +
   theme_minimal() +
   labs(title = "Bee Species",
