@@ -159,7 +159,6 @@ inat_wide <- inat_data %>%
 
 # Bee Biodiversity Metrics
 
-
 ```{r}
 #Total number of each bee species observed by site and month
 bees <- arthropods %>%
@@ -202,9 +201,9 @@ bees_shannon <-  bees.iNEXT$AsyEst[bees.iNEXT$AsyEst$Diversity == "Shannon diver
 bees_simpson <-  bees.iNEXT$AsyEst[bees.iNEXT$AsyEst$Diversity == "Simpson diversity",]
 
 # Match site_code to Assemblage
-sites$bee.rich    <- bees_richness$Observed[match(sites$site_code, bees_richness$Assemblage)]
-sites$bee.shannon <- bees_shannon$Observed[match(sites$site_code, bees_shannon$Assemblage)]
-sites$bee.simpson <- bees_simpson$Observed[match(sites$site_code, bees_simpson$Assemblage)]
+sites$bee.rich    <- bees_richness$Estimator[match(sites$site_code, bees_richness$Assemblage)]
+sites$bee.shannon <- bees_shannon$Estimator[match(sites$site_code, bees_shannon$Assemblage)]
+sites$bee.simpson <- bees_simpson$Estimator[match(sites$site_code, bees_simpson$Assemblage)]
 ```
 
 

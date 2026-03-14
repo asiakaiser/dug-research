@@ -186,6 +186,7 @@ pol.wealth.plot <- ggplot(sites, aes(x = WealthIndex, y = n.pol))+
     Asia_Theme
 pol.wealth.plot
 ```
+
 ### Herbivore Abundance and Landscape Variables
 ```{r}
 #Pollinator abundance and Impervious Surface
@@ -247,12 +248,36 @@ det.imp.plot
 det.wealth.plot <- ggplot(sites, aes(x = WealthIndex, y = n.det))+
     geom_point()+
     facet_wrap(vars(month), ncol = 3)+
-    ylab("Natural enemy abundance")+
+    ylab("Detritivore abundance")+
     xlab("Wealth Index (500 m)")+
     theme_minimal()+
     Asia_Theme
 det.wealth.plot
 ```
+## Bee Species Richness
+```{r}
+#Bee richness and Impervious Surface
+pol.imp.plot <- ggplot(sites, aes(x = imp200m, y = n.pol))+
+    geom_point()+
+    facet_wrap(vars(month), ncol = 3)+
+    ylab("Pollinator abundance")+
+    xlab("Impervious surface (200 m)")+
+    theme_minimal()+
+    Asia_Theme
+pol.imp.plot
+
+#Bee richness and Wealth Index
+pol.wealth.plot <- ggplot(sites, aes(x = WealthIndex, y = n.pol))+
+    geom_point()+
+    facet_wrap(vars(month), ncol = 3)+
+    ylab("Pollinator abundance")+
+    xlab("Wealth Index (500 m)")+
+    theme_minimal()+
+    Asia_Theme
+pol.wealth.plot
+```
+
+
 # Habitat Quality Index
 ```{r}
 
