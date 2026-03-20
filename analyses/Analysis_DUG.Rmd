@@ -150,6 +150,19 @@ wealth.loc.plot4
 ```
 # Arthropod Abundance
 
+Data Distributions
+```{r}
+#Total arthropod data
+#Total arthropod abundance and Impervious Surface
+arth.hist <- ggplot(sites, aes(x = n.obs))+
+    geom_histogram()+
+    xlab("arthropod abundance")+
+    theme_minimal()+
+    Asia_Theme
+arth.hist
+```
+
+
 ## Total Arthropod Abundance & Landscape Variables
 ```{r}
 #Total arthropod abundance and Impervious Surface
