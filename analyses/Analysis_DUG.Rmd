@@ -13,6 +13,8 @@ library("vegan")
 library("corrplot")
 library("Hmisc")
 library("brms")
+library("tidybayes")
+library("ggpubr")
 ```
 
 # Read in the Data
@@ -154,150 +156,250 @@ wealth.loc.plot4
 Data Distributions
 ```{r}
 #Total arthropod data
-#Total arthropod abundance and Impervious Surface
 arth.hist <- ggplot(sites, aes(x = n.obs))+
     geom_histogram()+
     xlab("arthropod abundance")+
     theme_minimal()+
     Asia_Theme
 arth.hist
+
+pol.hist <- ggplot(sites, aes(x = n.pol))+
+    geom_histogram()+
+    xlab("pollinator abundance")+
+    theme_minimal()+
+    Asia_Theme
+pol.hist
 ```
 ## Analysis
 
+*What is the relationship between impervious surface, wealth, and total arthropod abundance?*
 ```{r}
 set.seed(1)
 arthropods_brms <- brms::brm(n.obs ~ imp200m + WealthIndex + month + (1|site_code),
                          data = sites, 
                          family = negbinomial(link = "log"), 
-                         chains = 3, iter = 3000, warmup = 1000)
+                         chains = 3, cores = 4, iter = 2000, warmup = 1000)
+
 summary(arthropods_brms)
 plot(arthropods_brms)
+loo(arthropods_brms,arthropods2_brms, compare = TRUE)
 ```
+
+*What is the relationship between impervious surface, wealth, and pollinator, herbivore, and natural enemy abundances?*
+```{r}
+set.seed(1)
+pol_brms <- brms::brm(n.pol ~ imp200m + WealthIndex + month + (1|site_code),
+                         data = sites, 
+                         family = negbinomial(link = "log"), 
+                         chains = 3, cores = 4, iter = 2000, warmup = 1000)
+
+
+herb_brms <- brms::brm(n.herb ~ imp200m + WealthIndex + month + (1|site_code),
+                         data = sites, 
+                         family = negbinomial(link = "log"), 
+                         chains = 3, cores = 4, iter = 2000, warmup = 1000)
+summary(herb_brms)
+
+enemy_brms <- brms::brm(n.enemy ~ imp200m + WealthIndex + month + (1|site_code),
+                         data = sites, 
+                         family = negbinomial(link = "log"), 
+                         chains = 3, cores = 4, iter = 2000, warmup = 1000)
+summary(pol_brms)
+summary(herb_brms)
+summary(enemy_brms)
+#plot(pol_brms)
+```
+
 
 ## Plots
 
-#### Total Arthropod Abundance & Landscape Variables 
+Making site variables prediction grid
 ```{r}
-#Total arthropod abundance and Impervious Surface
-total.arth.imp.plot <- ggplot(sites, aes(x = imp200m, y = n.obs))+
-    geom_point()+
-    geom_smooth()+
-    facet_wrap(vars(month), ncol = 3)+
-    ylab("Total arthropod abundance")+
-    xlab("Impervious surface (200 m)")+
-    theme_minimal()+
-    Asia_Theme
-total.arth.imp.plot
+sitevar.pred <- tidyr::expand_grid(
+  imp200m = seq(min(sites$imp200m), max(sites$imp200m), length.out = 100),
+  site_code = unique(sites$site_code),
+  month = unique(sites$month),
+  WealthIndex = mean(sites$WealthIndex, na.rm = TRUE))
+```
 
-#Total arthropod abundance and Wealth Index
-total.arth.wealth.plot <- ggplot(sites, aes(x = WealthIndex, y = n.obs))+
-    geom_point()+
-    geom_smooth()+
-    facet_wrap(vars(month), ncol = 3)+
-    ylab("Total arthropod abundance")+
-    xlab("Wealth Index (500 m)")+
-    theme_minimal()+
+#### Total Arthropod Abundance & Landscape Variables 
+```{r, message=FALSE}
+#Generate predictions on grid from arthropod brms model
+arth.preds  <- sitevar.pred  %>%
+  add_epred_draws(arthropods_brms, ndraws = 200)
+
+#Total arthropod abundance and Impervious Surface with brms estimate with credible intervals
+arth.imp.plot <- ggplot(arth.preds, aes(x = imp200m, y = .epred)) +
+  stat_lineribbon(.width = c(.95, .80, .50),
+                  alpha = 0.5, colour = "black") +
+  geom_point(data = sites,
+             aes(x = imp200m, y = n.obs),
+             colour = "darkseagreen4", size = 3) +
+  scale_fill_brewer(palette = "Greys") +
+  ylab("Total arthropod abundance") +
+  xlab("Impervious surface 200 m") +
+  theme_minimal() +
+  theme(legend.title = element_blank(),
+        legend.position = c(0.85, 0.85))+
     Asia_Theme
-total.arth.wealth.plot
+arth.imp.plot 
+
+#Total arthropod abundance and Wealth Index with brms estimate with credible intervals
+arth.wealth.plot <- ggplot(arth.preds, aes(x = WealthIndex, y = .epred)) +
+  stat_lineribbon(.width = c(.95, .80, .50),
+                  alpha = 0.5, colour = "black") +
+  geom_point(data = sites,
+             aes(x = WealthIndex, y = n.obs),
+             colour = "darkseagreen4", size = 3) +
+  scale_fill_brewer(palette = "Greys") +
+  ylab("Total arthropod abundance") +
+  xlab("Wealth Index 500 m") +
+  theme_minimal() +
+  theme(legend.position = "none")+
+    Asia_Theme
+arth.wealth.plot 
+
+arthropods.panelplot <- ggarrange(arth.imp.plot, arth.wealth.plot, ncol = 2, labels = "AUTO")
 ```
 ### Pollinator Abundance and Landscape Variables
-```{r}
+```{r, message=FALSE}
+#Generate predictions on grid from pollinator brms model
+pol.preds  <- sitevar.pred  %>%
+  add_epred_draws(pol_brms, ndraws = 300)
+
 #Pollinator abundance and Impervious Surface
-pol.imp.plot <- ggplot(sites, aes(x = imp200m, y = n.pol))+
-    geom_point()+
-    geom_smooth()+
-    facet_wrap(vars(month), ncol = 3)+
-    ylab("Pollinator abundance")+
-    xlab("Impervious surface (200 m)")+
-    theme_minimal()+
+pol.imp.plot <- ggplot(pol.preds, aes(x = imp200m, y = .epred, color = month)) +
+  geom_smooth() +
+  geom_point(data = sites,
+             aes(x = imp200m, y = n.pol), size = 3) +
+  scale_color_viridis_d(
+    option = "magma",
+    limits = c("June","July","August"),
+    begin = 0.1,
+    end = .9,
+    name = "Month")+
+  ylab("Pollinator abundance") +
+  xlab("Impervious surface 200 m") +
+  theme_minimal() +
+  theme(legend.title = element_blank(),
+        legend.position = c(0.85, 0.85))+
     Asia_Theme
 pol.imp.plot
 
 #Pollinator abundance and Wealth Index
-pol.wealth.plot <- ggplot(sites, aes(x = WealthIndex, y = n.pol))+
-    geom_point()+
-    geom_smooth()+
-    facet_wrap(vars(month), ncol = 3)+
-    ylab("Pollinator abundance")+
-    xlab("Wealth Index (500 m)")+
-    theme_minimal()+
+pol.wealth.plot <- ggplot(pol.preds, aes(x = WealthIndex, y = .epred, color = month)) +
+  geom_smooth() +
+  geom_point(data = sites,
+             aes(x = WealthIndex, y = n.pol), size = 3) +
+  scale_color_viridis_d(
+    option = "magma",
+    limits = c("June","July","August"),
+    begin = 0.1,
+    end = .9,
+    name = "Month")+
+  ylab("Pollinator abundance") +
+  xlab("Wealth Index 500 m") +
+  theme_minimal() +
+  theme(legend.position = "none")+
     Asia_Theme
-pol.wealth.plot
+pol.wealth.plot 
 ```
 
 ### Herbivore Abundance and Landscape Variables
 ```{r}
-#Pollinator abundance and Impervious Surface
-herb.imp.plot <- ggplot(sites, aes(x = imp200m, y = n.herb))+
-    geom_point()+
-    geom_smooth()+
-    facet_wrap(vars(month), ncol = 3)+
-    ylab("Herbivore abundance")+
-    xlab("Impervious surface (200 m)")+
-    theme_minimal()+
+#Generate predictions on grid from herbivore brms model
+herb.preds  <- sitevar.pred  %>%
+  add_epred_draws(herb_brms, ndraws = 300)
+
+#Herbivore abundance and Impervious Surface
+herb.imp.plot <- ggplot(herb.preds, aes(x = imp200m, y = .epred, color = month)) +
+  geom_smooth() +
+  geom_point(data = sites,
+             aes(x = imp200m, y = n.herb), size = 3) +
+  scale_color_viridis_d(
+    option = "magma",
+    limits = c("June","July","August"),
+    begin = 0.1,
+    end = .9,
+    name = "Month")+
+  ylab("Herbivore abundance") +
+  xlab("Impervious surface 200 m") +
+  theme_minimal() +
+  theme(legend.title = element_blank(),
+        legend.position = c(0.85, 0.85))+
     Asia_Theme
 herb.imp.plot
 
-#Pollinator abundance and Wealth Index
-herb.wealth.plot <- ggplot(sites, aes(x = WealthIndex, y = n.herb))+
-    geom_point()+
-    geom_smooth()+
-    facet_wrap(vars(month), ncol = 3)+
-    ylab("Herbivore abundance")+
-    xlab("Wealth Index (500 m)")+
-    theme_minimal()+
+#Herbivore abundance and Wealth Index
+herb.wealth.plot <- ggplot(herb.preds, aes(x = WealthIndex, y = .epred,  color = month)) +
+  geom_smooth() +
+  geom_point(data = sites,
+             aes(x = WealthIndex, y = n.herb), size = 3) +
+  scale_color_viridis_d(
+    option = "magma",
+    limits = c("June","July","August"),
+    begin = 0.1,
+    end = .9,
+    name = "Month")+
+  ylab("Herbivore abundance") +
+  xlab("Wealth Index 500 m") +
+  theme_minimal() +
+  theme(legend.position = "none")+
     Asia_Theme
-herb.wealth.plot
+herb.wealth.plot 
 ```
 
 ### Natural Enemy Abundance and Landscape Variables
 ```{r}
-#Pollinator abundance and Impervious Surface
-enemy.imp.plot <- ggplot(sites, aes(x = imp200m, y = n.enemy))+
-    geom_point()+
-    geom_smooth()+
-    facet_wrap(vars(month), ncol = 3)+
-    ylab("Natural enemy abundance")+
-    xlab("Impervious surface (200 m)")+
-    theme_minimal()+
+#Generate predictions on grid from herbivore brms model
+enemy.preds  <- sitevar.pred  %>%
+  add_epred_draws(enemy_brms, ndraws = 300)
+
+#Natural Enemy abundance and Impervious Surface
+enemy.imp.plot <- ggplot(enemy.preds, aes(x = imp200m, y = .epred, color = month)) +
+  geom_smooth() +
+  geom_point(data = sites,
+             aes(x = imp200m, y = n.enemy), size = 3) +
+  scale_color_viridis_d(
+    option = "magma",
+    limits = c("June","July","August"),
+    begin = 0.1,
+    end = .9,
+    name = "Month")+
+  ylab("Natural Enemy abundance") +
+  xlab("Impervious surface 200 m") +
+  theme_minimal() +
+  theme(legend.title = element_blank(),
+        legend.position = c(0.85, 0.85))+
     Asia_Theme
 enemy.imp.plot
 
-#Pollinator abundance and Wealth Index
-enemy.wealth.plot <- ggplot(sites, aes(x = WealthIndex, y = n.enemy))+
-    geom_point()+
-    geom_smooth()+
-    facet_wrap(vars(month), ncol = 3)+
-    ylab("Natural enemy abundance")+
-    xlab("Wealth Index (500 m)")+
-    theme_minimal()+
+#Herbivore abundance and Wealth Index
+enemy.wealth.plot <- ggplot(enemy.preds, aes(x = WealthIndex, y = .epred,  color = month)) +
+  geom_smooth() +
+  geom_point(data = sites,
+             aes(x = WealthIndex, y = n.enemy), size = 3) +
+  scale_color_viridis_d(
+    option = "magma",
+    limits = c("June","July","August"),
+    begin = 0.1,
+    end = .9,
+    name = "Month")+
+  ylab("Natural Enemy abundance") +
+  xlab("Wealth Index 500 m") +
+  theme_minimal() +
+  theme(legend.position = "none")+
     Asia_Theme
-enemy.wealth.plot
+enemy.wealth.plot 
 ```
-### Detritivore Abundance and Landscape Variables
+Panel plot for all functional groups
 ```{r}
-#Pollinator abundance and Impervious Surface
-det.imp.plot <- ggplot(sites, aes(x = imp200m, y = n.det))+
-    geom_point()+
-    geom_smooth()+
-    facet_wrap(vars(month), ncol = 3)+
-    ylab("Detritivore abundance")+
-    xlab("Impervious surface (200 m)")+
-    theme_minimal()+
-    Asia_Theme
-det.imp.plot
-
-#Pollinator abundance and Wealth Index
-det.wealth.plot <- ggplot(sites, aes(x = WealthIndex, y = n.det))+
-    geom_point()+
-    geom_smooth()+
-    facet_wrap(vars(month), ncol = 3)+
-    ylab("Detritivore abundance")+
-    xlab("Wealth Index (500 m)")+
-    theme_minimal()+
-    Asia_Theme
-det.wealth.plot
+fungroup.panelplot <- ggarrange(pol.imp.plot, pol.wealth.plot, herb.imp.plot, herb.wealth.plot, enemy.imp.plot, enemy.wealth.plot, 
+        ncol = 2, nrow = 3, 
+        labels = "AUTO",
+        common.legend = TRUE)
 ```
+
 ## Bee Species Richness
 ```{r}
 #Bee richness and Impervious Surface
@@ -385,5 +487,12 @@ cuc.beeshan.plot4
 # Structural Equation Modelling
 ```{r}
 
+```
+
+# Save Images
+```{r}
+ggsave("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/figures/Arthropods_PanelFig.pdf", plot = arthropods.panelplot, height = 7, width = 10)
+
+ggsave("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/figures/FunctionalGroups_PanelFig.pdf", plot = fungroup.panelplot, height = 11, width = 7)
 ```
 
