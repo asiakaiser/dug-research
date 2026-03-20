@@ -12,6 +12,7 @@ library("lmerTest")
 library("vegan")
 library("corrplot")
 library("Hmisc")
+library("brms")
 ```
 
 # Read in the Data
@@ -161,9 +162,21 @@ arth.hist <- ggplot(sites, aes(x = n.obs))+
     Asia_Theme
 arth.hist
 ```
+## Analysis
 
+```{r}
+set.seed(1)
+arthropods_brms <- brms::brm(n.obs ~ imp200m + WealthIndex + month + (1|site_code),
+                         data = sites, 
+                         family = negbinomial(link = "log"), 
+                         chains = 3, iter = 3000, warmup = 1000)
+summary(arthropods_brms)
+plot(arthropods_brms)
+```
 
-## Total Arthropod Abundance & Landscape Variables
+## Plots
+
+#### Total Arthropod Abundance & Landscape Variables 
 ```{r}
 #Total arthropod abundance and Impervious Surface
 total.arth.imp.plot <- ggplot(sites, aes(x = imp200m, y = n.obs))+
@@ -308,7 +321,16 @@ bee.wealth.plot <- ggplot(sites, aes(x = WealthIndex, y = bee.rich))+
 bee.wealth.plot
 ```
 # Cucumber Outcomes
-## Cucumbers and Bee Richness
+
+## Analysis
+
+```{r}
+
+```
+
+## Plots
+
+### Cucumbers and Bee Richness
 ```{r}
 cuc.beerich.plot1 <- ggplot(sites, aes(x = bee.rich, y = delta_seed_mass_ratio))+
     geom_point()+
@@ -331,7 +353,7 @@ cuc.beerich.plot4 <- ggplot(sites, aes(x = bee.rich, y = delta_volume))+
 cuc.beerich.plot4
 ```
 
-## Cucumbers and Bee Shannon Diversity
+### Cucumbers and Bee Shannon Diversity
 ```{r}
 cuc.beeshan.plot1 <- ggplot(sites, aes(x = bee.shannon, y = delta_seed_mass_ratio))+
     geom_point()+
