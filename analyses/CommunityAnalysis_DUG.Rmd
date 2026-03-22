@@ -59,7 +59,7 @@ Site covariates of interest for NMDS plots & PERMANOVA
 ```{r}
 site_cov <- sites %>%
     filter(month == "June")%>%
-    select(c("site_code","tcc200m","imp200m","tcc500m","imp500m","WealthIndex","floral_area_m2","flor.rich"))
+    select(c("site_code","tcc200m","imp200m","tcc500m","imp500m","WealthIndex","PovertyIndex","MedNetWorth","MedHomeVal","VacantHU","RenterHU", "floral_area_m2","flor.rich"))
 ```
 
 ## Garden Floral NMDS
@@ -477,7 +477,7 @@ arthropods_disp <-betadisper(arthropods_dist,
                              group= arthropods.mds.scores$month,
                              type = c("median","centroid"))
 anova(arthropods_disp)
-arthropods_disp_plot <- plot(arthropods_disp)
+arthropods_disp_plot <- plot(arthropods_disp, hull=FALSE, ellipse=TRUE)
 
 #Full summer community differences by wealth
 arthropods_sum_matrix <- as.matrix(arthropods.sum.NMDS_input)
@@ -500,11 +500,11 @@ bees_disp <-betadisper(bees_dist,
                              type = c("median","centroid"))
 anova(bees_disp)
 TukeyHSD(bees_disp)
-bees_disp_plot <- plot(bees_disp)
+bees_disp_plot <- plot(bees_disp, hull=FALSE, ellipse=TRUE)
 
 #Full summer community differences by wealth
 bees_sum_matrix <- as.matrix(bees.agg.NMDS_input)
-bees_sum_permanova<- adonis2(bees_sum_matrix ~ imp200m + WealthIndex, data = bees.agg.mds.scores, method = "bray", permutations = 999, by = "margin")
+bees_sum_permanova<- adonis2(bees_sum_matrix ~ imp200m + PovertyIndex, data = bees.agg.mds.scores, method = "bray", permutations = 999, by = "margin")
 print(bees_sum_permanova)
 ```
 

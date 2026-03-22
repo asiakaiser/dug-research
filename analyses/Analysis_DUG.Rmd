@@ -15,6 +15,8 @@ library("Hmisc")
 library("brms")
 library("tidybayes")
 library("ggpubr")
+library("blavaan")
+library("gtsummary")
 ```
 
 # Read in the Data
@@ -175,32 +177,39 @@ pol.hist
 *What is the relationship between impervious surface, wealth, and total arthropod abundance?*
 ```{r}
 set.seed(1)
-arthropods_brms <- brms::brm(n.obs ~ imp200m + WealthIndex + month + (1|site_code),
+threshold <- 125
+sites$WI_high <- pmax(0, sites$WealthIndex - threshold)
+
+arthropods_brms <- brms::brm(n.obs ~ imp200m + WealthIndex + WI_high + month + (1|site_code),
                          data = sites, 
                          family = negbinomial(link = "log"), 
                          chains = 3, cores = 4, iter = 2000, warmup = 1000)
 
-summary(arthropods_brms)
-plot(arthropods_brms)
-loo(arthropods_brms,arthropods2_brms, compare = TRUE)
+arthropods_brms2 <- brms::brm(n.obs ~ imp200m + s(WealthIndex) + month + (1|site_code),
+                         data = sites, 
+                         family = negbinomial(link = "log"), 
+                         chains = 3, cores = 4, iter = 2000, warmup = 1000)
+
+#plot(arthropods_brms)
+loo(arthropods_brms,arthropods_brms2, compare = TRUE)
+
 ```
 
 *What is the relationship between impervious surface, wealth, and pollinator, herbivore, and natural enemy abundances?*
 ```{r}
 set.seed(1)
-pol_brms <- brms::brm(n.pol ~ imp200m + WealthIndex + month + (1|site_code),
+
+pol_brms <- brms::brm(n.pol ~ imp200m + WealthIndex + WI_high + month + (1|site_code),
                          data = sites, 
                          family = negbinomial(link = "log"), 
                          chains = 3, cores = 4, iter = 2000, warmup = 1000)
 
-
-herb_brms <- brms::brm(n.herb ~ imp200m + WealthIndex + month + (1|site_code),
+herb_brms <- brms::brm(n.herb ~ imp200m + WealthIndex + WI_high + month + (1|site_code),
                          data = sites, 
                          family = negbinomial(link = "log"), 
                          chains = 3, cores = 4, iter = 2000, warmup = 1000)
-summary(herb_brms)
 
-enemy_brms <- brms::brm(n.enemy ~ imp200m + WealthIndex + month + (1|site_code),
+enemy_brms <- brms::brm(n.enemy ~ imp200m + WealthIndex + WI_high + month + (1|site_code),
                          data = sites, 
                          family = negbinomial(link = "log"), 
                          chains = 3, cores = 4, iter = 2000, warmup = 1000)
@@ -210,16 +219,15 @@ summary(enemy_brms)
 #plot(pol_brms)
 ```
 
-
 ## Plots
 
 Making site variables prediction grid
 ```{r}
 sitevar.pred <- tidyr::expand_grid(
-  imp200m = seq(min(sites$imp200m), max(sites$imp200m), length.out = 100),
+  imp200m = seq(min(sites$imp200m), max(sites$imp200m), length.out = 50),
   site_code = unique(sites$site_code),
   month = unique(sites$month),
-  WealthIndex = mean(sites$WealthIndex, na.rm = TRUE))
+  WealthIndex = seq(min(sites$WealthIndex), max(sites$WealthIndex), length.out = 50))
 ```
 
 #### Total Arthropod Abundance & Landscape Variables 
@@ -401,6 +409,70 @@ fungroup.panelplot <- ggarrange(pol.imp.plot, pol.wealth.plot, herb.imp.plot, he
 ```
 
 ## Bee Species Richness
+```{r}
+threshold <- 125
+sites$WI_high <- pmax(0, sites$WealthIndex - threshold)
+bees_brms <- brms::brm(bee.rich ~ imp200m + WealthIndex + WI_high + month + (1|site_code),
+                         data = sites, 
+                         chains = 3, cores = 4, iter = 2000, warmup = 1000)
+bees2_brms <- brms::brm(bee.rich ~ imp200m + s(WealthIndex) + month + (1|site_code),
+                         data = sites, 
+                         chains = 3, cores = 4, iter = 2000, warmup = 1000)
+summary(bees_brms)
+loo(bees_brms,bees2_brms)
+```
+Plots
+```{r}
+#Making prediction grid
+sitevar.pred.high <- tidyr::expand_grid(
+  imp200m = mean(sites_high$imp200m),
+  site_code = unique(sites_high$site_code),
+  month = unique(sites_high$month),
+  WealthIndex = seq(min(sites_high$WealthIndex), max(sites_high$WealthIndex), length.out = 100))
+
+#Generate predictions on grid from bees brms model
+bees.preds  <- sitevar.pred.high  %>%
+  add_epred_draws(bees_brms, ndraws = 300)
+
+#Pollinator abundance and Impervious Surface
+bees.imp.plot <- ggplot(bees.preds, aes(x = imp200m, y = .epred, color = month)) +
+  geom_smooth() +
+  geom_point(data = sites_high,
+             aes(x = imp200m, y = bee.rich), size = 3) +
+  scale_color_viridis_d(
+    option = "magma",
+    limits = c("June","July","August"),
+    begin = 0.1,
+    end = .9,
+    name = "Month")+
+  ylab("Bee richness") +
+  xlab("Impervious surface 200 m") +
+  theme_minimal() +
+  theme(legend.title = element_blank(),
+        legend.position = c(0.85, 0.85))+
+    Asia_Theme
+bees.imp.plot
+
+#Pollinator abundance and Wealth Index
+bees.wealth.plot <- ggplot(bees.preds, aes(x = WealthIndex, y = .epred, color = month)) +
+  geom_smooth() +
+  geom_point(data = sites_high,
+             aes(x = WealthIndex, y = bee.rich), size = 3) +
+  scale_color_viridis_d(
+    option = "magma",
+    limits = c("June","July","August"),
+    begin = 0.1,
+    end = .9,
+    name = "Month")+
+  ylab("Bee richness") +
+  xlab("Wealth Index 500 m") +
+  theme_minimal() +
+  theme(legend.position = "none")+
+    Asia_Theme
+bees.wealth.plot 
+```
+
+
 ```{r}
 #Bee richness and Impervious Surface
 bee.imp.plot <- ggplot(sites, aes(x = imp200m, y = bee.rich))+
