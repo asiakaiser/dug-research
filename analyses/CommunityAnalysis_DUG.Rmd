@@ -14,6 +14,7 @@ library("corrplot")
 library("Hmisc")
 library("viridis")
 library("ggpubr")
+library("mvabund")
 ```
 
 # Read in the Data
@@ -506,6 +507,25 @@ bees_disp_plot <- plot(bees_disp, hull=FALSE, ellipse=TRUE)
 bees_sum_matrix <- as.matrix(bees.agg.NMDS_input)
 bees_sum_permanova<- adonis2(bees_sum_matrix ~ imp200m + PovertyIndex, data = bees.agg.mds.scores, method = "bray", permutations = 999, by = "margin")
 print(bees_sum_permanova)
+```
+
+#Multivariate GLMS for Species
+```{r}
+#Arthropod Functional Groups
+arthropods_mv <- mvabund(arthropods.sum.NMDS_input)
+arthropods_mod <- manyglm(arthropods_mv ~ imp200m + WealthIndex,
+               data = arthropods.sum.mds.scores,
+               family = "negative.binomial")
+arthropods_anova_res <- anova(arthropods_mod, p.uni = "adjusted")
+arthropods_anova_res
+
+#Bees
+bees_mv <- mvabund(bees.agg.NMDS_input)
+bees_mod <- manyglm(bees_mv ~ imp200m + WealthIndex,
+               data = bees.agg.mds.scores,
+               family = "negative.binomial")
+bees_anova_res <- anova(bees_mod, p.uni = "adjusted")
+bees_anova_res
 ```
 
 # Save Figures
