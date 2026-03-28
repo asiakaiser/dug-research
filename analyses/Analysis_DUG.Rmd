@@ -15,7 +15,8 @@ library("Hmisc")
 library("brms")
 library("tidybayes")
 library("ggpubr")
-library("modelsummary")
+library("mgcv")
+library("loo")
 ```
 
 # Read in the Data
@@ -37,7 +38,7 @@ sites <- sites %>%
            species_per_m2 = flor.rich/floral_area_m2,
            imp200m_s = as.numeric(scale(imp200m)),
            WealthIndex_s = as.numeric(scale(WealthIndex)),
-           WI_high = pmax(WealthIndex - 125, 0),
+           WI_high = pmax(WealthIndex - 155, 0),
            WI_high_s = as.numeric(scale(WI_high)))
 
 attributes(scale(sites$WealthIndex))
@@ -170,7 +171,6 @@ arth.hist <- ggplot(sites, aes(x = n.obs))+
     theme_minimal()+
     Asia_Theme
 arth.hist
-median(sites$n.obs)
 
 pol.hist <- ggplot(sites, aes(x = n.pol))+
     geom_histogram()+
@@ -200,47 +200,71 @@ pred.hist
 set.seed(10)
 
 #Setting priors
-priors <- c(prior(normal(4.5, 1), class = "Intercept"),
-            prior(normal(0, 0.5), class = "b"),
-            prior(exponential(0.7), class = "sd"),
-            prior(exponential(0.5), class = "shape")
-            )
+priors_arth <- c(
+  prior(normal(log(80), 1.5), class = "Intercept"),
+  prior(normal(0, 1), class = "b"),
+  prior(exponential(1), class = "sd"),
+  prior(exponential(0.5), class = "shape")
+)
 
-arthropods_brms <- brms::brm(n.obs ~ imp200m_s + WealthIndex_s + WI_high_s + month + (1|site_code),
+arthropods_brms <- brms::brm(n.obs ~ imp200m_s + WealthIndex_s + month + (1|site_code),
                          data = sites, 
                          family = negbinomial(link = "log"),
-                         prior = priors,
-                         chains = 3, cores = 4, iter = 2000, warmup = 1000)
-
-arthropods_brms2 <- brms::brm(n.obs ~ imp200m_s + s(WealthIndex_s) + month + (1|site_code),
-                         data = sites, 
-                         family = negbinomial(link = "log"),
-                         prior = priors,
+                         prior = priors_arth,
                          chains = 3, cores = 4, iter = 2000, warmup = 1000)
 
 #plot(arthropods_brms)
-
 #conditional_effects(arthropods_brms)
-loo(arthropods_brms,arthropods_brms2, compare = TRUE)
 summary(arthropods_brms)
 ```
 
 *What is the relationship between impervious surface, wealth, and pollinator, herbivore, and natural enemy abundances?*
 ```{r}
+#Test for non-linear response to wealth in pollinators
+gam_fit <- gam(n.pol ~ s(WealthIndex) + imp200m + month,
+               data = sites,
+               family = nb())
+summary(gam_fit) #no significant non-linear relationship with wealth
+plot(gam_fit, pages = 1)
+
+priors_pol <- c(
+  prior(normal(log(15), 2), class = "Intercept"),
+  prior(normal(0, 1.5), class = "b"),
+  prior(exponential(1), class = "sd"),
+  prior(exponential(1), class = "shape")
+)
+
+priors_herb <- c(
+  prior(normal(log(15), 1.5), class = "Intercept"),
+  prior(normal(0, 1), class = "b"),
+  prior(exponential(1), class = "sd"),
+  prior(exponential(1), class = "shape")
+)
+
+priors_enemy <- c(
+  prior(normal(log(10), 1.5), class = "Intercept"),
+  prior(normal(0, 1), class = "b"),
+  prior(exponential(1), class = "sd"),
+  prior(exponential(1), class = "shape")
+)
+
 set.seed(100)
-pol_brms <- brms::brm(n.pol ~ imp200m_s + WealthIndex_s + WI_high_s + month + (1|site_code),
+pol_brms <- brms::brm(n.pol ~ imp200m_s + WealthIndex_s + month + (1|site_code),
                       data = sites, 
-                      family = negbinomial(link = "log"), 
+                      family = negbinomial(link = "log"),
+                      prior = priors_pol,
                       chains = 3, cores = 4, iter = 2000, warmup = 1000)
 
-herb_brms <- brms::brm(n.herb ~ imp200m_s + WealthIndex_s + WI_high_s + month + (1|site_code),
+herb_brms <- brms::brm(n.herb ~ imp200m_s + WealthIndex_s + month + (1|site_code),
                          data = sites, 
-                         family = negbinomial(link = "log"), 
+                         family = negbinomial(link = "log"),
+                       prior = priors_herb,
                          chains = 3, cores = 4, iter = 2000, warmup = 1000)
 
-enemy_brms <- brms::brm(n.enemy ~ imp200m_s + WealthIndex_s + WI_high_s + month + (1|site_code),
+enemy_brms <- brms::brm(n.enemy ~ imp200m_s + WealthIndex_s + month + (1|site_code),
                          data = sites, 
                          family = negbinomial(link = "log"), 
+                        prior = priors_enemy,
                          chains = 3, cores = 4, iter = 2000, warmup = 1000)
 summary(pol_brms)
 summary(herb_brms)
@@ -261,9 +285,7 @@ imp_scale  <- sd(sites$imp200m, na.rm = TRUE)
 wealth_center <- mean(sites$WealthIndex, na.rm = TRUE)
 wealth_scale  <- sd(sites$WealthIndex, na.rm = TRUE)
 
-WI_high_center <- mean(sites$WI_high, na.rm = TRUE)
-WI_high_scale  <- sd(sites$WI_high, na.rm = TRUE)
-
+# Prediction grid for impervious surface
 sitevar.pred.imp <- tidyr::expand_grid(
   imp200m = seq(
     min(sites$imp200m, na.rm = TRUE),
@@ -275,27 +297,8 @@ sitevar.pred.imp <- tidyr::expand_grid(
 ) %>%
   mutate(
     WealthIndex = wealth_ref,
-    WI_high = pmax(WealthIndex - 125, 0),
     imp200m_s = (imp200m - imp_center) / imp_scale,
-    WealthIndex_s = (WealthIndex - wealth_center) / wealth_scale,
-    WI_high_s = (WI_high - WI_high_center) / WI_high_scale
-  )
-
-sitevar.pred.wealth <- tidyr::expand_grid(
-  WealthIndex = seq(
-    min(sites$WealthIndex, na.rm = TRUE),
-    max(sites$WealthIndex, na.rm = TRUE),
-    length.out = 50
-  ),
-  site_code = unique(sites$site_code),
-  month = unique(sites$month)
-) %>%
-  mutate(
-    imp200m = imp_ref,
-    WI_high = pmax(WealthIndex - 125, 0),
-    imp200m_s = (imp200m - imp_center) / imp_scale,
-    WealthIndex_s = (WealthIndex - wealth_center) / wealth_scale,
-    WI_high_s = (WI_high - WI_high_center) / WI_high_scale
+    WealthIndex_s = (WealthIndex - wealth_center) / wealth_scale
   )
 ```
 
@@ -324,8 +327,8 @@ arth.imp.plot <- ggplot(arth.preds.imp, aes(x = imp200m, y = .epred)) +
     Asia_Theme
 arth.imp.plot 
 
-#Total arthropod abundance and Wealth Index with brms estimate with credible intervals
-arth.wealth.plot <- ggplot(arth.preds.wealth, aes(x = WealthIndex, y = .epred)) +
+#Total arthropod abundance and Wealth Inde
+arth.wealth.plot <- ggplot(arth.preds.imp, aes(x = WealthIndex, y = .epred)) +
   geom_point(data = sites,
              aes(x = WealthIndex, y = n.obs),
              colour = "darkseagreen4", size = 3) +
@@ -340,9 +343,9 @@ arth.wealth.plot
 #Effect size plot with credible intervals
 effect_arthropods <- tibble(
   term = c("Impervious surface", "Wealth Index"),
-  estimate = c(-0.47, 0.03),
-  lower = c(-0.66,-0.46),
-  upper = c(-0.27, 0.53)
+  estimate = c(-0.49, 0.09),
+  lower = c(-0.67,-0.09),
+  upper = c(-0.31, 0.26)
 )
 
 effect.plot.arthropods <- ggplot(effect_arthropods, aes(x = term, y = estimate)) +
@@ -365,10 +368,6 @@ arthropods.panelplot <- ggarrange(arth.imp.plot, arth.wealth.plot, ncol = 2, lab
 #Generate predictions on grid from pollinator brms model
 pol.preds.imp <- sitevar.pred.imp %>%
   add_epred_draws(pol_brms, ndraws = 200)
-
-pol.preds.wealth <- sitevar.pred.wealth %>%
-  add_epred_draws(pol_brms, ndraws = 200)
-
 
 #Pollinator abundance and Impervious Surface
 pol.imp.plot <- ggplot(pol.preds.imp, aes(x = imp200m, y = .epred, color = month)) +
@@ -394,8 +393,7 @@ pol.imp.plot <- ggplot(pol.preds.imp, aes(x = imp200m, y = .epred, color = month
 pol.imp.plot
 
 #Pollinator abundance and Wealth Index
-pol.wealth.plot <- ggplot(pol.preds.wealth, aes(x = WealthIndex, y = .epred, color = month)) +
-    geom_smooth()+
+pol.wealth.plot <- ggplot(pol.preds.imp, aes(x = WealthIndex, y = .epred, color = month)) +
   geom_point(data = sites,
              aes(x = WealthIndex, y = n.pol, shape = month), size = 3) +
   scale_color_viridis_d(
@@ -418,20 +416,20 @@ pol.wealth.plot
 #Effect size plot with credible intervals
 effect_pol <- tibble(
   term = factor(
-    c("Impervious surface", "Wealth Index", "High Wealth"),
-    levels = c("Impervious surface", "Wealth Index", "High Wealth")
+    c("Impervious surface", "Wealth Index"),
+    levels = c("Impervious surface", "Wealth Index")
   ),
-  estimate = c(-0.66, 0.80, -0.78),
-  lower = c(-0.95, 0.06, -1.53),
-  upper = c(-0.36, 1.51, -0.04)
+  estimate = c(-0.53, 0.07),
+  lower = c(-0.81, -0.17),
+  upper = c(-0.24, 0.33)
 )
 
 effect.plot.pol <- ggplot(effect_pol, aes(x = term, y = estimate)) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   geom_linerange(aes(ymin = lower, ymax = upper), linewidth = 1, 
-                 color = c("darkseagreen4", "darkseagreen4","darkseagreen4")) +
+                 color = c("darkseagreen4", "gray")) +
   geom_point(size = 3,
-             color = c("darkseagreen4", "darkseagreen4","darkseagreen4")) +
+             color = c("darkseagreen4", "gray")) +
   ylab("Beta estimate") +
   xlab(NULL) +
   theme_minimal() +
@@ -443,9 +441,6 @@ effect.plot.pol
 ```{r}
 #Generate predictions on grid from herbivore brms model
 herb.preds.imp <- sitevar.pred.imp %>%
-  add_epred_draws(herb_brms, ndraws = 200)
-
-herb.preds.wealth <- sitevar.pred.wealth %>%
   add_epred_draws(herb_brms, ndraws = 200)
 
 #Herbivore abundance and Impervious Surface
@@ -472,7 +467,7 @@ herb.imp.plot <- ggplot(herb.preds.imp, aes(x = imp200m, y = .epred, color = mon
 herb.imp.plot
 
 #Herbivore abundance and Wealth Index
-herb.wealth.plot <- ggplot(herb.preds.wealth, aes(x = WealthIndex, y = .epred,  color = month)) +
+herb.wealth.plot <- ggplot(herb.preds.imp, aes(x = WealthIndex, y = .epred,  color = month)) +
   geom_point(data = sites,
              aes(x = WealthIndex, y = n.herb, shape = month), size = 3) +
   scale_color_viridis_d(
@@ -495,20 +490,20 @@ herb.wealth.plot
 #effect size with credible intervals
 effect_herb <- tibble(
   term = factor(
-    c("Impervious surface", "Wealth Index", "High Wealth"),
-    levels = c("Impervious surface", "Wealth Index", "High Wealth")
+    c("Impervious surface", "Wealth Index"),
+    levels = c("Impervious surface", "Wealth Index")
   ),
-  estimate = c(-0.42, -0.45, 0.55),
-  lower = c(-0.76, -1.47, -0.42),
-  upper = c(-0.05, 0.49, 1.56)
+  estimate = c(-0.47, 0.07),
+  lower = c(-0.79, -0.23),
+  upper = c(-0.18, 0.35)
 )
 
 effect.plot.herb <- ggplot(effect_herb, aes(x = term, y = estimate)) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   geom_linerange(aes(ymin = lower, ymax = upper), linewidth = 1, 
-                 color = c("darkseagreen4", "gray","gray")) +
+                 color = c("darkseagreen4", "gray")) +
   geom_point(size = 3,
-             color = c("darkseagreen4", "gray","gray")) +
+             color = c("darkseagreen4", "gray")) +
   ylab("Beta estimate") +
   xlab(NULL) +
   theme_minimal() +
@@ -520,9 +515,6 @@ effect.plot.herb
 ```{r}
 #Generate predictions on grid from natural enemy brms model
 enemy.preds.imp <- sitevar.pred.imp %>%
-  add_epred_draws(enemy_brms, ndraws = 200)
-
-enemy.preds.wealth <- sitevar.pred.wealth %>%
   add_epred_draws(enemy_brms, ndraws = 200)
 
 #Natural Enemy abundance and Impervious Surface
@@ -549,7 +541,7 @@ enemy.imp.plot <- ggplot(enemy.preds.imp, aes(x = imp200m, y = .epred, color = m
 enemy.imp.plot
 
 #Natural enemy abundance and Wealth Index
-enemy.wealth.plot <- ggplot(enemy.preds.wealth, aes(x = WealthIndex, y = .epred,  color = month)) +
+enemy.wealth.plot <- ggplot(enemy.preds.imp, aes(x = WealthIndex, y = .epred,  color = month)) +
   geom_point(data = sites,
              aes(x = WealthIndex, y = n.enemy, shape = month), size = 3) +
   scale_color_viridis_d(
@@ -572,20 +564,20 @@ enemy.wealth.plot
 #effect sizes with credible intervals
 effect_enemy <- tibble(
   term = factor(
-    c("Impervious surface", "Wealth Index", "High Wealth"),
-    levels = c("Impervious surface", "Wealth Index", "High Wealth")
+    c("Impervious surface", "Wealth Index"),
+    levels = c("Impervious surface", "Wealth Index")
   ),
-  estimate = c(-0.44, 0.12, -0.04),
-  lower = c(-0.65, -0.43, -0.61),
-  upper = c(-0.22, 0.68, 0.52)
+  estimate = c(-0.43, 0.08),
+  lower = c(-0.64, -0.09),
+  upper = c(-0.23, 0.25)
 )
 
 effect.plot.enemy <- ggplot(effect_enemy, aes(x = term, y = estimate)) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   geom_linerange(aes(ymin = lower, ymax = upper), linewidth = 1, 
-                 color = c("darkseagreen4", "gray","gray")) +
+                 color = c("darkseagreen4", "gray")) +
   geom_point(size = 3,
-             color = c("darkseagreen4", "gray","gray")) +
+             color = c("darkseagreen4", "gray")) +
   ylab("Beta estimate") +
   xlab(NULL) +
   theme_minimal() +
@@ -602,13 +594,80 @@ bee.hist <- ggplot(sites, aes(x = bee.rich))+
     Asia_Theme
 bee.hist #normally distributed within each month
 
+#Test for non-linear response to wealth
+gam_fit <- gam(bee.rich ~ s(WealthIndex) + imp200m + month,
+               data = sites,
+               family = gaussian(link = "identity"),
+  method = "REML")
+summary(gam_fit)
+plot(gam_fit, pages = 1) #significant non-linear effect with wealth
+
 set.seed(10)
+
+#finding the peak (where relationship reverses) by comparing model fits
+
+#   candidates <- seq(135, 175, by = 10)
+#   fits <- list()
+#   for (cp in candidates) {
+#   dat <- sites
+#   dat$WI_high_s <- pmax(dat$WealthIndex_s - cp, 0)
+  
+#  fits[[paste0("cp_", cp)]] <- brm(
+#    bee.rich ~ imp200m_s + WealthIndex_s + WI_high + month + (1|site_code),
+ #   data = sites,
+  #  family = gaussian(),
+   # chains = 2, cores = 2, iter = 2000, warmup = 1000,
+    #refresh = 0)}
+#loos <- lapply(fits, loo)
+#loo_compare(loos)
+
 bees_brms <- brms::brm(bee.rich ~ imp200m_s + WealthIndex_s + WI_high_s + month + (1|site_code),data = sites,  family = gaussian(), 
                          chains = 3, cores = 4, iter = 2000, warmup = 1000)
 summary(bees_brms)
+
 ```
 Plots
 ```{r}
+WI_high <- pmax(sites$WealthIndex - 155, 0)
+WI_high_center <- mean(WI_high, na.rm = TRUE)
+WI_high_scale  <- sd(WI_high, na.rm = TRUE)
+
+# Prediction grid for impervious surface
+sitevar.pred.imp <- tidyr::expand_grid(
+  imp200m = seq(
+    min(sites$imp200m, na.rm = TRUE),
+    max(sites$imp200m, na.rm = TRUE),
+    length.out = 50
+  ),
+  site_code = unique(sites$site_code),
+  month = unique(sites$month)
+) %>%
+  mutate(
+    WealthIndex = wealth_ref,
+    WI_high = pmax(WealthIndex - 155, 0),
+    imp200m_s = (imp200m - imp_center) / imp_scale,
+    WealthIndex_s = (WealthIndex - wealth_center) / wealth_scale,
+    WI_high_s = (WI_high - WI_high_center) / WI_high_scale
+  )
+
+# Prediction grid for wealth index
+sitevar.pred.wealth <- tidyr::expand_grid(
+  WealthIndex = seq(
+    min(sites$WealthIndex, na.rm = TRUE),
+    max(sites$WealthIndex, na.rm = TRUE),
+    length.out = 50
+  ),
+  site_code = unique(sites$site_code),
+  month = unique(sites$month)
+) %>%
+  mutate(
+    imp200m = imp_ref,
+    WI_high = pmax(WealthIndex - 155, 0),
+    imp200m_s = (imp200m - imp_center) / imp_scale,
+    WealthIndex_s = (WealthIndex - wealth_center) / wealth_scale,
+    WI_high_s = (WI_high - WI_high_center) / WI_high_scale
+  )
+
 #Generate predictions on grid from bees brms model
 bees.preds.imp  <- sitevar.pred.imp %>%
   add_epred_draws(bees_brms, ndraws = 200)
@@ -632,7 +691,7 @@ bees.imp.plot <- ggplot(bees.preds.imp, aes(x = imp200m, y = .epred, color = mon
          "June" = 16,
          "July" = 15,
          "August" = 17), limits = c("June", "July", "August"), name = "Month") +
-  ylab("Bee richness") +
+  ylab("Rarefied bee richness") +
   xlab("Impervious surface 200 m") +
   theme_minimal() +
   theme(legend.title = element_blank(),
@@ -655,7 +714,7 @@ bees.wealth.plot <- ggplot(bees.preds.wealth, aes(x = WealthIndex, y = .epred, c
          "June" = 16,
          "July" = 15,
          "August" = 17), limits = c("June", "July", "August"), name = "Month") +
-  ylab("Bee richness") +
+  ylab("Rarefied bee richness") +
   xlab("Wealth Index 500 m") +
   theme_minimal() +
   theme(legend.position = "none")+
@@ -665,12 +724,12 @@ bees.wealth.plot
 #effect sizes with credible intervals
 effect_bees <- tibble(
   term = factor(
-    c("Impervious surface", "Wealth Index", "High Wealth"),
-    levels = c("Impervious surface", "Wealth Index", "High Wealth")
+    c("Impervious surface", "WI < 155", "WI slope change > 155"),
+    levels = c("Impervious surface", "WI < 155", "WI slope change > 155")
   ),
-  estimate = c(-3.57, 8.09, -9.31),
-  lower = c(-5.85, 1.43, -16.16),
-  upper = c(-1.32, 14.83, -2.71)
+  estimate = c(-3.32, 5.01, -6.46),
+  lower = c(-5.31, 0.89, -10.47),
+  upper = c(-1.32, 8.98, -2.38)
 )
 
 effect.plot.bees <- ggplot(effect_bees, aes(x = term, y = estimate)) +
@@ -697,51 +756,100 @@ fungroup.panelplot <- ggarrange(pol.imp.plot, pol.wealth.plot, effect.plot.pol, 
         common.legend = TRUE)
 ```
 
-
 # Cucumber Outcomes
+
+Created dataset aggregated by summer
+```{r}
+#one full summer data set, summing arthropod values across months
+sem_data <- sites%>%
+    group_by(site_code)%>%
+    summarise(n.herb = sum(n.herb),
+              n.pol = sum(n.pol),
+              n.enemy = sum(n.enemy),
+              n.pred = sum(n.pred),
+              WealthIndex = mean(WealthIndex),
+              tcc200m = mean(tcc200m),
+              tcc500m = mean(tcc500m),
+              imp200m = mean(imp200m),
+              wood_m2 = mean(wood_m2),
+              bareground_m2 = mean(bareground_m2),
+              floral_area_m2 = mean(floral_area_m2),
+              shrub_grass1000m = mean(shrub_grass1000m),
+              gbif.rich = mean(gbif.rich),
+              gbif.shannon = mean(gbif.shannon),
+              gbif.simpson = mean(gbif.simpson),
+              flor.rich = mean(flor.rich),
+              flor.shannon = mean(flor.shannon),
+              flor.simpson = mean(flor.simpson),
+              delta_mass = mean(delta_mass),
+              delta_cylindrical = mean(delta_cylindrical),
+              delta_length = mean(delta_length),
+              delta_width = mean(delta_width),
+              delta_volume = mean(delta_volume),
+              delta_seed_mass_ratio = mean(delta_seed_mass_ratio),
+              delta_no = mean(delta_no),
+              n.obs = sum(n.obs),
+              bee.rich = sum(bee.rich),
+              bee.shannon = sum(bee.shannon),
+              bee.simpson = sum(bee.simpson),
+              water_wetland_1000m = mean(water_wetland_1000m),
+              species_per_m2 = mean(species_per_m2),
+              imp200m_s = mean(imp200m_s),
+              WealthIndex_s = mean(WealthIndex_s),
+              WI_high = mean(WI_high),
+              WI_high_s = mean(WI_high_s)
+    )
+sem_data             
+```
+
+Explore cucumber outcome data for normality
+```{r}
+c_outcomes <- c("delta_seed_mass_ratio", "delta_mass", "delta_cylindrical", "delta_no", "delta_length", "delta_width", "delta_volume") 
+
+for (i in c_outcomes) {
+  print(i)
+  print(shapiro.test(sem_data[[i]]))
+}
+```
 
 ## Structural Equation Modelling 
 
 Put arthropod mediator models in correct format
 ```{r}
-sites_july <- sites %>%
-    filter(month == "July")
-
-bf_pol   <- bf(n.pol   ~ imp200m_s + WealthIndex_s + WI_high_s + month + (1|site_code),
+bf_pol   <- bf(n.pol   ~ imp200m_s + WealthIndex_s,
                family = negbinomial())
-
-bf_herb  <- bf(n.herb  ~ imp200m_s + WealthIndex_s + WI_high + month + (1|site_code),
+bf_herb  <- bf(n.herb  ~ imp200m_s + WealthIndex_s,
                family = negbinomial())
-
-bf_enemy <- bf(n.enemy ~ imp200m_s + WealthIndex_s + WI_high + month + (1|site_code),
+bf_enemy <- bf(n.enemy ~ imp200m_s + WealthIndex_s,
                family = negbinomial())
-
-bf_bee   <- bf(bee.shannon ~ imp200m_s + WealthIndex_s + WI_high_s,
+bf_bee   <- bf(bee.shannon ~ imp200m_s + WealthIndex_s,
                family = gaussian())
+
+#priors for cucumber outcomes
+prior(normal(0,1), class = "b", coef = "bee.rich")
+
 
 #Cucumber outcome model
 bf_cuc <- bf(delta_no ~ 
-                bee.shannon + imp200m_s + WealthIndex_s + WI_high_s,
-              family = gaussian())
+                bee.shannon + WealthIndex_s + imp200m_s,
+              family = student())
 ```
 
 
 Structural Equation Model
 ```{r}
+set.seed(100)
+
 fit_sem <- brm(
   bf_bee + bf_cuc +
     set_rescor(FALSE),
-  data = sites_july,
+  data = sem_data,
   chains = 4, cores = 4
 )
 
 summary(fit_sem)
 
 post <- posterior_samples(fit_sem)
-
-post$indirect_imp <- 
-  post$b_beerich_imp200m_s *
-  post$b_delta_seed_mass_ratio_bee.rich
 ```
 
 
@@ -749,22 +857,22 @@ post$indirect_imp <-
 
 ### Cucumbers and Bee Richness
 ```{r}
-cuc.beerich.plot1 <- ggplot(sites, aes(x = bee.rich, y = delta_seed_mass_ratio))+
+cuc.beerich.plot1 <- ggplot(sem_data, aes(x = bee.rich, y = delta_seed_mass_ratio))+
     geom_point()+
     geom_smooth(method = "lm")
 cuc.beerich.plot1 
 
-cuc.beerich.plot2 <- ggplot(sites, aes(x = bee.rich, y = delta_no))+
+cuc.beerich.plot2 <- ggplot(sem_data, aes(x = bee.rich, y = delta_no))+
     geom_point()+
     geom_smooth(method = "lm")
 cuc.beerich.plot2 
 
-cuc.beerich.plot3 <- ggplot(sites, aes(x = bee.rich, y = delta_cylindrical))+
+cuc.beerich.plot3 <- ggplot(sem_data, aes(x = bee.rich, y = delta_cylindrical))+
     geom_point()+
     geom_smooth(method = "lm")
 cuc.beerich.plot3 
 
-cuc.beerich.plot4 <- ggplot(sites, aes(x = bee.rich, y = delta_volume))+
+cuc.beerich.plot4 <- ggplot(sem_data, aes(x = bee.rich, y = delta_mass))+
     geom_point()+
     geom_smooth(method = "lm")
 cuc.beerich.plot4
@@ -772,32 +880,124 @@ cuc.beerich.plot4
 
 ### Cucumbers and Bee Shannon Diversity
 ```{r}
-cuc.beeshan.plot1 <- ggplot(sites, aes(x = bee.shannon, y = delta_seed_mass_ratio))+
+cuc.beeshan.plot1 <- ggplot(sem_data, aes(x = bee.shannon, y = delta_seed_mass_ratio))+
     geom_point()+
     geom_smooth(method = "lm")
 cuc.beeshan.plot1 
 
-cuc.beeshan.plot2 <- ggplot(sites, aes(x = bee.shannon, y = delta_no))+
+cuc.beeshan.plot2 <- ggplot(sem_data, aes(x = bee.shannon , y = delta_no))+
     geom_point()+
     geom_smooth(method = "lm")
 cuc.beeshan.plot2 
 
-cuc.beeshan.plot3 <- ggplot(sites, aes(x = bee.shannon, y = delta_cylindrical))+
+cuc.beeshan.plot3 <- ggplot(sem_data, aes(x = bee.shannon, y = delta_cylindrical))+
     geom_point()+
     geom_smooth(method = "lm")
 cuc.beeshan.plot3 
 
-cuc.beeshan.plot4 <- ggplot(sites, aes(x = bee.shannon, y = delta_volume))+
+cuc.beeshan.plot4 <- ggplot(sem_data, aes(x = bee.shannon, y = delta_mass))+
     geom_point()+
     geom_smooth(method = "lm")
 cuc.beeshan.plot4
 ```
 
-
-# Habitat Quality Index
+Number of cucumbers and bee shannon diversity
 ```{r}
-
+set.seed(1)
+cuc_brms <- brms::brm(delta_no ~ bee.shannon,  family = student(), 
+                      data = sem_data,
+                         chains = 3, cores = 4, iter = 2000, warmup = 1000)
+summary(cuc_brms)
 ```
+Bee shannon diversity and no of cucumbers plot
+```{r}
+#Generate predictions on grid from brms model
+pred_grid <- tibble(
+  bee.shannon = seq(
+    min(sem_data$bee.shannon, na.rm = TRUE),
+    max(sem_data$bee.shannon, na.rm = TRUE),
+    length.out = 100
+  )
+)
+
+cuc.preds <- pred_grid %>%
+  add_epred_draws(cuc_brms, ndraws = 200)
+
+
+#Cucumbers and bee shannon diversity with brms estimate with credible intervals
+cuc.plot <- ggplot(cuc.preds, aes(x = bee.shannon, y = .epred)) +
+  stat_lineribbon(.width = c(.95, .80, .50),
+                  alpha = 0.5, colour = "black") +
+  geom_point(data = sem_data,
+             aes(x = bee.shannon, y = delta_no),
+             colour = "darkseagreen4", size = 3) +
+  scale_fill_brewer(palette = "Greys") +
+  ylab("delta cucumber abundance n/
+       (control - hand pollinated)") +
+  xlab("rarefied bee shannon diversity") +
+  theme_minimal() +
+  theme(legend.title = element_blank(),
+        legend.position = c(0.85, 0.15))+
+    Asia_Theme
+cuc.plot 
+```
+
+# Habitat Quality
+
+Look at the relationship between local and landscape variable and wealth index
+
+Local variables
+```{r}
+set.seed(1)
+wood_brms <- brms::brm(wood_m2 ~ WealthIndex,  family = student(), 
+                      data = sem_data,
+                         chains = 3, cores = 4, iter = 2000, warmup = 1000)
+
+bareground_brms <- brms::brm(bareground_m2 ~ WealthIndex,  family = student(), 
+                      data = sem_data,
+                         chains = 3, cores = 4, iter = 2000, warmup = 1000)
+
+flor_brms <- brms::brm(flor.rich ~ WealthIndex,  family = gaussian(), 
+                      data = sem_data,
+                         chains = 3, cores = 4, iter = 2000, warmup = 1000)
+
+flor_density_brms <- brms::brm(species_per_m2 ~ WealthIndex,  family = student(), 
+                      data = sem_data,
+                         chains = 3, cores = 4, iter = 2000, warmup = 1000)
+
+
+summary(wood_brms)
+summary(flor_brms)
+summary(bareground_brms)
+summary(flor_density_brms)
+```
+
+Landscape variables
+```{r}
+set.seed(1)
+tcc_brms <- brms::brm(tcc500m ~ WealthIndex,  family = student(), 
+                      data = sem_data,
+                         chains = 3, cores = 4, iter = 2000, warmup = 1000)
+
+gbif_brms <- brms::brm(gbif.rich ~ WealthIndex,  family = student(), 
+                      data = sem_data,
+                         chains = 3, cores = 4, iter = 2000, warmup = 1000)
+
+water_wetland_brms <- brms::brm(water_wetland_1000m ~ WealthIndex,  family = gaussian(), 
+                      data = sem_data,
+                         chains = 3, cores = 4, iter = 2000, warmup = 1000)
+
+shrub_grassland_brms <- brms::brm(shrub_grass1000m ~ WealthIndex,  family = student(), 
+                      data = sem_data,
+                         chains = 3, cores = 4, iter = 2000, warmup = 1000)
+
+
+summary(tcc_brms)
+summary(gbif_brms)
+summary(water_wetland_brms)
+summary(shrub_grassland_brms)
+```
+
 
 # Save Images
 ```{r}
@@ -806,5 +1006,7 @@ ggsave("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/figures/Arth
 ggsave("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/figures/Bees_PanelFig.pdf", plot = bees.panelplot, height = 6, width = 12)
 
 ggsave("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/figures/FunctionalGroups_PanelFig.pdf", plot = fungroup.panelplot, height = 12, width = 12)
+
+ggsave("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/figures/Cucumber_plot.pdf", plot = cuc.plot, height = 6, width = 6)
 ```
 

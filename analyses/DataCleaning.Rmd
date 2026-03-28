@@ -223,21 +223,19 @@ cucumbers_avg <- cucumbers_raw %>%
     fill = list(n_cucumbers = 0))
 cucumbers_avg
  
-#Difference (Pollinated - Control) for cucumber values by site
-cucumbers_delta <-  cucumbers_avg %>%
-   arrange(site_code, treatment) %>% 
-    group_by(site_code) %>%
+#Difference (Control - Pollinated) for cucumber values by site
+cucumbers_delta <- cucumbers_avg %>%
+  group_by(site_code) %>%
   summarise(
-    delta_mass  = diff(avg_mass),
-    delta_seeds = diff(avg_seeds),
-    delta_length = diff(avg_length),
-    delta_width = diff(avg_width),
-    delta_volume = diff(avg_volume),
-    delta_cylindrical = diff(prop_cylindrical),
-    delta_seed_mass_ratio = diff(avg_seed_mass_ratio),
-    delta_no = diff(n_cucumbers))
-cucumbers_delta
-
+    delta_mass  = avg_mass[treatment == "Control"] - avg_mass[treatment == "Pollinated"],
+    delta_seeds = avg_seeds[treatment == "Control"] - avg_seeds[treatment == "Pollinated"],
+    delta_length = avg_length[treatment == "Control"] - avg_length[treatment == "Pollinated"],
+    delta_width = avg_width[treatment == "Control"] - avg_width[treatment == "Pollinated"],
+    delta_volume = avg_volume[treatment == "Control"] - avg_volume[treatment == "Pollinated"],
+    delta_cylindrical = prop_cylindrical[treatment == "Control"] - prop_cylindrical[treatment == "Pollinated"],
+    delta_seed_mass_ratio = avg_seed_mass_ratio[treatment == "Control"] - avg_seed_mass_ratio[treatment == "Pollinated"],
+    delta_no = n_cucumbers[treatment == "Control"] - n_cucumbers[treatment == "Pollinated"]
+  )
 cucumbers_avg <- full_join(cucumbers_avg, sites, join_by("site_code"))
 ```
 
