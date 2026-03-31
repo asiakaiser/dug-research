@@ -209,3 +209,8 @@ Save updated sites dataframe as csv
 write.csv(sites, "/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/data/DUG_sites.csv", row.names = FALSE)
 ```
 
+Citations and Packages
+```{r}
+packageVersion("sp")
+```
+

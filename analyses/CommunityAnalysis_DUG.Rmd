@@ -545,3 +545,8 @@ final_plot <- ggarrange(
 ggsave("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/figures/NMDS Panel Figure.pdf", plot = final_plot, height = 12, width = 9)
 ```
 
+# Session Info and Packages
+```{r}
+packageVersion("vegan")
+packageVersion("mvabund")
+```

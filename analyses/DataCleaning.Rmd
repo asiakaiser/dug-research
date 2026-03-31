@@ -353,5 +353,8 @@ write.csv(arthropods_wide, "/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-r
 write.csv(arthropods_wide_sum, "/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/data/arthropods_wide_sum.csv", row.names = FALSE)
 ```
 
-
+# Session Info and Packages
+```{r}
+packageVersion("iNEXT")
+```
 

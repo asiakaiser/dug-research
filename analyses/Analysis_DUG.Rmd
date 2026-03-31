@@ -59,8 +59,6 @@ Asia_Theme <- theme(
 
 # Habitat Quality and Environmental Variables
 
-## Landscape Level Variables
-
 Landscape Level Correlations
 ```{r}
 #Landscape variables
@@ -75,91 +73,6 @@ landscape.pvals <- landscape.rcorr$P
 landscape.cor.plot <- corrplot(landscape.rcorr$r)
 ```
 
-## Wealth and Landscape Variables Relationships
-```{r}
-#GBIF Landscape floral richness
-wealth.land.plot1 <- ggplot(sites, aes(x = WealthIndex, y = gbif.rich))+
-    geom_point()+
-    geom_smooth()+
-    ylab("Landscape floral richness (1 km)")+
-    xlab("Wealth Index (500 m)")+
-    theme_minimal()+
-    Asia_Theme
-wealth.land.plot1
-
-#Tree canopy cover
-wealth.land.plot2 <- ggplot(sites, aes(x = WealthIndex, y = tcc500m))+
-    geom_point()+
-    geom_smooth()+
-    ylab("Tree Canopy Cover (500 m)")+
-    xlab("Wealth Index (500 m)")+
-    theme_minimal()+
-    Asia_Theme
-wealth.land.plot2
-
-#Shrubland Cover
-wealth.land.plot3 <- ggplot(sites, aes(x = WealthIndex, y = shrub_grass1000m))+
-    geom_point()+
-    geom_smooth()+
-    ylab("Shrub & Grassland (1 km)")+
-    xlab("Wealth Index (500 m)")+
-    theme_minimal()+
-    Asia_Theme
-wealth.land.plot3
-
-#Wetland Cover
-wealth.land.plot4 <- ggplot(sites, aes(x = WealthIndex, y = water_wetland_1000m))+
-    geom_point()+
-    geom_smooth()+
-    ylab("Water and Wetland (1 km)")+
-    xlab("Wealth Index (500 m)")+
-    theme_minimal()+
-    Asia_Theme
-wealth.land.plot4
-```
-
-## Wealth and Local Variables Relationships
-```{r}
-#Garden floral richness
-wealth.loc.plot1 <- ggplot(sites, aes(x = WealthIndex, y = flor.simpson))+
-    geom_point()+
-    geom_smooth()+
-    ylab("Garden floral richness")+
-    xlab("Wealth Index (500 m)")+
-    theme_minimal()+
-    Asia_Theme
-wealth.loc.plot1
-
-#Garden Tree and Shrub Cover
-wealth.loc.plot2 <- ggplot(sites, aes(x = WealthIndex, y = wood_m2))+
-    geom_point()+
-    geom_smooth()+
-    ylab("Garden Tree and Shrub Cover")+
-    xlab("Wealth Index (500 m)")+
-    theme_minimal()+
-    Asia_Theme
-wealth.loc.plot2
-
-#Garden Bareground Cover
-wealth.loc.plot3 <- ggplot(sites, aes(x = WealthIndex, y = bareground_m2))+
-    geom_point()+
-    geom_smooth()+
-    ylab("Garden Bareground Cover")+
-    xlab("Wealth Index (500 m)")+
-    theme_minimal()+
-    Asia_Theme
-wealth.loc.plot3
-
-#Garden Bareground Cover
-wealth.loc.plot4 <- ggplot(sites, aes(x = WealthIndex, y = species_per_m2))+
-    geom_point()+
-    geom_smooth()+
-    ylab("Garden Floral Species/m2")+
-    xlab("Wealth Index (500 m)")+
-    theme_minimal()+
-    Asia_Theme
-wealth.loc.plot4
-```
 # Arthropod Abundance
 
 Data Distributions
@@ -623,7 +536,11 @@ set.seed(10)
 
 bees_brms <- brms::brm(bee.rich ~ imp200m_s + WealthIndex_s + WI_high_s + month + (1|site_code),data = sites,  family = gaussian(), 
                          chains = 3, cores = 4, iter = 2000, warmup = 1000)
+
+shannon_brms <- brms::brm(bee.shannon ~ imp200m_s + WealthIndex_s + month + (1|site_code),data = sites,  family = gaussian(), 
+                         chains = 3, cores = 4, iter = 2000, warmup = 1000)
 summary(bees_brms)
+summary(shannon_brms)
 
 ```
 Plots
@@ -799,7 +716,16 @@ sem_data <- sites%>%
               WI_high = mean(WI_high),
               WI_high_s = mean(WI_high_s)
     )
-sem_data             
+
+sem_data  
+
+#Scaling bee shannon index and accounting for NA value
+
+sem_data$bee.shannon_s <- (
+  sem_data$bee.shannon - mean(sem_data$bee.shannon, na.rm = TRUE)
+) / sd(sem_data$bee.shannon, na.rm = TRUE)
+
+sem_data$bee.shannon_s
 ```
 
 Explore cucumber outcome data for normality
@@ -816,23 +742,55 @@ for (i in c_outcomes) {
 
 Put arthropod mediator models in correct format
 ```{r}
-bf_pol   <- bf(n.pol   ~ imp200m_s + WealthIndex_s,
-               family = negbinomial())
-bf_herb  <- bf(n.herb  ~ imp200m_s + WealthIndex_s,
-               family = negbinomial())
-bf_enemy <- bf(n.enemy ~ imp200m_s + WealthIndex_s,
-               family = negbinomial())
-bf_bee   <- bf(bee.shannon ~ imp200m_s + WealthIndex_s,
-               family = gaussian())
+bf_pol   <- bf(n.pol ~ imp200m_s + WealthIndex_s, family = negbinomial())
+bf_herb  <- bf(n.herb ~ imp200m_s + WealthIndex_s, family = negbinomial())
+bf_enemy <- bf(n.enemy ~ imp200m_s + WealthIndex_s, family = negbinomial())
 
-#priors for cucumber outcomes
-prior(normal(0,1), class = "b", coef = "bee.rich")
+bf_bee   <- bf(bee.shannon_s ~ imp200m_s + WealthIndex_s, family = gaussian())
 
+bf_cuc   <- bf(delta_no ~ bee.shannon_s + imp200m_s,
+               family = student())
+```
 
-#Cucumber outcome model
-bf_cuc <- bf(delta_no ~ 
-                bee.shannon + WealthIndex_s + imp200m_s,
-              family = student())
+Setting global priors
+```{r}
+priors_full_sem <- c(
+  # Arthropods
+  prior(normal(0, 0.5), class = "b", resp = "npol"),
+  prior(normal(0, 0.5), class = "b", resp = "nherb"),
+  prior(normal(0, 0.5), class = "b", resp = "nenemy"),
+
+  prior(normal(1, 1.5), class = "Intercept", resp = "npol"),
+  prior(normal(1, 1.5), class = "Intercept", resp = "nherb"),
+  prior(normal(1, 1.5), class = "Intercept", resp = "nenemy"),
+
+  prior(exponential(1), class = "shape", resp = "npol"),
+  prior(exponential(1), class = "shape", resp = "nherb"),
+  prior(exponential(1), class = "shape", resp = "nenemy"),
+
+  # Bee Shannon
+  prior(normal(0, 0.5), class = "b", resp = "beeshannons"),
+  prior(normal(0, 1), class = "Intercept", resp = "beeshannons"),
+  prior(exponential(1), class = "sigma", resp = "beeshannons"),
+
+  # Cucumber
+  prior(normal(0, 0.5), class = "b", resp = "deltano"),
+  prior(normal(0, 1), class = "Intercept", resp = "deltano"),
+  prior(exponential(1), class = "sigma", resp = "deltano"),
+  prior(gamma(2, 0.1), class = "nu", resp = "deltano")
+)
+
+priors_sem <- c(
+  # Bee Shannon
+  prior(normal(0, 0.5), class = "b", resp = "beeshannons"),
+  prior(normal(0, 1), class = "Intercept", resp = "beeshannons"),
+  prior(exponential(1), class = "sigma", resp = "beeshannons"),
+  # Cucumber
+  prior(normal(0, 0.5), class = "b", resp = "deltano"),
+  prior(normal(0, 1), class = "Intercept", resp = "deltano"),
+  prior(exponential(1), class = "sigma", resp = "deltano"),
+  prior(gamma(2, 0.1), class = "nu", resp = "deltano")
+)
 ```
 
 
@@ -841,12 +799,11 @@ Structural Equation Model
 set.seed(100)
 
 fit_sem <- brm(
-  bf_bee + bf_cuc +
-    set_rescor(FALSE),
+  bf_bee + bf_cuc + set_rescor(FALSE),
   data = sem_data,
+  prior = priors_sem,
   chains = 4, cores = 4
 )
-
 summary(fit_sem)
 
 post <- posterior_samples(fit_sem)
@@ -901,14 +858,41 @@ cuc.beeshan.plot4 <- ggplot(sem_data, aes(x = bee.shannon, y = delta_mass))+
 cuc.beeshan.plot4
 ```
 
-Number of cucumbers and bee shannon diversity
+Number of cucumbers and herbivores and predators
 ```{r}
+priors_cuc <- c(
+  prior(normal(0, 1), class = "b"),
+  prior(normal(0, 1), class = "Intercept"),
+  prior(exponential(1), class = "sigma"),
+  prior(gamma(2, 0.1), class = "nu"))
+
 set.seed(1)
+herb_cuc_brms <- brms::brm(delta_no ~ n.herb,  family = student(), 
+                      data = sem_data,
+                      prior = priors_cuc,
+                         chains = 3, cores = 4, iter = 2000, warmup = 1000)
+
+pred_cuc_brms <- brms::brm(delta_no ~ n.pred,  family = student(), 
+                      data = sem_data,
+                      prior = priors_cuc,
+                         chains = 3, cores = 4, iter = 2000, warmup = 1000)
+
+pol_cuc_brms <- brms::brm(delta_no ~ n.pol,  family = student(), 
+                      data = sem_data,
+                      prior = priors_cuc,
+                         chains = 3, cores = 4, iter = 2000, warmup = 1000)
+
 cuc_brms <- brms::brm(delta_no ~ bee.shannon,  family = student(), 
                       data = sem_data,
+                      prior = priors_cuc,
                          chains = 3, cores = 4, iter = 2000, warmup = 1000)
+
 summary(cuc_brms)
+summary(pol_cuc_brms)
+summary(herb_cuc_brms)
+summary(pred_cuc_brms)
 ```
+
 Bee shannon diversity and no of cucumbers plot
 ```{r}
 #Generate predictions on grid from brms model
@@ -949,53 +933,152 @@ Look at the relationship between local and landscape variable and wealth index
 Local variables
 ```{r}
 set.seed(1)
-wood_brms <- brms::brm(wood_m2 ~ WealthIndex,  family = student(), 
-                      data = sem_data,
-                         chains = 3, cores = 4, iter = 2000, warmup = 1000)
+hist(sem_data$wood_m2)
+hist(sem_data$bareground_m2)
+hist(sem_data$flor.rich)
+hist(sem_data$flor.shannon)
+hist(sem_data$species_per_m2)
 
-bareground_brms <- brms::brm(bareground_m2 ~ WealthIndex,  family = student(), 
-                      data = sem_data,
-                         chains = 3, cores = 4, iter = 2000, warmup = 1000)
+wood_brms <- brm(
+  I(wood_m2 + 0.001) ~ WealthIndex_s,
+  family = lognormal(),
+  prior = c(
+    prior(normal(0, 0.5), class = "b"),
+    prior(normal(0, 1.5), class = "Intercept"),
+    prior(exponential(1), class = "sigma")
+  ),
+  data = sem_data,
+  chains = 3, cores = 3, iter = 2000, warmup = 1000
+)
 
-flor_brms <- brms::brm(flor.rich ~ WealthIndex,  family = gaussian(), 
-                      data = sem_data,
-                         chains = 3, cores = 4, iter = 2000, warmup = 1000)
+bare_brms <- brm(
+  bf(bareground_m2 ~ WealthIndex_s,
+     hu ~ 1),
+  family = hurdle_lognormal(),
+  prior = c(
+    prior(normal(0, 0.5), class = "b"),
+    prior(normal(0, 1.5), class = "Intercept"),
+    prior(normal(0, 1.5), class = "Intercept", dpar = "hu"),
+    prior(exponential(1), class = "sigma")
+  ),
+  data = sem_data,
+  chains = 3, cores = 3, iter = 2000, warmup = 1000
+)
 
-flor_density_brms <- brms::brm(species_per_m2 ~ WealthIndex,  family = student(), 
-                      data = sem_data,
-                         chains = 3, cores = 4, iter = 2000, warmup = 1000)
+flor_rich_brms <- brm(
+  flor.rich ~ WealthIndex_s,
+  family = gaussian(),
+  prior = c(
+    prior(normal(50, 15), class = "Intercept"),
+    prior(normal(0, 3), class = "b"),
+    prior(exponential(1), class = "sigma")
+  ),
+  data = sem_data,
+  chains = 3, cores = 4, iter = 2000, warmup = 1000
+)
+
+flor_shannon_brms <- brm(
+  flor.shannon ~ WealthIndex_s,
+  family = gaussian(),
+  prior = c(
+    prior(normal(45, 15), class = "Intercept"),
+    prior(normal(0, 3), class = "b"),
+    prior(exponential(1), class = "sigma")
+  ),
+  data = sem_data,
+  chains = 3, cores = 4, iter = 2000, warmup = 1000
+)
+
+flor_density_brms <- brm(
+  species_per_m2 ~ WealthIndex_s,
+  family = lognormal(),
+  prior = c(
+    prior(normal(-1, 1), class = "Intercept"),
+    prior(normal(0, 0.5), class = "b"),
+    prior(exponential(1), class = "sigma")
+  ),
+  data = sem_data,
+  chains = 3, cores = 4, iter = 2000, warmup = 1000
+)
 
 
 summary(wood_brms)
-summary(flor_brms)
-summary(bareground_brms)
+summary(flor_rich_brms)
+summary(flor_shannon_brms)
+summary(bare_brms)
 summary(flor_density_brms)
 ```
 
 Landscape variables
 ```{r}
 set.seed(1)
-tcc_brms <- brms::brm(tcc500m ~ WealthIndex,  family = student(), 
-                      data = sem_data,
-                         chains = 3, cores = 4, iter = 2000, warmup = 1000)
+hist(sem_data$tcc500m)
+hist(sem_data$water_wetland_1000m)
+hist(sem_data$gbif.rich)
+hist(sem_data$gbif.shannon)
+hist(sem_data$shrub_grass1000m)
 
-gbif_brms <- brms::brm(gbif.rich ~ WealthIndex,  family = student(), 
-                      data = sem_data,
-                         chains = 3, cores = 4, iter = 2000, warmup = 1000)
+tcc_brms <- brm(
+  tcc500m ~ WealthIndex_s,
+  family = gaussian(),
+  prior = c(
+    prior(normal(12, 5), class = "Intercept"),
+    prior(normal(0, 2), class = "b"),
+    prior(exponential(1), class = "sigma")
+  ),
+  data = sem_data,chains = 3, cores = 4, iter = 2000, warmup = 1000
+)
 
-water_wetland_brms <- brms::brm(water_wetland_1000m ~ WealthIndex,  family = gaussian(), 
-                      data = sem_data,
-                         chains = 3, cores = 4, iter = 2000, warmup = 1000)
+waterwet_brms <- brm(
+  I(water_wetland_1000m + 0.001) ~ WealthIndex_s,
+  family = lognormal(),
+  prior = c(
+    prior(normal(-4, 1.5), class = "Intercept"),
+    prior(normal(0, 0.5), class = "b"),
+    prior(exponential(1), class = "sigma")
+  ),
+  data = sem_data, chains = 3, cores = 4, iter = 2000, warmup = 1000
+)
 
-shrub_grassland_brms <- brms::brm(shrub_grass1000m ~ WealthIndex,  family = student(), 
-                      data = sem_data,
-                         chains = 3, cores = 4, iter = 2000, warmup = 1000)
+gbifrich_brms <- brm(
+  gbif.rich ~ WealthIndex_s,
+  family = gaussian(),
+  prior = c(
+    prior(normal(115, 30), class = "Intercept"),
+    prior(normal(0, 10), class = "b"),
+    prior(exponential(1), class = "sigma")
+  ),
+  data = sem_data, chains = 3, cores = 4, iter = 2000, warmup = 1000
+)
+
+gbifshannon_brms <- brm(
+  gbif.shannon ~ WealthIndex_s,
+  family = gaussian(),
+  prior = c(
+    prior(normal(80, 25), class = "Intercept"),
+    prior(normal(0, 5), class = "b"),
+    prior(exponential(1), class = "sigma")
+  ),
+  data = sem_data, chains = 3, cores = 4, iter = 2000, warmup = 1000
+)
+
+shrubgrass_brms <- brm(
+  I(shrub_grass1000m + 0.001) ~ WealthIndex_s,
+  family = lognormal(),
+  prior = c(
+    prior(normal(-4.5, 1.5), class = "Intercept"),
+    prior(normal(0, 0.5), class = "b"),
+    prior(exponential(1), class = "sigma")
+  ),
+  data = sem_data, chains = 3, cores = 4, iter = 2000, warmup = 1000
+)
 
 
 summary(tcc_brms)
-summary(gbif_brms)
-summary(water_wetland_brms)
-summary(shrub_grassland_brms)
+summary(gbifrich_brms)
+summary(gbifshannon_brms)
+summary(waterwet_brms)
+summary(shrubgrass_brms)
 ```
 
 
@@ -1008,5 +1091,11 @@ ggsave("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/figures/Bees
 ggsave("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/figures/FunctionalGroups_PanelFig.pdf", plot = fungroup.panelplot, height = 12, width = 12)
 
 ggsave("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/figures/Cucumber_plot.pdf", plot = cuc.plot, height = 6, width = 6)
+```
+
+# Session Info and Packages
+
+```{r}
+packageVersion("brms")
 ```
 
