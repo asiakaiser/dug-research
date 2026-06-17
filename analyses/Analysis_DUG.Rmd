@@ -508,7 +508,7 @@ bee.hist <- ggplot(sites, aes(x = bee.rich))+
 bee.hist #normally distributed within each month
 
 #Test for non-linear response to wealth
-gam_fit <- gam(bee.rich ~ s(WealthIndex) + imp200m + month,
+gam_fit <- gam(bee.shannon ~ s(WealthIndex) + imp200m + month,
                data = sites,
                family = gaussian(link = "identity"),
   method = "REML")
@@ -537,7 +537,7 @@ set.seed(10)
 bees_brms <- brms::brm(bee.rich ~ imp200m_s + WealthIndex_s + WI_high_s + month + (1|site_code),data = sites,  family = gaussian(), 
                          chains = 3, cores = 4, iter = 2000, warmup = 1000)
 
-shannon_brms <- brms::brm(bee.shannon ~ imp200m_s + WealthIndex_s + month + (1|site_code),data = sites,  family = gaussian(), 
+shannon_brms <- brms::brm(bee.shannon ~ imp200m_s + WealthIndex_s + WI_high_s + month + (1|site_code),data = sites,  family = gaussian(), 
                          chains = 3, cores = 4, iter = 2000, warmup = 1000)
 summary(bees_brms)
 summary(shannon_brms)
@@ -704,6 +704,7 @@ sem_data <- sites%>%
               delta_width = mean(delta_width),
               delta_volume = mean(delta_volume),
               delta_seed_mass_ratio = mean(delta_seed_mass_ratio),
+              delta_seeds = mean(delta_seeds),
               delta_no = mean(delta_no),
               n.obs = sum(n.obs),
               bee.rich = sum(bee.rich),
@@ -715,6 +716,11 @@ sem_data <- sites%>%
               WealthIndex_s = mean(WealthIndex_s),
               WI_high = mean(WI_high),
               WI_high_s = mean(WI_high_s)
+    )%>%
+    mutate(
+        n.pol_s = as.numeric(scale(n.pol)),
+        n.herb_s = as.numeric(scale(n.herb)),
+        n.enemy_s = as.numeric(scale(n.enemy))
     )
 
 sem_data  
@@ -730,13 +736,69 @@ sem_data$bee.shannon_s
 
 Explore cucumber outcome data for normality
 ```{r}
-c_outcomes <- c("delta_seed_mass_ratio", "delta_mass", "delta_cylindrical", "delta_no", "delta_length", "delta_width", "delta_volume") 
+c_outcomes <- c("delta_seeds", "delta_mass", "delta_cylindrical", "delta_no", "delta_length", "delta_width", "delta_volume") 
 
 for (i in c_outcomes) {
   print(i)
-  print(shapiro.test(sem_data[[i]]))
+  hist(sem_data[[i]],
+       main = paste("Histogram of", i),
+       xlab = i)
 }
 ```
+
+Regressions looking at each arthropod group and cucumber outcomes
+```{r}
+priors_no<- c(
+  # Cucumber Abundance
+  prior(normal(0, 0.5), class = "b"),
+  prior(normal(0, 1), class = "Intercept"),
+  prior(exponential(1), class = "sigma"),
+  prior(gamma(2, 0.1), class = "nu"))
+
+priors_seeds <- c(
+  prior(normal(0, 20), class = "Intercept"),
+  prior(normal(0, 1), class = "b"),
+  prior(exponential(1), class = "sigma"),
+  prior(gamma(2, 0.1), class = "nu"))
+
+priors_mass <- c(
+  prior(normal(0, 30), class = "Intercept"),
+  prior(normal(0, 1), class = "b"),
+  prior(exponential(1), class = "sigma"),
+  prior(gamma(2, 0.1), class = "nu"))
+
+priors_cylindrical <- c(
+  prior(normal(0, 0.3), class = "Intercept"),
+  prior(normal(0, 0.5), class = "b"),
+  prior(exponential(2), class = "sigma"))
+
+
+abundance_cuc_brms <- brms::brm(delta_no ~ bee.shannon_s + n.pol_s + n.herb_s + n.enemy_s,  family = student(), 
+                      data = sem_data,
+                      prior = priors_no,
+                      chains = 3, cores = 4, iter = 2000, warmup = 1000)
+
+seeds_cuc_brms <- brms::brm(delta_seeds ~ bee.shannon_s + n.pol_s + n.herb_s + n.enemy_s,  family = student(), 
+                      data = sem_data,
+                      prior = priors_seeds,
+                      chains = 3, cores = 4, iter = 2000, warmup = 1000)
+
+mass_cuc_brms <- brms::brm(delta_mass ~ bee.shannon_s + n.pol_s + n.herb_s + n.enemy_s,  family = student(), 
+                      data = sem_data,
+                      prior = priors_mass,
+                      chains = 3, cores = 4, iter = 2000, warmup = 1000)
+
+cylindrical_cuc_brms <- brms::brm(delta_cylindrical ~ bee.shannon_s + n.pol_s + n.herb_s + n.enemy_s,  family = gaussian(), 
+                      data = sem_data,
+                      prior = priors_cylindrical,
+                      chains = 3, cores = 4, iter = 2000, warmup = 1000)
+
+summary(abundance_cuc_brms)
+summary(seeds_cuc_brms)
+summary(mass_cuc_brms)
+summary(cylindrical_cuc_brms)
+```
+
 
 ## Structural Equation Modelling 
 
@@ -814,49 +876,126 @@ post <- posterior_samples(fit_sem)
 
 ### Cucumbers and Bee Richness
 ```{r}
-cuc.beerich.plot1 <- ggplot(sem_data, aes(x = bee.rich, y = delta_seed_mass_ratio))+
+cuc.beerich.plot1 <- ggplot(sem_data, aes(x = bee.rich, y = delta_seeds))+
     geom_point()+
-    geom_smooth(method = "lm")
+    geom_smooth(method = "lm", se = FALSE, linetype = "dashed")+
+    xlab("Bee Richness")+
+    ylab("seed ct.")+
+    theme_classic()+
+    Asia_Theme
 cuc.beerich.plot1 
 
 cuc.beerich.plot2 <- ggplot(sem_data, aes(x = bee.rich, y = delta_no))+
     geom_point()+
-    geom_smooth(method = "lm")
+    geom_smooth(method = "lm", se = FALSE, linetype = "dashed")+
+    ylab("abundance")+
+    xlab("Bee Richness")+
+    theme_classic()+
+    Asia_Theme
 cuc.beerich.plot2 
 
 cuc.beerich.plot3 <- ggplot(sem_data, aes(x = bee.rich, y = delta_cylindrical))+
     geom_point()+
-    geom_smooth(method = "lm")
+    geom_smooth(method = "lm", se = FALSE, linetype = "dashed")+
+    ylab("prop. cylindrical")+
+    xlab("Bee Richness")+
+    theme_classic()+
+    Asia_Theme
 cuc.beerich.plot3 
 
 cuc.beerich.plot4 <- ggplot(sem_data, aes(x = bee.rich, y = delta_mass))+
     geom_point()+
-    geom_smooth(method = "lm")
+    geom_smooth(method = "lm", se = FALSE, linetype = "dashed")+
+    ylab("fruit mass")+
+    xlab("Bee Richness")+
+    theme_classic()+
+    Asia_Theme
 cuc.beerich.plot4
 ```
 
 ### Cucumbers and Bee Shannon Diversity
 ```{r}
-cuc.beeshan.plot1 <- ggplot(sem_data, aes(x = bee.shannon, y = delta_seed_mass_ratio))+
+cuc.beeshan.plot1 <- ggplot(sem_data, aes(x = bee.shannon, y = delta_seeds))+
     geom_point()+
-    geom_smooth(method = "lm")
+    geom_smooth(method = "lm", se = FALSE, linetype = "dashed")+
+    ylab("seed ct.")+
+    xlab("Shannon diversity")+
+    theme_classic()+
+    Asia_Theme
 cuc.beeshan.plot1 
 
 cuc.beeshan.plot2 <- ggplot(sem_data, aes(x = bee.shannon , y = delta_no))+
     geom_point()+
-    geom_smooth(method = "lm")
+    geom_smooth(method = "lm", se = TRUE)+
+    ylab("abundance")+
+    xlab("Shannon diversity")+
+    theme_classic()+
+    Asia_Theme
 cuc.beeshan.plot2 
 
 cuc.beeshan.plot3 <- ggplot(sem_data, aes(x = bee.shannon, y = delta_cylindrical))+
     geom_point()+
-    geom_smooth(method = "lm")
+    geom_smooth(method = "lm", se = FALSE, linetype = "dashed")+
+    ylab("prop. cylindrical")+
+    xlab("Shannon diversity")+
+    theme_classic()+
+    Asia_Theme
 cuc.beeshan.plot3 
 
 cuc.beeshan.plot4 <- ggplot(sem_data, aes(x = bee.shannon, y = delta_mass))+
     geom_point()+
-    geom_smooth(method = "lm")
+    geom_smooth(method = "lm", se = FALSE, linetype = "dashed")+
+    ylab("fruit mass")+
+    xlab("Shannon diversity")+
+    theme_classic()+
+    Asia_Theme
 cuc.beeshan.plot4
 ```
+### Cucumbers and Pollinator Abundance
+```{r}
+cuc.pol.plot1 <- ggplot(sem_data, aes(x = n.pol, y = delta_seeds))+
+    geom_point()+
+    geom_smooth(method = "lm", se = FALSE, linetype = "dashed")+
+    ylab("seed ct.")+
+    xlab("pollinators")+
+    theme_classic()+
+    Asia_Theme
+cuc.pol.plot1 
+
+cuc.pol.plot2 <- ggplot(sem_data, aes(x =n.pol, y = delta_no))+
+    geom_point()+
+    geom_smooth(method = "lm", se = FALSE, linetype = "dashed")+
+    ylab("abundance")+
+    xlab("pollinators")+
+    theme_classic()+
+    Asia_Theme
+cuc.pol.plot2 
+
+cuc.pol.plot3 <- ggplot(sem_data, aes(x = n.pol, y = delta_cylindrical))+
+    geom_point()+
+    geom_smooth(method = "lm", se = FALSE, linetype = "dashed")+
+    ylab("prop. cylindrical")+
+    xlab("pollinators")+
+    theme_classic()+
+    Asia_Theme
+cuc.pol.plot3 
+
+cuc.pol.plot4 <- ggplot(sem_data, aes(x = n.pol, y = delta_mass))+
+    geom_point()+
+    geom_smooth(method = "lm", se = FALSE, linetype = "dashed")+
+    xlab("pollinators")+
+    ylab("fruit mass")+
+    theme_classic()+
+    Asia_Theme
+cuc.pol.plot4
+```
+Combined cucumber outcome plot for supplements
+```{r}
+cucumber.panelplot <- ggarrange(cuc.beerich.plot1,cuc.beeshan.plot1,cuc.pol.plot1, cuc.beerich.plot2, cuc.beeshan.plot2, cuc.pol.plot2, cuc.beerich.plot3, cuc.beeshan.plot3, cuc.pol.plot3, cuc.beerich.plot4, cuc.beeshan.plot4, cuc.pol.plot4,
+        ncol = 3, nrow = 4,
+        common.legend = TRUE)
+```
+
 
 Number of cucumbers and herbivores and predators
 ```{r}
@@ -886,6 +1025,7 @@ cuc_brms <- brms::brm(delta_no ~ bee.shannon,  family = student(),
                       data = sem_data,
                       prior = priors_cuc,
                          chains = 3, cores = 4, iter = 2000, warmup = 1000)
+
 
 summary(cuc_brms)
 summary(pol_cuc_brms)
@@ -1018,6 +1158,9 @@ hist(sem_data$gbif.rich)
 hist(sem_data$gbif.shannon)
 hist(sem_data$shrub_grass1000m)
 
+#testing correlation between wealth index and impervious surface
+cor.test(sem_data$imp200m, sem_data$WealthIndex)
+
 tcc_brms <- brm(
   tcc500m ~ WealthIndex_s,
   family = gaussian(),
@@ -1091,6 +1234,8 @@ ggsave("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/figures/Bees
 ggsave("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/figures/FunctionalGroups_PanelFig.pdf", plot = fungroup.panelplot, height = 12, width = 12)
 
 ggsave("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/figures/Cucumber_plot.pdf", plot = cuc.plot, height = 6, width = 6)
+
+ggsave("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/figures/Cucumbers_PanelFig.png", plot = cucumber.panelplot, height = 10, width = 10)
 ```
 
 # Session Info and Packages

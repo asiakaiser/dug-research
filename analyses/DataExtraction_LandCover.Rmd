@@ -14,9 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 #Clear environment
 rm(list = ls())
 
-library(raster)
-library(sp)
-library(exactextractr)
+library(terra)
 library(dplyr)
 library(tidyr)
 library(purrr)
@@ -25,192 +23,136 @@ library(purrr)
 
 ## Read in the Data
 ```{r}
-setwd("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research")
-sites <- read.csv("data/DUG_data - fall_data.csv")
+# Load CSV
+sites <- read.csv("../data/DUG_data - fall_data.csv")
 
-imperv_path <- "data/NLCD_mf5qnksxr8tzfi/Annual_NLCD_FctImp_2024_CU_C1V1_mf5qnksxr8tzfi.tiff"
-tcc_path <- "data/NLCD_mf5qnksxr8tzfi/nlcd_tcc_conus_wgs84_v2023-5_20230101_20231231_mf5qnksxr8tzfi.tiff"
-nlcd_path <- "data/NLCD_mf5qnt9vt9mx4o/Annual_NLCD_LndCov_2024_CU_C1V1_mf5qnt9vt9mx4o.tiff"
+# Standardize Paths (Using your relative data folder)
+imperv_path <- "../data/NLCD_mf5qnksxr8tzfi/Annual_NLCD_FctImp_2024_CU_C1V1_mf5qnksxr8tzfi.tiff"
+tcc_path    <- "../data/NLCD_mf5qnksxr8tzfi/nlcd_tcc_conus_wgs84_v2023-5_20230101_20231231_mf5qnksxr8tzfi.tiff"
 
-# Load rasters into R
-tcc_ras <- rast(tcc_path)  # Tree canopy cover raster
-imperv_ras <- rast(imperv_path)
-nlcd <- rast(nlcd_path)
+# Load rasters directly into a unified SpatRaster stack 
+rasters <- rast(c(tcc_path, imperv_path))
+names(rasters) <- c("tcc", "imperv")
 ```
 
-# Extract Raster Data
+## Extract Raster Data
 
-Extract City Coordinates
+Prepare spatial datapoints
 ```{r}
-# Extract city coordinates
-garden_coords <- st_as_sf(sites, coords = c("Long", "Lat"), crs = 4326) # Use EPSG 4326 for WGS84
+# Convert CSV points into a SpatVector
+sites_spatial <- vect(sites, geom = c("Long", "Lat"), crs = "EPSG:4326")
+
+# Re-project point vectors to match the Raster projection
+sites_projected <- project(sites_spatial, crs(rasters))
 ```
 
-Extract Raster CRS
+### Extract Continuous Variables (TCC and IMP)
 ```{r}
-# Force imperv_ras into the same CRS as tcc_ras
-imperv_ras <- project(imperv_ras, tcc_ras)
-nlcd_ras <- project(nlcd_ras, tcc_ras)
+buffer_radius <- c(200, 500, 1000)
 
-# Save the CRS of the rasters
-crs_rasters <- crs(tcc_ras)
-```
+# Create a copy of our data frame to hold all our metrics
+sites_output <- sites
 
-Extract mean raster values within each buffer
-```{r}
-# Create a buffer around sites
-buffer_radius <- c(200, 500, 1000)  # set to desired buffer size (in meters)
-
-# Function to extract summed raster values for buffers
-extract_raster_mean <- function(raster, buffers) {
-  extracted_values <- terra::extract(raster, as(buffers, "SpatVector"), fun = mean, na.rm = TRUE)
-  extracted_values[, 2]  # summed values in second column
+for (r in buffer_radius) {
+  # Generate buffers natively in terra (meters units matching NLCD CRS)
+  site_buffers <- terra::buffer(sites_projected, width = r)
+  
+  # Extract means for TCC and Impervious simultaneously
+  extracted_means <- terra::extract(rasters[[c("tcc", "imperv")]], site_buffers, fun = mean, na.rm = TRUE)
+  
+  # Assign clean dynamic column names
+  tcc_col <- paste0("tcc_", r, "m")
+  imp_col <- paste0("imp_", r, "m")
+  
+  sites_output[[tcc_col]] <- extracted_means$tcc
+  sites_output[[imp_col]] <- extracted_means$imperv
 }
 
-for (i in buffer_radius) {
-  # create buffer of radius i
-  garden_buffer <- st_transform(
-    st_buffer(st_transform(garden_coords, crs_rasters), dist = i),
-    crs_rasters
-  )
-  
-  # dynamic column names
-  tcc_col <- paste0("tcc", i, "m")
-  imp_col <- paste0("imp", i, "m")
-  
-  # extract and save into dataframe
-  sites[[tcc_col]] <- extract_raster_mean(tcc_ras, garden_buffer)
-  sites[[imp_col]] <- extract_raster_mean(imperv_ras, garden_buffer)
-}
+print(sites_output)
 ```
 
-# Land Cover Classes Code
+## Extract Categorical Variables (Land Cover Class Proportions)
+Reclassify nlcd raster and assign categories
 ```{r}
-## --------------------------------------------------
-## Inputs
-## --------------------------------------------------
-# Load NLCD raster (RasterLayer)
-nlcd <- raster("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/data/NLCD_mf5qnt9vt9mx4o/Annual_NLCD_LndCov_2024_CU_C1V1_mf5qnt9vt9mx4o.tiff")
+nlcd_map <- rast("../data/NLCD_mf5qnt9vt9mx4o/Annual_NLCD_LndCov_2024_CU_C1V1_mf5qnt9vt9mx4o.tiff")
 
-# Load site coordinates: data frame with site_code, lon, lat
-# Replace 'sites' with your actual data frame
-# Convert to SpatialPointsDataFrame
-coordinates(sites) <- ~Long+Lat
-proj4string(sites) <- CRS("+init=epsg:4326")  # WGS84
+#Build lookup table
+lookup_table <- tibble(
+  ID = 1:nrow(sites_projected),
+  site_code = as.character(sites_projected$site_code)
+)
 
-# Reproject sites to NLCD CRS
-sites <- sp::spTransform(sites, crs(nlcd))
-
-## --------------------------------------------------
-## Buffer sizes (meters)
-## --------------------------------------------------
 buffer_sizes <- c(200, 500, 1000)
 
-## --------------------------------------------------
-## Function: extract NLCD and calculate proportions
-## --------------------------------------------------
-extract_nlcd_buffer <- function(buffer_m, sites, nlcd) {
+extract_nlcd_buffer <- function(buffer_m, points, raster_file) {
   
-  # Convert SpatialPointsDataFrame to SpatVector
-  sites_vect <- terra::vect(sites)
+  # Generate local buffers
+  buffers_vect <- terra::buffer(points, width = buffer_m)
   
-  # Create buffers
-  buffers_vect <- terra::buffer(sites_vect, width = buffer_m)
+  # Force terra to return raw cell numbers (11, 21, etc.)
+  raw_extract <- terra::extract(raster_file, buffers_vect, raw = TRUE)
   
-  # Convert back to Spatial* object for exactextractr
-  buffers_sp <- as(buffers_vect, "Spatial")
+  # FIX: Convert the raw matrix into a standard data frame so we can name the columns!
+  raw_extract_df <- as.data.frame(raw_extract)
+  names(raw_extract_df) <- c("ID", "pixel_value")
   
-  # Extract NLCD values
-  exact_list <- exact_extract(nlcd, buffers_sp)
-  
-  # Combine into tibble with site codes
-  df <- map2_dfr(exact_list, sites$site_code, function(vals, site) {
-    tibble(
-      site_code = site,
-      nlcd = vals$value
-    )
-  })
-  
-  # Collapse NLCD codes and compute proportions
-  df %>%
+  # Run your exact matching rules
+  raw_extract_df %>%
+    as_tibble() %>%
+    left_join(lookup_table, by = "ID") %>%
     mutate(
       lc_group = case_when(
-        nlcd == 11 ~ "water",
-        nlcd %in% c(21, 22) ~ "dev_low",
-        nlcd %in% c(23, 24) ~ "dev_high",
-        nlcd %in% c(41, 42, 43) ~ "forest",
-        nlcd %in% c(52, 71) ~ "shrub_grass",
-        nlcd %in% c(81, 82) ~ "agriculture",
-        nlcd %in% c(90, 95) ~ "wetland",
-        nlcd == 31 ~ "barren",
+        pixel_value == 11 ~ "water",
+        pixel_value %in% c(21, 22) ~ "dev_low",
+        pixel_value %in% c(23, 24) ~ "dev_high",
+        pixel_value %in% c(41, 42, 43) ~ "forest",
+        pixel_value %in% c(52, 71) ~ "shrub_grass",
+        pixel_value %in% c(81, 82) ~ "agriculture",
+        pixel_value %in% c(90, 95) ~ "wetland",
+        pixel_value == 31 ~ "barren",
         TRUE ~ NA_character_
       )
     ) %>%
     filter(!is.na(lc_group)) %>%
-    group_by(site_code, lc_group) %>%
-    summarise(n = n(), .groups = "drop") %>%
+    count(site_code, lc_group) %>%
     group_by(site_code) %>%
     mutate(prop = n / sum(n)) %>%
     ungroup() %>%
-    mutate(buffer_label = paste0(lc_group, buffer_m, "m")) %>%
+    mutate(buffer_label = paste0(lc_group, "_", buffer_m, "m")) %>%
     dplyr::select(site_code, buffer_label, prop)
 }
 
-## --------------------------------------------------
-## Run extraction for all buffer sizes
-## --------------------------------------------------
-landcover_list <- map(buffer_sizes, ~ extract_nlcd_buffer(.x, sites, nlcd))
-landcover_all <- bind_rows(landcover_list)
+# 4. Run loop across your buffer sizes
+landcover_all <- map_dfr(buffer_sizes, ~ extract_nlcd_buffer(.x, sites_projected, nlcd_map))
 
-## --------------------------------------------------
-## Pivot to wide format (one row per site)
-## --------------------------------------------------
+# 5. Pivot sideways 
 landcover_wide <- landcover_all %>%
-  pivot_wider(
-    names_from = buffer_label,
-    values_from = prop,
-    values_fill = 0
-  )
+  pivot_wider(names_from = buffer_label, values_from = prop, values_fill = 0)
 
-## --------------------------------------------------
-## Join to site-level dataset
-## --------------------------------------------------
-sites_data_full <- left_join(sites, landcover_wide, by = "site_code")
-
-# Check the result
-head(sites_data_full)
-
-colnames(landcover_wide)
+# 6. Join back to your main site metrics
+final_data <- left_join(sites_output, landcover_wide, by = "site_code")
 ```
 
-
-Final dataframe
+#Final Dataframe
 ```{r}
-# View the final dataframe
-print(sites)
-```
-
-### Project cities points onto rasters
-```{r}
-plot(tcc_ras,
-     main = "Tree Canopy Cover")
-plot(garden_coords$geometry,
-     pch = 19)
-```
-
-```{r}
-plot(imperv_ras,
-     main = "Impervious Surface")
-plot(garden_coords$geometry)
+print(final_data)
 ```
 
 Save updated sites dataframe as csv
 ```{r}
-write.csv(sites, "/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/data/DUG_sites.csv", row.names = FALSE)
+write.csv(final_data,"../data/DUG_sites.csv", row.names = FALSE)
 ```
 
 Citations and Packages
 ```{r}
-packageVersion("sp")
+target_packages <- c("terra", "dplyr", "tidyr", "purrr")
+
+# Data frame with package names and their active versions
+package_versions <- data.frame(
+  Package = target_packages,
+  Version = sapply(target_packages, function(pkg) as.character(package_version(utils::packageVersion(pkg))))
+)
+
+print(package_versions)
 ```
 

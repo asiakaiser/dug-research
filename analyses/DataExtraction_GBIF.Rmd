@@ -23,94 +23,90 @@ library("iNEXT")
 rm(list = ls())
 
 #Load in GBIF and site datasets
-setwd("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research")
-
-gbif_raw <- read_tsv("data/0003154-260226173443078.csv") 
-sites_raw <- read.csv("data/DUG_data - fall_data.csv", na.strings = c("", " "))
+gbif_raw <- read_tsv("../data/0003154-260226173443078.csv") 
+sites_raw <- read.csv("../data/DUG_sites.csv", na.strings = c("", " "))
 ```
 
-Select variables of interest in GBIF dataset
+# Clean and filter variables
 ```{r}
 gbif <- gbif_raw %>%
-    dplyr::select(decimalLatitude,decimalLongitude,coordinateUncertaintyInMeters,year,recordedBy,
-                  order,family,genus,species)%>%
-    filter(year >= 2020)
+  dplyr::select(decimalLatitude, decimalLongitude, coordinateUncertaintyInMeters, year, recordedBy,
+                order, family, genus, species) %>%
+  filter(year >= 2020)
 ```
 
-Assign iNaturalist floral observations in surrounding neighborhood to sites
+# Spatial Geometry and Buffers
 ```{r}
-#Convert iNaturalist data to an sf object
-#Create buffer distances
+# Convert raw coordinates to standard WGS84 spatial points
+sf_data_wgs84  <- st_as_sf(gbif, coords = c("decimalLongitude", "decimalLatitude"), crs = 4326)
+gardens.sf_wgs84 <- st_as_sf(sites_raw, coords = c("Long", "Lat"), crs = 4326)
 
-#Convert gbif to sf points
-sf_data <- st_as_sf(gbif, coords = c("decimalLongitude", "decimalLatitude"), crs = 4326)
+# Transform coordinate systems to a metric projection (UTM or Albers) 
+# so st_buffer uses true meters
+# (Using EPSG:5070 - NAD83 Albers Conical Equal Area as an effective standard standard)
+sf_data  <- st_transform(sf_data_wgs84, crs = 5070)
+gardens.sf <- st_transform(gardens.sf_wgs84, crs = 5070)
 
-#Convert cities.test to sf points
-gardens.sf <- st_as_sf(sites_raw, coords = c("Long", "Lat"), crs = 4326)
-
-#Create 45 km buffers around all cities
-buffer_distance <- set_units(1000, "m")  # 1 km in meters
-gardens.buffer <- st_buffer(gardens.sf, dist = buffer_distance)
+# Create 1km buffer around garden points cleanly
+buffer_distance <- set_units(1000, "m") 
+gardens.buffer  <- st_buffer(gardens.sf, dist = buffer_distance)
 ```
 
-Assign all observations to a garden site
+# Spatial Join and Data Extraction
 ```{r}
-# Perform spatial join: assign gardens to points within buffer
+# Assign observations to gardens based on spatial boundaries
 sf_data <- st_join(sf_data, gardens.buffer["site_code"], join = st_within)
 
-# Fill points outside any garden buffer
-sf_data$site_code <- sf_data$site_code # Copy joined column
-
-
-# Convert back to data frame if needed
-gbif_data <- as.data.frame(sf_data)
-
-# Check unique city assignments
-unique(gbif_data$site_code)
-
-gbif_data <- gbif_data %>% filter(!is.na(site_code))
+# Use st_drop_geometry() to completely scrub spatial vectors so data processing loops run fast and don't trip over metadata
+gbif_data <- sf_data %>% 
+  st_drop_geometry() %>% 
+  filter(!is.na(site_code))
 ```
 
-# Extract biodiversity metrics
+# Extract Biodiversity Metrics
 ```{r}
-# Prepare GBIF data and convert to wide format
 gbif_wide <- gbif_data %>%
-  count(site_code,species) %>%
+  count(site_code, species) %>%
+  filter(!is.na(species)) %>% # Protects against empty species classifications
   pivot_wider(names_from = site_code, values_from = n, values_fill = 0)
 
-# Prepare iNEXT input data
-gbif.iNEXTinput <- as.data.frame(gbif_wide[,-1])
+# Convert matrix column to actual data frame rownames so iNEXT reads site metadata correctly
+gbif.iNEXTinput <- gbif_wide %>% 
+  column_to_rownames(var = "species") %>% 
+  as.data.frame()
 
-# Run iNEXT to find richness data
+# Run iNEXT to get richness and diversity estimates
 gbif.iNEXT <- iNEXT(gbif.iNEXTinput, q = 0, datatype = "abundance")
 
-# Extract richness and diversity data
-gbif_richness <-  gbif.iNEXT$AsyEst[gbif.iNEXT$AsyEst$Diversity == "Species richness",]
-gbif_shannon <-  gbif.iNEXT$AsyEst[gbif.iNEXT$AsyEst$Diversity == "Shannon diversity",]
-gbif_simpson <-  gbif.iNEXT$AsyEst[gbif.iNEXT$AsyEst$Diversity == "Simpson diversity",]
+# Extract richness indices
+gbif_richness <- gbif.iNEXT$AsyEst[gbif.iNEXT$AsyEst$Diversity == "Species richness", ]
+gbif_shannon  <- gbif.iNEXT$AsyEst[gbif.iNEXT$AsyEst$Diversity == "Shannon diversity", ]
+gbif_simpson  <- gbif.iNEXT$AsyEst[gbif.iNEXT$AsyEst$Diversity == "Simpson diversity", ]
 
-# Match site_code to Assemblage
-sites_raw$gbif.rich   <- gbif_richness$Estimator[match(sites_raw$site_code, gbif_richness$Assemblage)]
+# Merge metrics cleanly back to site rows
+sites_raw$gbif.rich    <- gbif_richness$Estimator[match(sites_raw$site_code, gbif_richness$Assemblage)]
 sites_raw$gbif.shannon <- gbif_shannon$Estimator[match(sites_raw$site_code, gbif_shannon$Assemblage)]
 sites_raw$gbif.simpson <- gbif_simpson$Estimator[match(sites_raw$site_code, gbif_simpson$Assemblage)]
 ```
 
-Family Level Data for NMDS 
+## Prep family data code for NMDS
 ```{r}
-# Prepare GBIF genus level data and convert to wide format
+# Push site_code directly to row IDs so vegan doesn't read it as count metrics
 gbif_fam_wide <- gbif_data %>%
-  count(site_code,family) %>%
-  pivot_wider(names_from = family, values_from = n, values_fill = 0)
+  count(site_code, family) %>%
+  filter(!is.na(family)) %>% 
+  pivot_wider(names_from = family, values_from = n, values_fill = 0) %>% 
+  column_to_rownames(var = "site_code")
 ```
 
-#Save dataframe
+
+#Save Output Datasets
 ```{r}
 #Site level data with landscape level rarefied GBIF floral data added 
-write.csv(sites_raw,"/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/data/DUG_data - fall_data.csv", row.names = FALSE)
+write.csv(sites_raw,"../data/DUG_sites.csv", row.names = FALSE)
 
 #Landscape Level iNat data from GBIF wide format
-write.csv(gbif_fam_wide,"/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/data/gbif_fam,_wide.csv", row.names = FALSE)
-
-
+#Keep rownames TRUE to preserve site identifiers
+write.csv(gbif_fam_wide,"../data/NMDS_datasets/gbif_fam_wide.csv", row.names =TRUE)
 ```
 

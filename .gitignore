@@ -1,17 +1,34 @@
-.Rproj.user
+# ==============================================================================
+# R / RStudio Generated Files
+# ==============================================================================
 .Rhistory
 .RData
 .Ruserdata
-data/DenverGardens_Sites.csv
-data/"Arthropod Data - June - Traps.csv"
-data/"Arthropod Data - July - Traps.csv"
-data/"Arthropod Data - August - Traps.csv"
-data/site_data.csv
+.Rproj.user/
+
+# ==============================================================================
+# Data Files (Ignore all CSVs)
+# ==============================================================================
+data/*.csv
+data/**/*.csv
+
+# Ignore large NLCD geospatial data directories
 data/NLCD_mf5qnksxr8tzfi/
 data/NLCD_mf5qnt9vt9mx4o/
-data/"observations-670835.csv"
-analyses/CodeTemplate_HonorTheses.Rmd
-analyses/DataCleaning_HonorTheses.Rmd
-analyses/DataCleaning_Rene_HonorTheses.Rmd
-data/"0003154-260226173443078.csv"
-data/
+data/NLCD_3f36b451-e6dd-4028-8537-eff07da5ad3d/
+
+# EXCEPTIONS: Force Git to track these specific datasets
+!data/sites_all.csv
+!data/NMDS_datasets/
+# ==============================================================================
+# R Markdown Output (Keep scripts, ignore knitted local outputs)
+# ==============================================================================
+analyses/*.html
+analyses/*.pdf
+analyses/*.docx
+
+# ==============================================================================
+# OS Generated Files
+# ==============================================================================
+.DS_Store
+Thumbs.db

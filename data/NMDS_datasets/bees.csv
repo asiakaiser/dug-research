@@ -1,0 +1,367 @@
+"","spec_ID","site_code","month","spec.obs"
+"1","Agapostemon angelicus/texanus","CHA","June",1
+"2","Agapostemon angelicus/texanus","EDI","June",1
+"3","Agapostemon angelicus/texanus","GABL","June",1
+"4","Agapostemon angelicus/texanus","GABR","August",1
+"5","Agapostemon angelicus/texanus","GRE","July",1
+"6","Agapostemon angelicus/texanus","GW","June",1
+"7","Agapostemon angelicus/texanus","KCA","August",1
+"8","Agapostemon angelicus/texanus","KCA","July",1
+"9","Agapostemon angelicus/texanus","PAL","August",1
+"10","Agapostemon angelicus/texanus","PAL","July",1
+"11","Agapostemon angelicus/texanus","SAM","August",1
+"12","Agapostemon femoratus","CHA","July",1
+"13","Agapostemon femoratus","EDI","July",1
+"14","Agapostemon femoratus","EIB","June",1
+"15","Agapostemon femoratus","GW","July",2
+"16","Agapostemon femoratus","PAL","August",1
+"17","Agapostemon femoratus","RUB","August",1
+"18","Agapostemon femoratus","SAB","August",1
+"19","Agapostemon virescens","CHA","July",2
+"20","Agapostemon virescens","CHA","June",3
+"21","Agapostemon virescens","COO","June",1
+"22","Agapostemon virescens","EDI","July",1
+"23","Agapostemon virescens","GRE","July",1
+"24","Agapostemon virescens","GW","August",2
+"25","Agapostemon virescens","GW","July",2
+"26","Agapostemon virescens","GW","June",1
+"27","Agapostemon virescens","KCA","June",1
+"28","Agapostemon virescens","PAL","August",2
+"29","Agapostemon virescens","PAL","July",1
+"30","Agapostemon virescens","RUB","June",1
+"31","Agapostemon virescens","SAB","August",1
+"32","Agapostemon virescens","SAM","June",1
+"33","Agapostemon virescens","STE","June",1
+"34","Agapostemon virescens","WES","June",1
+"35","Anthophora montana","GABR","June",1
+"36","Apis mellifera","APP","August",9
+"37","Apis mellifera","APP","July",3
+"38","Apis mellifera","EIB","July",1
+"39","Apis mellifera","GABL","August",1
+"40","Apis mellifera","GABL","July",3
+"41","Apis mellifera","GW","August",1
+"42","Apis mellifera","PAL","July",1
+"43","Apis mellifera","PAR","August",1
+"44","Apis mellifera","PAR","July",5
+"45","Apis mellifera","PAR","June",1
+"46","Apis mellifera","SAB","July",1
+"47","Apis mellifera","SAM","August",2
+"48","Apis mellifera","SAM","July",2
+"49","Apis mellifera","SLA","August",1
+"50","Apis mellifera","WES","August",1
+"51","Augochlorella aurata","PAL","July",1
+"52","Augochlorella aurata","SAM","July",2
+"53","Augochlorella aurata","SLA","June",1
+"54","Augochlorella aurata","WES","July",4
+"55","Bombus bifarius","COO","July",1
+"56","Bombus bifarius","SAB","July",2
+"57","Bombus fervidus","APP","August",1
+"58","Bombus fervidus","APP","July",1
+"59","Bombus fervidus","CHA","August",1
+"60","Bombus fervidus","CHA","July",1
+"61","Bombus fervidus","COO","August",1
+"62","Bombus fervidus","EDI","June",1
+"63","Bombus fervidus","EIB","June",1
+"64","Bombus fervidus","GRE","August",1
+"65","Bombus fervidus","GW","June",1
+"66","Bombus fervidus","JEF","July",1
+"67","Bombus fervidus","PAL","July",1
+"68","Bombus fervidus","PAR","July",1
+"69","Bombus fervidus","RUB","August",1
+"70","Bombus fervidus","SAB","July",1
+"71","Bombus fervidus","SAM","July",1
+"72","Bombus fervidus","SAM","June",2
+"73","Bombus fervidus","SHO","June",1
+"74","Bombus fervidus","SLA","June",2
+"75","Bombus fervidus","STE","July",1
+"76","Bombus fervidus","WES","August",2
+"77","Bombus fervidus","WES","July",2
+"78","Bombus fervidus","WES","June",1
+"79","Bombus huntii","APP","August",1
+"80","Bombus huntii","CHA","August",1
+"81","Bombus huntii","CHA","July",2
+"82","Bombus huntii","EIB","July",1
+"83","Bombus huntii","GRE","July",1
+"84","Bombus huntii","PAL","July",1
+"85","Bombus huntii","PAR","July",1
+"86","Bombus huntii","RUB","July",2
+"87","Bombus huntii","SAB","July",1
+"88","Bombus huntii","STE","July",1
+"89","Bombus nevadensis","RUB","August",1
+"90","Bombus pensylvanicus","JEF","July",1
+"91","Brachymelecta interrupta","EDI","July",1
+"92","Ceratina spp.","RUB","August",1
+"93","Diadasia australis","CHA","July",1
+"94","Diadasia australis","EDI","June",1
+"95","Diadasia australis","PAL","June",1
+"96","Diadasia australis","SLA","July",1
+"97","Diadasia enavata","COO","August",1
+"98","Diadasia enavata","GABL","June",1
+"99","Diadasia enavata","SAM","June",1
+"100","Diadasia rinconis","GRE","July",1
+"101","Diadasia rinconis","SLA","July",1
+"102","Eucera pruinosa","APP","August",25
+"103","Eucera pruinosa","APP","July",24
+"104","Eucera pruinosa","CHA","August",17
+"105","Eucera pruinosa","CHA","July",12
+"106","Eucera pruinosa","COO","August",15
+"107","Eucera pruinosa","COO","July",15
+"108","Eucera pruinosa","EDI","July",17
+"109","Eucera pruinosa","EIB","August",5
+"110","Eucera pruinosa","GABL","August",6
+"111","Eucera pruinosa","GABL","July",20
+"112","Eucera pruinosa","GABR","August",1
+"113","Eucera pruinosa","GABR","July",6
+"114","Eucera pruinosa","GRE","August",10
+"115","Eucera pruinosa","GRE","July",8
+"116","Eucera pruinosa","GW","July",3
+"117","Eucera pruinosa","JEF","August",11
+"118","Eucera pruinosa","KCA","August",2
+"119","Eucera pruinosa","KCA","July",4
+"120","Eucera pruinosa","KCA","June",1
+"121","Eucera pruinosa","PAL","August",42
+"122","Eucera pruinosa","PAL","July",23
+"123","Eucera pruinosa","PAR","August",9
+"124","Eucera pruinosa","PAR","July",13
+"125","Eucera pruinosa","RUB","August",39
+"126","Eucera pruinosa","RUB","July",13
+"127","Eucera pruinosa","SAB","August",10
+"128","Eucera pruinosa","SAB","July",25
+"129","Eucera pruinosa","SAM","August",14
+"130","Eucera pruinosa","SAM","June",3
+"131","Eucera pruinosa","SHO","August",2
+"132","Eucera pruinosa","SHO","July",16
+"133","Eucera pruinosa","SLA","August",4
+"134","Eucera pruinosa","SLA","July",5
+"135","Eucera pruinosa","STE","August",10
+"136","Eucera pruinosa","STE","July",21
+"137","Eucera pruinosa","WES","August",7
+"138","Eucera pruinosa","WES","July",2
+"139","Halictus confusus","RUB","July",1
+"140","Halictus farinosus","CHA","June",1
+"141","Halictus ligatus","GABL","August",1
+"142","Halictus ligatus","GABR","July",1
+"143","Halictus ligatus","JEF","July",1
+"144","Halictus ligatus","PAR","August",1
+"145","Halictus ligatus","RUB","July",2
+"146","Halictus ligatus","SAM","June",1
+"147","Halictus ligatus","SLA","July",1
+"148","Halictus ligatus","WES","August",1
+"149","Halictus ligatus","WES","June",1
+"150","Halictus rubicundus","APP","July",2
+"151","Halictus rubicundus","CHA","July",10
+"152","Halictus rubicundus","CHA","June",1
+"153","Halictus rubicundus","COO","August",1
+"154","Halictus rubicundus","COO","July",1
+"155","Halictus rubicundus","EDI","July",2
+"156","Halictus rubicundus","EDI","June",3
+"157","Halictus rubicundus","EIB","July",1
+"158","Halictus rubicundus","EIB","June",2
+"159","Halictus rubicundus","GABL","July",8
+"160","Halictus rubicundus","GABL","June",4
+"161","Halictus rubicundus","GABR","July",2
+"162","Halictus rubicundus","GABR","June",1
+"163","Halictus rubicundus","GRE","July",3
+"164","Halictus rubicundus","JEF","July",4
+"165","Halictus rubicundus","KCA","July",2
+"166","Halictus rubicundus","KCA","June",1
+"167","Halictus rubicundus","MAR","July",1
+"168","Halictus rubicundus","PAL","July",33
+"169","Halictus rubicundus","RUB","August",1
+"170","Halictus rubicundus","RUB","July",2
+"171","Halictus rubicundus","RUB","June",1
+"172","Halictus rubicundus","SAB","July",2
+"173","Halictus rubicundus","SAM","August",1
+"174","Halictus rubicundus","SAM","July",1
+"175","Halictus rubicundus","SAM","June",5
+"176","Halictus rubicundus","SHO","July",1
+"177","Halictus rubicundus","SHO","June",1
+"178","Halictus rubicundus","SLA","July",3
+"179","Halictus rubicundus","SLA","June",2
+"180","Halictus rubicundus","STE","July",1
+"181","Halictus rubicundus","WES","July",2
+"182","Halictus spp.","SLA","July",1
+"183","Halictus tripartitus","APP","August",7
+"184","Halictus tripartitus","EIB","June",1
+"185","Halictus tripartitus","GABL","July",3
+"186","Halictus tripartitus","GABL","June",1
+"187","Halictus tripartitus","GABR","July",2
+"188","Halictus tripartitus","PAL","August",1
+"189","Halictus tripartitus","PAL","July",6
+"190","Halictus tripartitus","PAL","June",2
+"191","Halictus tripartitus","PAR","July",1
+"192","Halictus tripartitus","RUB","August",3
+"193","Halictus tripartitus","RUB","July",22
+"194","Halictus tripartitus","SAM","August",1
+"195","Halictus tripartitus","SAM","June",1
+"196","Halictus tripartitus","WES","August",1
+"197","Halictus tripartitus","WES","July",1
+"198","Hoplitis producta","STE","June",1
+"199","Lasioglossum Dialictus semicaeruleum","CHA","July",3
+"200","Lasioglossum Dialictus semicaeruleum","EDI","July",1
+"201","Lasioglossum Dialictus semicaeruleum","GABL","July",1
+"202","Lasioglossum Dialictus semicaeruleum","GABR","July",1
+"203","Lasioglossum Dialictus semicaeruleum","GRE","August",1
+"204","Lasioglossum Dialictus semicaeruleum","PAL","August",1
+"205","Lasioglossum Dialictus semicaeruleum","PAL","July",3
+"206","Lasioglossum Dialictus semicaeruleum","PAL","June",1
+"207","Lasioglossum Dialictus semicaeruleum","PAR","August",2
+"208","Lasioglossum Dialictus semicaeruleum","PAR","July",1
+"209","Lasioglossum Dialictus semicaeruleum","RUB","July",6
+"210","Lasioglossum Dialictus semicaeruleum","SAM","August",1
+"211","Lasioglossum Dialictus semicaeruleum","SAM","July",2
+"212","Lasioglossum Dialictus semicaeruleum","SAM","June",1
+"213","Lasioglossum Dialictus semicaeruleum","SLA","August",1
+"214","Lasioglossum Dialictus semicaeruleum","SLA","July",2
+"215","Lasioglossum Dialictus semicaeruleum","WES","August",1
+"216","Lasioglossum Dialictus spp.","CHA","July",1
+"217","Lasioglossum Dialictus spp.","GW","July",1
+"218","Lasioglossum Dialictus spp.","JEF","August",1
+"219","Lasioglossum Dialictus spp.","MAR","June",1
+"220","Lasioglossum Dialictus spp.","RUB","August",1
+"221","Lasioglossum Dialictus versans","WES","August",1
+"222","Lasioglossum Dialictus zephyrus","CHA","July",2
+"223","Lasioglossum Dialictus zephyrus","COO","August",1
+"224","Lasioglossum Dialictus zephyrus","COO","July",1
+"225","Lasioglossum Dialictus zephyrus","EDI","July",2
+"226","Lasioglossum Dialictus zephyrus","EIB","August",1
+"227","Lasioglossum Dialictus zephyrus","EIB","July",1
+"228","Lasioglossum Dialictus zephyrus","GABL","July",1
+"229","Lasioglossum Dialictus zephyrus","JEF","August",1
+"230","Lasioglossum Dialictus zephyrus","JEF","July",1
+"231","Lasioglossum Dialictus zephyrus","KCA","August",1
+"232","Lasioglossum Dialictus zephyrus","PAL","August",2
+"233","Lasioglossum Dialictus zephyrus","PAL","July",5
+"234","Lasioglossum Dialictus zephyrus","RUB","August",1
+"235","Lasioglossum Dialictus zephyrus","RUB","July",2
+"236","Lasioglossum Dialictus zephyrus","SAB","July",1
+"237","Lasioglossum Dialictus zephyrus","SAM","July",1
+"238","Lasioglossum Dialictus zephyrus","SHO","July",1
+"239","Lasioglossum Dialictus zephyrus","SLA","July",1
+"240","Lasioglossum Dialictus zephyrus","STE","July",3
+"241","Lasioglossum Evylaeus spp.","EDI","June",3
+"242","Lasioglossum Evylaeus spp.","GABL","June",1
+"243","Lasioglossum Evylaeus spp.","GRE","June",3
+"244","Lasioglossum Evylaeus spp.","GW","July",1
+"245","Lasioglossum Evylaeus spp.","JEF","June",1
+"246","Lasioglossum Evylaeus spp.","PAL","June",3
+"247","Lasioglossum Evylaeus spp.","PAR","June",1
+"248","Lasioglossum Evylaeus spp.","SAM","August",1
+"249","Lasioglossum Evylaeus spp.","SLA","July",1
+"250","Lasioglossum Sensu Stricto sisymbri","SAM","June",1
+"251","Lasioglossum Sensu Stricto spp.","APP","August",1
+"252","Lasioglossum Sensu Stricto spp.","CHA","August",1
+"253","Lasioglossum Sensu Stricto spp.","PAL","July",1
+"254","Lasioglossum Sensu Stricto spp.","PAR","July",1
+"255","Lasioglossum Sensu Stricto spp.","WES","July",1
+"256","Lithurgopsis apicalis","KCA","June",2
+"257","Megachile brevis","MAR","June",1
+"258","Megachile centuncularis","COO","August",1
+"259","Megachile nivalis","STE","June",1
+"260","Megachile parallela","KCA","July",1
+"261","Megachile rotundata","GABL","June",1
+"262","Melissodes agilis","APP","August",13
+"263","Melissodes agilis","APP","July",13
+"264","Melissodes agilis","CHA","August",60
+"265","Melissodes agilis","CHA","July",52
+"266","Melissodes agilis","COO","August",32
+"267","Melissodes agilis","COO","July",18
+"268","Melissodes agilis","EDI","July",48
+"269","Melissodes agilis","EDI","June",6
+"270","Melissodes agilis","EIB","August",15
+"271","Melissodes agilis","EIB","July",4
+"272","Melissodes agilis","GABL","August",5
+"273","Melissodes agilis","GABL","July",12
+"274","Melissodes agilis","GABR","August",7
+"275","Melissodes agilis","GABR","July",3
+"276","Melissodes agilis","GRE","August",9
+"277","Melissodes agilis","GRE","July",13
+"278","Melissodes agilis","GW","August",3
+"279","Melissodes agilis","GW","July",5
+"280","Melissodes agilis","JEF","August",4
+"281","Melissodes agilis","JEF","July",12
+"282","Melissodes agilis","KCA","August",7
+"283","Melissodes agilis","KCA","July",1
+"284","Melissodes agilis","PAL","August",26
+"285","Melissodes agilis","PAL","July",30
+"286","Melissodes agilis","PAR","August",33
+"287","Melissodes agilis","PAR","July",28
+"288","Melissodes agilis","PAR","June",1
+"289","Melissodes agilis","RUB","August",18
+"290","Melissodes agilis","RUB","July",17
+"291","Melissodes agilis","SAB","August",2
+"292","Melissodes agilis","SAB","July",5
+"293","Melissodes agilis","SAM","August",22
+"294","Melissodes agilis","SAM","July",4
+"295","Melissodes agilis","SHO","August",12
+"296","Melissodes agilis","SHO","July",10
+"297","Melissodes agilis","SLA","August",4
+"298","Melissodes agilis","SLA","July",12
+"299","Melissodes agilis","STE","August",6
+"300","Melissodes agilis","STE","July",17
+"301","Melissodes agilis","WES","August",6
+"302","Melissodes agilis","WES","July",8
+"303","Melissodes agilis","WES","June",1
+"304","Melissodes bimaculatus","APP","August",3
+"305","Melissodes bimaculatus","APP","July",2
+"306","Melissodes bimaculatus","CHA","August",3
+"307","Melissodes bimaculatus","CHA","July",6
+"308","Melissodes bimaculatus","COO","July",1
+"309","Melissodes bimaculatus","EDI","July",5
+"310","Melissodes bimaculatus","EDI","June",1
+"311","Melissodes bimaculatus","EIB","August",1
+"312","Melissodes bimaculatus","EIB","July",1
+"313","Melissodes bimaculatus","GABL","July",2
+"314","Melissodes bimaculatus","GABR","August",1
+"315","Melissodes bimaculatus","GABR","July",5
+"316","Melissodes bimaculatus","GRE","July",2
+"317","Melissodes bimaculatus","GW","July",8
+"318","Melissodes bimaculatus","KCA","July",3
+"319","Melissodes bimaculatus","PAL","July",1
+"320","Melissodes bimaculatus","PAR","July",3
+"321","Melissodes bimaculatus","RUB","August",2
+"322","Melissodes bimaculatus","RUB","July",4
+"323","Melissodes bimaculatus","SAB","August",1
+"324","Melissodes bimaculatus","SAM","June",1
+"325","Melissodes bimaculatus","SHO","July",5
+"326","Melissodes bimaculatus","SLA","August",1
+"327","Melissodes bimaculatus","SLA","July",1
+"328","Melissodes bimaculatus","WES","July",1
+"329","Melissodes bimaculatus","WES","June",2
+"330","Melissodes communis","RUB","August",1
+"331","Melissodes coreopsis","SAB","August",1
+"332","Melissodes niveus","CHA","June",1
+"333","Melissodes niveus","GABL","July",2
+"334","Melissodes niveus","GABL","June",2
+"335","Melissodes niveus","GW","June",1
+"336","Melissodes niveus","PAL","August",1
+"337","Melissodes sp1","CHA","August",1
+"338","Melissodes sp2","COO","August",1
+"339","Melissodes sp2","SLA","June",1
+"340","Melissodes spp.","APP","August",1
+"341","Melissodes spp.","GABR","July",1
+"342","Melissodes spp.","RUB","June",1
+"343","Melissodes spp.","WES","August",1
+"344","Melissodes tristis","CHA","August",1
+"345","Melissodes tristis","CHA","July",1
+"346","Melitoma grisella","GABR","August",1
+"347","Melitoma grisella","SAM","August",3
+"348","NA spp.","CHA","August",1
+"349","NA spp.","COO","August",1
+"350","NA spp.","EIB","July",3
+"351","NA spp.","GABR","August",1
+"352","NA spp.","JEF","August",1
+"353","NA spp.","JEF","July",3
+"354","NA spp.","PAR","July",1
+"355","NA spp.","SAM","August",1
+"356","NA spp.","SAM","July",2
+"357","Osmia inermis","SLA","June",2
+"358","Perdita sp1","EDI","July",1
+"359","Perdita sp2","GABL","August",1
+"360","Perdita sp3","SAM","August",1
+"361","Perdita spp.","GRE","August",1
+"362","Protandrena spp.","PAR","August",1
+"363","Sphecodes davisii","RUB","July",1
+"364","Sphecodes spp.","PAL","July",2
+"365","Sphecodes spp.","RUB","July",1
+"366","Svastra obliqua","APP","August",1

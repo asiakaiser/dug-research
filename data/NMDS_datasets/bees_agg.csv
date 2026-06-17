@@ -1,0 +1,268 @@
+"","spec_ID","site_code","spec.obs"
+"1","Agapostemon angelicus/texanus","CHA",1
+"2","Agapostemon angelicus/texanus","EDI",1
+"3","Agapostemon angelicus/texanus","GABL",1
+"4","Agapostemon angelicus/texanus","GABR",1
+"5","Agapostemon angelicus/texanus","GRE",1
+"6","Agapostemon angelicus/texanus","GW",1
+"7","Agapostemon angelicus/texanus","KCA",2
+"8","Agapostemon angelicus/texanus","PAL",2
+"9","Agapostemon angelicus/texanus","SAM",1
+"10","Agapostemon femoratus","CHA",1
+"11","Agapostemon femoratus","EDI",1
+"12","Agapostemon femoratus","EIB",1
+"13","Agapostemon femoratus","GW",2
+"14","Agapostemon femoratus","PAL",1
+"15","Agapostemon femoratus","RUB",1
+"16","Agapostemon femoratus","SAB",1
+"17","Agapostemon virescens","CHA",5
+"18","Agapostemon virescens","COO",1
+"19","Agapostemon virescens","EDI",1
+"20","Agapostemon virescens","GRE",1
+"21","Agapostemon virescens","GW",5
+"22","Agapostemon virescens","KCA",1
+"23","Agapostemon virescens","PAL",3
+"24","Agapostemon virescens","RUB",1
+"25","Agapostemon virescens","SAB",1
+"26","Agapostemon virescens","SAM",1
+"27","Agapostemon virescens","STE",1
+"28","Agapostemon virescens","WES",1
+"29","Anthophora montana","GABR",1
+"30","Apis mellifera","APP",12
+"31","Apis mellifera","EIB",1
+"32","Apis mellifera","GABL",4
+"33","Apis mellifera","GW",1
+"34","Apis mellifera","PAL",1
+"35","Apis mellifera","PAR",7
+"36","Apis mellifera","SAB",1
+"37","Apis mellifera","SAM",4
+"38","Apis mellifera","SLA",1
+"39","Apis mellifera","WES",1
+"40","Augochlorella aurata","PAL",1
+"41","Augochlorella aurata","SAM",2
+"42","Augochlorella aurata","SLA",1
+"43","Augochlorella aurata","WES",4
+"44","Bombus bifarius","COO",1
+"45","Bombus bifarius","SAB",2
+"46","Bombus fervidus","APP",2
+"47","Bombus fervidus","CHA",2
+"48","Bombus fervidus","COO",1
+"49","Bombus fervidus","EDI",1
+"50","Bombus fervidus","EIB",1
+"51","Bombus fervidus","GRE",1
+"52","Bombus fervidus","GW",1
+"53","Bombus fervidus","JEF",1
+"54","Bombus fervidus","PAL",1
+"55","Bombus fervidus","PAR",1
+"56","Bombus fervidus","RUB",1
+"57","Bombus fervidus","SAB",1
+"58","Bombus fervidus","SAM",3
+"59","Bombus fervidus","SHO",1
+"60","Bombus fervidus","SLA",2
+"61","Bombus fervidus","STE",1
+"62","Bombus fervidus","WES",5
+"63","Bombus huntii","APP",1
+"64","Bombus huntii","CHA",3
+"65","Bombus huntii","EIB",1
+"66","Bombus huntii","GRE",1
+"67","Bombus huntii","PAL",1
+"68","Bombus huntii","PAR",1
+"69","Bombus huntii","RUB",2
+"70","Bombus huntii","SAB",1
+"71","Bombus huntii","STE",1
+"72","Bombus nevadensis","RUB",1
+"73","Bombus pensylvanicus","JEF",1
+"74","Brachymelecta interrupta","EDI",1
+"75","Ceratina spp.","RUB",1
+"76","Diadasia australis","CHA",1
+"77","Diadasia australis","EDI",1
+"78","Diadasia australis","PAL",1
+"79","Diadasia australis","SLA",1
+"80","Diadasia enavata","COO",1
+"81","Diadasia enavata","GABL",1
+"82","Diadasia enavata","SAM",1
+"83","Diadasia rinconis","GRE",1
+"84","Diadasia rinconis","SLA",1
+"85","Eucera pruinosa","APP",49
+"86","Eucera pruinosa","CHA",29
+"87","Eucera pruinosa","COO",30
+"88","Eucera pruinosa","EDI",17
+"89","Eucera pruinosa","EIB",5
+"90","Eucera pruinosa","GABL",26
+"91","Eucera pruinosa","GABR",7
+"92","Eucera pruinosa","GRE",18
+"93","Eucera pruinosa","GW",3
+"94","Eucera pruinosa","JEF",11
+"95","Eucera pruinosa","KCA",7
+"96","Eucera pruinosa","PAL",65
+"97","Eucera pruinosa","PAR",22
+"98","Eucera pruinosa","RUB",52
+"99","Eucera pruinosa","SAB",35
+"100","Eucera pruinosa","SAM",17
+"101","Eucera pruinosa","SHO",18
+"102","Eucera pruinosa","SLA",9
+"103","Eucera pruinosa","STE",31
+"104","Eucera pruinosa","WES",9
+"105","Halictus confusus","RUB",1
+"106","Halictus farinosus","CHA",1
+"107","Halictus ligatus","GABL",1
+"108","Halictus ligatus","GABR",1
+"109","Halictus ligatus","JEF",1
+"110","Halictus ligatus","PAR",1
+"111","Halictus ligatus","RUB",2
+"112","Halictus ligatus","SAM",1
+"113","Halictus ligatus","SLA",1
+"114","Halictus ligatus","WES",2
+"115","Halictus rubicundus","APP",2
+"116","Halictus rubicundus","CHA",11
+"117","Halictus rubicundus","COO",2
+"118","Halictus rubicundus","EDI",5
+"119","Halictus rubicundus","EIB",3
+"120","Halictus rubicundus","GABL",12
+"121","Halictus rubicundus","GABR",3
+"122","Halictus rubicundus","GRE",3
+"123","Halictus rubicundus","JEF",4
+"124","Halictus rubicundus","KCA",3
+"125","Halictus rubicundus","MAR",1
+"126","Halictus rubicundus","PAL",33
+"127","Halictus rubicundus","RUB",4
+"128","Halictus rubicundus","SAB",2
+"129","Halictus rubicundus","SAM",7
+"130","Halictus rubicundus","SHO",2
+"131","Halictus rubicundus","SLA",5
+"132","Halictus rubicundus","STE",1
+"133","Halictus rubicundus","WES",2
+"134","Halictus spp.","SLA",1
+"135","Halictus tripartitus","APP",7
+"136","Halictus tripartitus","EIB",1
+"137","Halictus tripartitus","GABL",4
+"138","Halictus tripartitus","GABR",2
+"139","Halictus tripartitus","PAL",9
+"140","Halictus tripartitus","PAR",1
+"141","Halictus tripartitus","RUB",25
+"142","Halictus tripartitus","SAM",2
+"143","Halictus tripartitus","WES",2
+"144","Hoplitis producta","STE",1
+"145","Lasioglossum Dialictus semicaeruleum","CHA",3
+"146","Lasioglossum Dialictus semicaeruleum","EDI",1
+"147","Lasioglossum Dialictus semicaeruleum","GABL",1
+"148","Lasioglossum Dialictus semicaeruleum","GABR",1
+"149","Lasioglossum Dialictus semicaeruleum","GRE",1
+"150","Lasioglossum Dialictus semicaeruleum","PAL",5
+"151","Lasioglossum Dialictus semicaeruleum","PAR",3
+"152","Lasioglossum Dialictus semicaeruleum","RUB",6
+"153","Lasioglossum Dialictus semicaeruleum","SAM",4
+"154","Lasioglossum Dialictus semicaeruleum","SLA",3
+"155","Lasioglossum Dialictus semicaeruleum","WES",1
+"156","Lasioglossum Dialictus spp.","CHA",1
+"157","Lasioglossum Dialictus spp.","GW",1
+"158","Lasioglossum Dialictus spp.","JEF",1
+"159","Lasioglossum Dialictus spp.","MAR",1
+"160","Lasioglossum Dialictus spp.","RUB",1
+"161","Lasioglossum Dialictus versans","WES",1
+"162","Lasioglossum Dialictus zephyrus","CHA",2
+"163","Lasioglossum Dialictus zephyrus","COO",2
+"164","Lasioglossum Dialictus zephyrus","EDI",2
+"165","Lasioglossum Dialictus zephyrus","EIB",2
+"166","Lasioglossum Dialictus zephyrus","GABL",1
+"167","Lasioglossum Dialictus zephyrus","JEF",2
+"168","Lasioglossum Dialictus zephyrus","KCA",1
+"169","Lasioglossum Dialictus zephyrus","PAL",7
+"170","Lasioglossum Dialictus zephyrus","RUB",3
+"171","Lasioglossum Dialictus zephyrus","SAB",1
+"172","Lasioglossum Dialictus zephyrus","SAM",1
+"173","Lasioglossum Dialictus zephyrus","SHO",1
+"174","Lasioglossum Dialictus zephyrus","SLA",1
+"175","Lasioglossum Dialictus zephyrus","STE",3
+"176","Lasioglossum Evylaeus spp.","EDI",3
+"177","Lasioglossum Evylaeus spp.","GABL",1
+"178","Lasioglossum Evylaeus spp.","GRE",3
+"179","Lasioglossum Evylaeus spp.","GW",1
+"180","Lasioglossum Evylaeus spp.","JEF",1
+"181","Lasioglossum Evylaeus spp.","PAL",3
+"182","Lasioglossum Evylaeus spp.","PAR",1
+"183","Lasioglossum Evylaeus spp.","SAM",1
+"184","Lasioglossum Evylaeus spp.","SLA",1
+"185","Lasioglossum Sensu Stricto sisymbri","SAM",1
+"186","Lasioglossum Sensu Stricto spp.","APP",1
+"187","Lasioglossum Sensu Stricto spp.","CHA",1
+"188","Lasioglossum Sensu Stricto spp.","PAL",1
+"189","Lasioglossum Sensu Stricto spp.","PAR",1
+"190","Lasioglossum Sensu Stricto spp.","WES",1
+"191","Lithurgopsis apicalis","KCA",2
+"192","Megachile brevis","MAR",1
+"193","Megachile centuncularis","COO",1
+"194","Megachile nivalis","STE",1
+"195","Megachile parallela","KCA",1
+"196","Megachile rotundata","GABL",1
+"197","Melissodes agilis","APP",26
+"198","Melissodes agilis","CHA",112
+"199","Melissodes agilis","COO",50
+"200","Melissodes agilis","EDI",54
+"201","Melissodes agilis","EIB",19
+"202","Melissodes agilis","GABL",17
+"203","Melissodes agilis","GABR",10
+"204","Melissodes agilis","GRE",22
+"205","Melissodes agilis","GW",8
+"206","Melissodes agilis","JEF",16
+"207","Melissodes agilis","KCA",8
+"208","Melissodes agilis","PAL",56
+"209","Melissodes agilis","PAR",62
+"210","Melissodes agilis","RUB",35
+"211","Melissodes agilis","SAB",7
+"212","Melissodes agilis","SAM",26
+"213","Melissodes agilis","SHO",22
+"214","Melissodes agilis","SLA",16
+"215","Melissodes agilis","STE",23
+"216","Melissodes agilis","WES",15
+"217","Melissodes bimaculatus","APP",5
+"218","Melissodes bimaculatus","CHA",9
+"219","Melissodes bimaculatus","COO",1
+"220","Melissodes bimaculatus","EDI",6
+"221","Melissodes bimaculatus","EIB",2
+"222","Melissodes bimaculatus","GABL",2
+"223","Melissodes bimaculatus","GABR",6
+"224","Melissodes bimaculatus","GRE",2
+"225","Melissodes bimaculatus","GW",8
+"226","Melissodes bimaculatus","KCA",3
+"227","Melissodes bimaculatus","PAL",1
+"228","Melissodes bimaculatus","PAR",3
+"229","Melissodes bimaculatus","RUB",6
+"230","Melissodes bimaculatus","SAB",1
+"231","Melissodes bimaculatus","SAM",1
+"232","Melissodes bimaculatus","SHO",5
+"233","Melissodes bimaculatus","SLA",2
+"234","Melissodes bimaculatus","WES",3
+"235","Melissodes communis","RUB",1
+"236","Melissodes coreopsis","SAB",1
+"237","Melissodes niveus","CHA",1
+"238","Melissodes niveus","GABL",4
+"239","Melissodes niveus","GW",1
+"240","Melissodes niveus","PAL",1
+"241","Melissodes sp1","CHA",1
+"242","Melissodes sp2","COO",1
+"243","Melissodes sp2","SLA",1
+"244","Melissodes spp.","APP",1
+"245","Melissodes spp.","GABR",1
+"246","Melissodes spp.","RUB",1
+"247","Melissodes spp.","WES",1
+"248","Melissodes tristis","CHA",2
+"249","Melitoma grisella","GABR",1
+"250","Melitoma grisella","SAM",3
+"251","NA spp.","CHA",1
+"252","NA spp.","COO",1
+"253","NA spp.","EIB",3
+"254","NA spp.","GABR",1
+"255","NA spp.","JEF",4
+"256","NA spp.","PAR",1
+"257","NA spp.","SAM",3
+"258","Osmia inermis","SLA",2
+"259","Perdita sp1","EDI",1
+"260","Perdita sp2","GABL",1
+"261","Perdita sp3","SAM",1
+"262","Perdita spp.","GRE",1
+"263","Protandrena spp.","PAR",1
+"264","Sphecodes davisii","RUB",1
+"265","Sphecodes spp.","PAL",2
+"266","Sphecodes spp.","RUB",1
+"267","Svastra obliqua","APP",1

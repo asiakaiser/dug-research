@@ -1,0 +1,66 @@
+---
+title: "Manuscript Tables"
+output: html_document
+date: "2026-04-06"
+---
+
+# Load Packages
+```{r}
+library("tidyverse")
+```
+
+# Read in the Data
+```{r}
+#Clear environment
+rm(list = ls())
+
+#Load in all datasets
+arthropods_jun_raw <- read.csv("../data/Arthropod Data - June - Traps.csv", na.strings = c("", " "))
+arthropods_jul_raw <- read.csv("../data/Arthropod Data - July - Traps.csv", na.strings = c("", " "))
+arthropods_aug_raw <- read.csv("../data/Arthropod Data - August - Traps.csv", na.strings = c("", " "))
+sites <- read.csv("../data/DUG_sites.csv", na.strings = c("", " "))
+
+#Joining arthropod month datasets
+arthropods <- rbind(arthropods_jun_raw, arthropods_jul_raw)
+arthropods <-rbind(arthropods,arthropods_aug_raw)
+```
+
+## Site characteristics for supplements
+```{r}
+sites_tab <- select(sites,Site,estYear, Plots,Area_m2,WealthIndex,imp_200m,tcc_200m)
+```
+
+
+## Arthropod functional group and abundance table for supplements
+```{r}
+arth.table <- arthropods %>%
+    mutate(across(c(fun_group, specie, genus, fam, order, class),
+                  ~ tidyr::replace_na(., "Unknown"))) %>%
+    group_by(class,order,fam, genus,fun_group)%>%
+    summarise(n.obs = n())
+```
+
+## Bee species for supplements
+```{r}
+#Total number of each bee species observed
+bees <- arthropods %>%
+  filter(fam %in% c("Apidae", "Halictidae", "Megachilidae",
+                    "Andrenidae", "Melittidae", "Colletidae")) %>%
+  mutate(
+    fam   = ifelse(is.na(fam)   | fam == "", "Unknown", fam),
+    genus = ifelse(is.na(genus) | genus == "", "Unknown", genus),
+    specie = tidyr::replace_na(specie, "spp.")
+  ) %>%
+  group_by(fam, genus, specie) %>%
+  summarise(n.obs = n())
+```
+
+
+# Export Tables
+```{r}
+write.csv(arth.table, "../tables/arth_table.csv", row.names = FALSE)
+
+write.csv(bees, "../tables/bee_table.csv", row.names = FALSE)
+```
+
+

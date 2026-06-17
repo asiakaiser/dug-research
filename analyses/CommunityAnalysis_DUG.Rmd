@@ -22,24 +22,18 @@ library("mvabund")
 #Clear environment
 rm(list = ls())
 
-setwd("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research")
-
 #all site data
-sites <- read.csv("data/sites_all.csv")
+sites <- read.csv("../data/sites_all.csv")
 
 #matrix data for community analyses
-inat_wide <- read.csv("data/inat_wide.csv")
-arthropods_wide <- read.csv("data/arthropods_wide.csv")
-arthropods_wide_sum <- read.csv("data/arthropods_wide_sum.csv")
-gbif_wide <- read.csv("data/gbif_fam_wide.csv")
-bees <- read.csv("data/bees.csv")
-bees_agg <- read.csv("data/bees_agg.csv")
+inat_wide <- read.csv("../data/NMDS_datasets/inat_wide.csv", row.names = 1)
+arthropods_wide <- read.csv("../data/NMDS_datasets/arthropods_wide.csv", row.names = 1)
+arthropods_wide_sum <- read.csv("../data/NMDS_datasets/arthropods_wide_sum.csv", row.names = 1)
+gbif_wide <- read.csv("../data/NMDS_datasets/gbif_fam_wide.csv", row.names = 1)
+bees <- read.csv("../data/NMDS_datasets/bees.csv", row.names = 1)
+bees_agg <- read.csv("../data/NMDS_datasets/bees_agg.csv", row.names = 1)
 ```
 
-# Explore the Data
-```{r}
-
-```
 
 GGplot Theme
 ```{r}
@@ -53,21 +47,24 @@ Asia_Theme <- theme(
 ```
 
 
-
 # Community Composition
 
 Site covariates of interest for NMDS plots & PERMANOVA
 ```{r}
 site_cov <- sites %>%
     filter(month == "June")%>%
-    select(c("site_code","tcc200m","imp200m","tcc500m","imp500m","WealthIndex","PovertyIndex","MedNetWorth","MedHomeVal","VacantHU","RenterHU", "floral_area_m2","flor.rich"))
+    select(c("site_code","estYear","tcc_200m","imp_200m","tcc_500m","imp_500m","WealthIndex","PovertyIndex","MedNetWorth","MedHomeVal","VacantHU","RenterHU", "floral_area_m2","inat.rich","gbif.rich","inat.shannon","gbif.shannon"))
 ```
 
 ## Garden Floral NMDS
 ```{r, echo=FALSE}
 set.seed(10)
-florNMDS_input <- inat_wide[,-1]
-florNMDS_input <- florNMDS_input[, colSums(florNMDS_input > 0) >= 10]
+
+#filtering for species present in at least 10 sites 
+florNMDS_input <- inat_wide[, colSums(inat_wide > 0) >= 10]
+
+# Check what percentage of total observations remain
+sum(florNMDS_input) / sum(inat_wide) # >92% remaining
 
 flor.mds <- metaMDS(florNMDS_input, k = 2, trymax = 20)
 flor.mds
@@ -81,7 +78,7 @@ stressplot(flor.mds)
 #Running ordisurf
 flor.sf <- ordisurf(
   flor.mds,
-  flor.mds.scores$imp200m,
+  flor.mds.scores$imp_200m,
   plot = FALSE,
   scaling = 3)
 
@@ -98,13 +95,13 @@ flor.contour.vals <- na.omit(flor.contour.vals)
 
 Garden Floral Community NMDS Plot
 ```{r}
-range_imp <- range(flor.mds.scores$imp200m, na.rm = TRUE)
+range_imp <- range(flor.mds.scores$imp_200m, na.rm = TRUE)
 
 flor.mds.plot <- 
   ggplot(data = flor.contour.vals, aes(x = x, y = y, z = z)) +
   geom_point(
     data = flor.mds.scores,
-    aes(x = NMDS1, y = NMDS2, fill = imp200m),
+    aes(x = NMDS1, y = NMDS2, fill = imp_200m),
     size = 3,
     shape = 21,
     color = "black",
@@ -126,8 +123,12 @@ flor.mds.plot
 ## Landscape NMDS Floral Families
 ```{r, echo=FALSE}
 set.seed(10)
-landNMDS_input <- gbif_wide[,-1]
-landNMDS_input <- landNMDS_input[, colSums(landNMDS_input > 0) >= 7]
+
+#filtering for families present surrounding at least 8 sites 
+landNMDS_input <- gbif_wide[, colSums(gbif_wide > 0) >= 7]
+
+# Check what percentage of total observations remain
+sum(landNMDS_input) / sum(gbif_wide) # > 93% remaining
 
 land.mds <- metaMDS(landNMDS_input, k = 2, trymax = 20)
 land.mds
@@ -140,7 +141,7 @@ land.mds.scores$z <- NA
 #Running ordisurf
 land.sf <- ordisurf(
   land.mds,
-  land.mds.scores$imp200m,
+  land.mds.scores$imp_200m,
   plot = FALSE,
   scaling = 3
 )
@@ -152,14 +153,14 @@ land.contour.vals <- na.omit(land.contour.vals)
 Landscape Level Floral Community NMDS Plot
 ```{r}
 #Impervious surface plot
-range_imp <- range(land.mds.scores$imp200m, na.rm = TRUE)
+range_imp <- range(land.mds.scores$imp_200m, na.rm = TRUE)
 
 land.mds.plot <- 
   ggplot(data = land.contour.vals, aes(x = x, y = y, z = z)) +
   stat_contour(color = "gray", bins = 10, linewidth = 0.8) +
   geom_point(
     data = land.mds.scores,
-    aes(x = NMDS1, y = NMDS2, fill = imp200m),
+    aes(x = NMDS1, y = NMDS2, fill = imp_200m),
     size = 3,
     shape = 21,
     color = "black",
@@ -180,20 +181,27 @@ land.mds.plot
 ## Arthropod Functional Groups NMDS
 ```{r, echo=FALSE}
 set.seed(100)
-arthropodsNMDS_input <- arthropods_wide[,-1]
-arthropodsNMDS_input <- arthropodsNMDS_input[, colSums(arthropodsNMDS_input > 0) >= 30] # remove uncommon taxa to reduce stress
-arthropodsNMDS_input <- arthropodsNMDS_input %>% select(-Unknown)
 
-arthropods.mds <- metaMDS(arthropodsNMDS_input, trymax = 50)
+# remove uncommon functional groups to reduce stress
+arthropodsNMDS_input <- arthropods_wide[, colSums(arthropods_wide > 0) >= 30] 
+
+# Check what percentage of total observations remain
+sum(arthropodsNMDS_input) / sum(arthropods_wide) # > 97% remaining
+
+arthropods.mds <- metaMDS(arthropodsNMDS_input, try = 50, trymax = 50)
 arthropods.mds
 
-#make nmds into dataframe for plotting
+#Extract nmds as dataframe for plotting
 arthropods.mds.scores <- as.data.frame(scores(arthropods.mds, display = "sites"))
+
+#Grab the row names from arthropods_wide and split them
 arthropods_columns <- arthropods_wide %>%
+    rownames_to_column(var = "site_month") %>%
     separate(site_month, into = c("site", "month"), sep = "_")%>%
     select(site,month)%>%
     mutate(site_code = site)
 
+#Join nmds scores with site covariates
 arthropods.mds.scores$site_code <- arthropods_columns$site_code
 arthropods.mds.scores$month <- arthropods_columns$month
 arthropods.mds.scores <-left_join(arthropods.mds.scores, site_cov, by = "site_code")
@@ -234,8 +242,11 @@ Arthropod NMDS for Aggregated Summer Data
 ```{r}
 set.seed(10)
 
-arthropods.sum.NMDS_input <- arthropods_wide_sum[,-1]
-arthropods.sum.NMDS_input <- arthropods.sum.NMDS_input[, colSums(arthropods.sum.NMDS_input > 0) >= 5]
+#Filter out rare functional groups, present in at least 15 sites
+arthropods.sum.NMDS_input <- arthropods_wide_sum[, colSums(arthropods_wide_sum > 0) >= 15]
+
+# Check what percentage of total observations remain
+sum(arthropods.sum.NMDS_input) / sum(arthropods_wide_sum) # > 99% remaining
 
 arthropods.sum.mds <- metaMDS(arthropods.sum.NMDS_input, k = 2, trymax = 30)
 arthropods.sum.mds
@@ -244,12 +255,14 @@ arthropods.sum.mds.scores <- as.data.frame(scores(arthropods.sum.mds, display = 
 
 #Make nmds into dataframe for plotting
 arthropods.sum.mds.scores$site_code <- arthropods_wide_sum$site_code
-arthropods.sum.mds.scores <-left_join(arthropods.sum.mds.scores, site_cov, by = "site_code")
+arthropods.sum.mds.scores  <- arthropods.sum.mds.scores %>%
+    rownames_to_column(var = "site_code") %>%
+    left_join(site_cov, by = "site_code")
 
 #Running ordisurf
 arthropods.sf <- ordisurf(
   arthropods.sum.mds,
-  arthropods.sum.mds.scores$imp200m,
+  arthropods.sum.mds.scores$imp_200m,
   plot = FALSE,
   scaling = 3)
 
@@ -260,14 +273,14 @@ arthropods.contour.vals <- na.omit(arthropods.contour.vals)
 Arthropods NMDS Plot for Full Summer Data
 ```{r}
 #Impervious surface plot
-range_imp <- range(arthropods.sum.mds.scores$imp200m, na.rm = TRUE)
+range_imp <- range(arthropods.sum.mds.scores$imp_200m, na.rm = TRUE)
 
 arthropods.sum.mds.plot <- 
   ggplot(data = arthropods.contour.vals, aes(x = x, y = y, z = z)) +
   stat_contour(color = "gray", bins = 10, linewidth = 0.8) +
   geom_point(
     data = arthropods.sum.mds.scores,
-    aes(x = NMDS1, y = NMDS2, fill = imp200m),
+    aes(x = NMDS1, y = NMDS2, fill = imp_200m),
     size = 3,
     shape = 21,
     color = "black",
@@ -290,29 +303,29 @@ arthropods.sum.mds.plot
 ```{r}
 set.seed(10)
 bees_wide <- bees %>%
-  mutate(site_month = paste(site_code, month, sep = "_"))%>%
-    pivot_wider(
+  mutate(site_month = paste(site_code, month, sep = "_")) %>%
+  pivot_wider(
     id_cols = site_month,
     names_from = spec_ID,
     values_from = spec.obs,
-    values_fill = 0)
+    values_fill = list(spec.obs = 0))%>%
+  column_to_rownames(var = "site_month")
 
-beesNMDS_input <- bees_wide[,-1]
+#Remove rare taxa to reduce stress
+beesNMDS_input <- bees_wide[, colSums(bees_wide > 0) >= 11] 
+beesNMDS_input <- beesNMDS_input[rowSums(beesNMDS_input) > 0, ]
 
-bees.mds <- metaMDS(beesNMDS_input, k = 2, trymax = 20)
+# Check what percentage of total observations remain
+sum(beesNMDS_input) / sum(bees_wide) # > 97% remaining
 
+bees.mds <- metaMDS(beesNMDS_input, k = 2, try = 75, trymax = 75)
 bees.mds
 
+# 1. Extract the site scores into a data frame
 bees.mds.scores <- as.data.frame(scores(bees.mds, display = "sites"))
-bees_columns <- bees_wide %>%
-    separate(site_month, into = c("site", "month"), sep = "_")%>%
-    select(site,month)%>%
-    mutate(site_code = site)
-
-#Make nmds into dataframe for plotting
-bees.mds.scores$site_code <- bees_columns$site_code
-bees.mds.scores$month <- bees_columns$month
-bees.mds.scores <-left_join(bees.mds.scores, site_cov, by = "site_code")
+bees.mds.scores <- bees.mds.scores %>%
+  rownames_to_column(var = "site_month") %>%
+  separate(site_month, into = c("site_code", "month"), sep = "_", remove = FALSE)
 ```
 Bees NMDS Plot by Month
 ```{r}
@@ -353,24 +366,32 @@ bees_agg_wide <- bees_agg %>%
     id_cols = site_code,
     names_from = spec_ID,
     values_from = spec.obs,
-    values_fill = 0)
+    values_fill = 0)%>%
+  column_to_rownames(var = "site_code")
 
-bees.agg.NMDS_input <- bees_agg_wide[,-1]
-bees.agg.NMDS_input <- bees.agg.NMDS_input[, colSums(bees.agg.NMDS_input > 0) >= 2]
+#Remove rare taxa to reduce stress
+bees.agg.NMDS_input <- bees_agg_wide[, colSums(bees_agg_wide > 0) >= 5]
+
+# Check what percentage of total observations remain
+sum(bees.agg.NMDS_input) / sum(bees_agg_wide) # > 96% remaining
 
 bees.agg.mds <- metaMDS(bees.agg.NMDS_input, k = 2, trymax = 30)
 bees.agg.mds
 
-bees.agg.mds.scores <- as.data.frame(scores(bees.agg.mds, display = "sites"))
 
 #Make nmds into dataframe for plotting
+bees.agg.mds.scores <- as.data.frame(scores(bees.agg.mds, display = "sites"))
+
+#Add site names and covariates
 bees.agg.mds.scores$site_code <- bees_agg_wide$site_code
-bees.agg.mds.scores <-left_join(bees.agg.mds.scores, site_cov, by = "site_code")
+bees.agg.mds.scores <- bees.agg.mds.scores %>%
+    rownames_to_column(var = "site_code") %>%
+    left_join(site_cov, by = "site_code")
 
 #making ordisurf
 bees.sf <- ordisurf(
   bees.agg.mds,
-  bees.agg.mds.scores$imp200m,
+  bees.agg.mds.scores$imp_200m,
   plot = FALSE,
   scaling = 3)
 
@@ -380,51 +401,15 @@ bees.contour.vals <- na.omit(bees.contour.vals)
 
 Bee NMDS Plot for Full Summer Data
 ```{r}
-bees.agg.mds.scores$WealthStrata <- cut(
-  bees.agg.mds.scores$WealthIndex,
-  breaks = c(-Inf, 100, 150, Inf),
-  labels = c("Low wealth (< 100)","Moderate wealth (100-150)","High wealth (>150)"),
-  include.lowest = TRUE)
-
-
-bees.agg.mds.plot <- 
-  ggplot(bees.agg.mds.scores, aes(NMDS1, NMDS2)) +
-  geom_polygon(data = bees.agg.mds.scores %>%
-    group_by(WealthStrata) %>%
-    slice(chull(NMDS1, NMDS2)),aes(fill = WealthStrata, group = WealthStrata), alpha = 0.22, color = NA, show.legend = FALSE) +
-  geom_point(aes(fill = WealthStrata, shape = WealthStrata),
-    color = "black",
-    size = 3,
-    stroke = 0.6) +
-  scale_fill_viridis_d(
-    option = "viridis",
-    limits = c("Low wealth (< 100)","Moderate wealth (100-150)","High wealth (>150)"),
-    begin = 0,
-    end = 1,
-    name = "Wealth Index") +
-    scale_shape_manual(
-    values = c(21, 22, 24),   # all filled shapes
-    limits = c(
-      "Low wealth (< 100)","Moderate wealth (100-150)","High wealth (>150)"),
-    name = "Wealth Index") +
-  theme_minimal() +
-  labs(title = "Bee Species",
-    x = "NMDS1",
-    y = "NMDS2") +
-    Asia_Theme+
-    theme(legend.position = "none", aspect.ratio = 1)+
-    coord_fixed(ratio = 1)
-bees.agg.mds.plot
-
 #Impervious surface plot
-range_imp <- range(arthropods.sum.mds.scores$imp200m, na.rm = TRUE)
+range_imp <- range(arthropods.sum.mds.scores$imp_200m, na.rm = TRUE)
 
 bees.agg.mds.plot <- 
   ggplot(data = bees.contour.vals, aes(x = x, y = y, z = z)) +
   stat_contour(color = "gray", bins = 10, linewidth = 0.8) +
   geom_point(
     data = bees.agg.mds.scores,
-    aes(x = NMDS1, y = NMDS2, fill = imp200m),
+    aes(x = NMDS1, y = NMDS2, fill = imp_200m),
     size = 3,
     shape = 21,
     color = "black",
@@ -448,28 +433,29 @@ To test for significant correlations between continuous variables and site matri
 
 Garden-Level Floral Community
 ```{r}
+set.seed(0)
 flor_matrix <- as.matrix(florNMDS_input)
 
-flor_permanova<- adonis2(flor_matrix ~ imp200m + WealthIndex, data = site_cov, method = "bray", permutations = 999,  by = "margin")
+flor_permanova<- adonis2(flor_matrix ~ imp_200m + WealthIndex, data = site_cov, method = "bray", permutations = 999,  by = "margin")
 
 print(flor_permanova)
 ```
 
 Landscape Level Floral Community
 ```{r}
+set.seed(0)
 land_matrix <- as.matrix(landNMDS_input)
-
-land_permanova<- adonis2(land_matrix ~ imp200m + WealthIndex, data = site_cov, method = "bray", permutations = 999,  by = "margin")
+land_permanova<- adonis2(land_matrix ~ imp_200m + WealthIndex, data = site_cov, method = "bray", permutations = 999,  by = "margin")
 
 print(land_permanova)
 ```
 
 Arthropod Functional Group Community
 ```{r}
+set.seed(0)
 #Community differences by month
 arthropods_matrix <- as.matrix(arthropodsNMDS_input)
 arthropods_permanova<- adonis2(arthropods_matrix ~ month, data = arthropods.mds.scores, method = "bray", permutations = 999)
-
 print(arthropods_permanova)
 
 #Test for dispersion
@@ -481,17 +467,18 @@ anova(arthropods_disp)
 arthropods_disp_plot <- plot(arthropods_disp, hull=FALSE, ellipse=TRUE)
 
 #Full summer community differences by wealth
+set.seed(0)
 arthropods_sum_matrix <- as.matrix(arthropods.sum.NMDS_input)
-arthropods_sum_permanova<- adonis2(arthropods_sum_matrix ~ imp200m + WealthIndex, data = arthropods.sum.mds.scores, method = "bray", permutations = 999, by = "margin")
+arthropods_sum_permanova<- adonis2(arthropods_sum_matrix ~ imp_200m + WealthIndex, data = arthropods.sum.mds.scores, method = "bray", permutations = 999, by = "margin")
 print(arthropods_sum_permanova)
 ```
 
 Bee Species Community
 ```{r}
+set.seed(0)
 #Community differences by month
 bees_matrix <- as.matrix(beesNMDS_input)
 bees_permanova<- adonis2(bees_matrix ~ month, data = bees.mds.scores, method = "bray", permutations = 999)
-
 print(bees_permanova)
 
 #Test for dispersion
@@ -504,16 +491,18 @@ TukeyHSD(bees_disp)
 bees_disp_plot <- plot(bees_disp, hull=FALSE, ellipse=TRUE)
 
 #Full summer community differences by wealth
+set.seed(0)
 bees_sum_matrix <- as.matrix(bees.agg.NMDS_input)
-bees_sum_permanova<- adonis2(bees_sum_matrix ~ imp200m + PovertyIndex, data = bees.agg.mds.scores, method = "bray", permutations = 999, by = "margin")
+bees_sum_permanova<- adonis2(bees_sum_matrix ~ imp_200m +PovertyIndex, data = bees.agg.mds.scores, method = "bray", permutations = 999, by = "margin")
 print(bees_sum_permanova)
 ```
 
 #Multivariate GLMS for Species
 ```{r}
+set.seed(0)
 #Arthropod Functional Groups
 arthropods_mv <- mvabund(arthropods.sum.NMDS_input)
-arthropods_mod <- manyglm(arthropods_mv ~ imp200m + WealthIndex,
+arthropods_mod <- manyglm(arthropods_mv ~ imp_200m + WealthIndex,
                data = arthropods.sum.mds.scores,
                family = "negative.binomial")
 arthropods_anova_res <- anova(arthropods_mod, p.uni = "adjusted")
@@ -521,7 +510,7 @@ arthropods_anova_res
 
 #Bees
 bees_mv <- mvabund(bees.agg.NMDS_input)
-bees_mod <- manyglm(bees_mv ~ imp200m + WealthIndex,
+bees_mod <- manyglm(bees_mv ~ imp_200m + WealthIndex,
                data = bees.agg.mds.scores,
                family = "negative.binomial")
 bees_anova_res <- anova(bees_mod, p.uni = "adjusted")
@@ -542,7 +531,7 @@ final_plot <- ggarrange(
   common.legend = TRUE, legend = "right",
   font.label = list(size = 18, color = "black", face = "bold"))
 
-ggsave("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/figures/NMDS Panel Figure.pdf", plot = final_plot, height = 12, width = 9)
+ggsave("../figures/NMDS Panel Figure.pdf", plot = final_plot, height = 12, width = 9)
 ```
 
 # Session Info and Packages

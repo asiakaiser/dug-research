@@ -20,13 +20,12 @@ library("vegan")
 rm(list = ls())
 
 #Load in all datasets
-setwd("/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research")
-arthropods_jun_raw <- read.csv("data/Arthropod Data - June - Traps.csv", na.strings = c("", " "))
-arthropods_jul_raw <- read.csv("data/Arthropod Data - July - Traps.csv", na.strings = c("", " "))
-arthropods_aug_raw <- read.csv("data/Arthropod Data - August - Traps.csv", na.strings = c("", " "))
-cucumbers_raw <- read.csv("data/cucumber_data.csv", na.strings = c("", " "))
-sites_raw <- read.csv("data/DUG_data - fall_data.csv", na.strings = c("", " "))
-inat_raw <- read.csv("data/observations-672273.csv", na.strings = c("", " "))
+arthropods_jun_raw <- read.csv("../data/Arthropod Data - June - Traps.csv", na.strings = c("", " "))
+arthropods_jul_raw <- read.csv("../data/Arthropod Data - July - Traps.csv", na.strings = c("", " "))
+arthropods_aug_raw <- read.csv("../data/Arthropod Data - August - Traps.csv", na.strings = c("", " "))
+cucumbers_raw <- read.csv("../data/cucumber_data.csv", na.strings = c("", " "))
+sites_raw <- read.csv("../data/DUG_sites.csv", na.strings = c("", " "))
+inat_raw <- read.csv("../data/observations-672273.csv", na.strings = c("", " "))
 
 #Joining arthropod month datasets
 arthropods <- rbind(arthropods_jun_raw, arthropods_jul_raw)
@@ -45,14 +44,14 @@ Select subset of site variables
 ```{r}
 #Select which site level variables you want to keep in dataframe
 sites <- sites_raw %>%
-    dplyr::select(Site, site_code, Area_m2, Plots, WealthIndex,PovertyIndex, MedNetWorth, MedHomeVal, VacantHU, RenterHU, tcc200m, imp200m, tcc500m, imp500m, CWD_m2, wood_m2, FWD_m2,logs, bareground_m2,floral_area_m2,dev_high500m, dev_low500m,wetland500m, water500m,dev_high1000m, dev_low1000m, water1000m, wetland1000m, shrub_grass1000m, gbif.rich, gbif.shannon,gbif.simpson)
+    dplyr::select(Site, site_code, Area_m2, Plots, Lat, Long, estYear, WealthIndex,PovertyIndex, DiversityIndex, MedNetWorth, MedHomeVal, VacantHU, RenterHU, tcc_200m, imp_200m, tcc_500m, imp_500m, CWD_m2, wood_m2, FWD_m2,logs, bareground_m2,floral_area_m2,dev_high_500m, dev_low_500m,wetland_500m, water_500m,dev_high_1000m, dev_low_1000m, water_1000m, wetland_1000m, shrub_grass_1000m, gbif.rich, gbif.shannon,gbif.simpson)
 str(sites)
 ```
 
 Descriptive statistics of site level variables
 ```{r}
 site_statistics <- sites %>%
-  summarise(across(c(Area_m2, Plots, WealthIndex, tcc200m, imp200m),
+  summarise(across(c(Area_m2, Plots, WealthIndex, tcc_200m, imp_200m),
                    list(mean = ~mean(.x, na.rm = TRUE),
                         sd   = ~sd(.x, na.rm = TRUE)),
                    .names = "{.fn}_{.col}"))%>%
@@ -103,49 +102,82 @@ inat_data <- as.data.frame(sf_data)
 unique(inat_data$site_code)
 ```
 
-Add floral observation abundance to site data
+## Garden Floral Biodiversity
+
+Spatial Geometry and Buffers
 ```{r}
-## Group Summaries
+# Convert raw coordinates to standard WGS84 spatial points
+sf_data_wgs84  <- st_as_sf(inat_raw, coords = c("longitude", "latitude"), crs = 4326)
+gardens.sf_wgs84 <- st_as_sf(sites, coords = c("Long", "Lat"), crs = 4326)
 
-# No. of observations
-inat.obs.all <- inat_data %>%
-  group_by(site_code) %>%
-  summarise(floral.obs = n())
+# Transform coordinate systems to a metric projection (UTM or Albers) 
+# so st_buffer uses true meters
+# (Using EPSG:5070 - NAD83 Albers Conical Equal Area as an effective standard standard)
+sf_data  <- st_transform(sf_data_wgs84, crs = 5070)
+gardens.sf <- st_transform(gardens.sf_wgs84, crs = 5070)
 
-# Merge into site datasheet
-sites <- sites %>%
-  left_join(inat.obs.all, by = "site_code")
+# Create 500 m buffer around gardens to catch all datapoints associated with our project
+buffer_distance <- set_units(500, "m") 
+gardens.buffer  <- st_buffer(gardens.sf, dist = buffer_distance)
 ```
 
-# Floral Biodiversity Metrics
-### Extracting Biodiversity Values
-
-* Summarize species counts per site
-* Pivot dataframe wide to get into correct format for iNEXT
-* Run iNEXT for estimated richness and diversity values
-* Add values back to garden sites dataframe
-
+Spatial join
 ```{r}
-# Prepare iNaturalist data and convert to wide format
+# Assign observations to gardens based on spatial boundaries
+sf_data <- st_join(sf_data, gardens.buffer["site_code"], join = st_within)
+
+# Create your manual mapping vector
+manual_sites <- c(`81`="PAL", `183`="PAL", `202`="PAL", `637`="SLA", `649`="EDI",
+                  `664`="EDI", `905`="EDI", `985`="SHO", `1005`="GW", `1012`="GW",
+                  `1354`="RUB", `1356`="RUB", `1578`="SAM", `1640`="GABL",
+                  `2101`="APP", `2202`="SLA", `2211`="SLA", `2214`="SLA",
+                  `2446`="SHO", `2486`="CHA", `2511`="CHA")
+
+# Process spatial vectors into a structured dataframe
+inat_data <- sf_data %>% 
+  st_drop_geometry() %>%
+  mutate(row_id = as.character(row_number())) %>% 
+  mutate(site_code = case_when(
+    row_id %in% names(manual_sites) ~ manual_sites[row_id],
+    TRUE ~ site_code
+  )) %>% 
+  select(-row_id) %>% 
+  filter(!is.na(site_code))
+```
+
+Extract Floral Biodiversity Metrics
+```{r}
 inat_wide <- inat_data %>%
   count(site_code,scientific_name) %>%
+  filter(!is.na(scientific_name)) %>% # Protects against empty species classifications
   pivot_wider(names_from = site_code, values_from = n, values_fill = 0)
 
-# Prepare iNEXT input data
-inat.iNEXTinput <- as.data.frame(inat_wide[,-1])
+# Convert matrix column to actual data frame rownames so iNEXT reads site metadata correctly
+inat.iNEXTinput <- inat_wide %>% 
+  column_to_rownames(var = "scientific_name") %>% 
+  as.data.frame()
 
-# Run iNEXT to find richness data
+# Run iNEXT to get richness and diversity estimates
 inat.iNEXT <- iNEXT(inat.iNEXTinput, q = 0, datatype = "abundance")
 
-# Extract richness and diversity data
-inat_richness <-  inat.iNEXT$AsyEst[inat.iNEXT$AsyEst$Diversity == "Species richness",]
-inat_shannon <-  inat.iNEXT$AsyEst[inat.iNEXT$AsyEst$Diversity == "Shannon diversity",]
-inat_simpson <-  inat.iNEXT$AsyEst[inat.iNEXT$AsyEst$Diversity == "Simpson diversity",]
+# Extract richness indices
+inat_richness <- inat.iNEXT$AsyEst[inat.iNEXT$AsyEst$Diversity == "Species richness", ]
+inat_shannon  <- inat.iNEXT$AsyEst[inat.iNEXT$AsyEst$Diversity == "Shannon diversity", ]
+inat_simpson  <- inat.iNEXT$AsyEst[inat.iNEXT$AsyEst$Diversity == "Simpson diversity", ]
 
-# Match site_code to Assemblage
-sites$flor.rich    <- inat_richness$Observed[match(sites$site_code, inat_richness$Assemblage)]
-sites$flor.shannon <- inat_shannon$Observed[match(sites$site_code, inat_shannon$Assemblage)]
-sites$flor.simpson <- inat_simpson$Observed[match(sites$site_code, inat_simpson$Assemblage)]
+# Merge metrics cleanly back to site rows
+#Ued observed not estimated, since we sampled every plant at each site
+sites$inat.rich    <- inat_richness$Observed[match(sites$site_code, inat_richness$Assemblage)]
+sites$inat.shannon <- inat_shannon$Observed[match(sites$site_code, inat_shannon$Assemblage)]
+sites$inat.simpson <- inat_simpson$Observed[match(sites$site_code, inat_simpson$Assemblage)]
+```
+
+Add floral observation abundance to site data
+```{r}
+sites <- inat_data %>%
+  group_by(site_code) %>%
+  summarise(floral.obs = n()) %>%
+  left_join(sites, ., by = "site_code")
 ```
 
 iNaturalist data summarized at the family level for NMDS
@@ -153,12 +185,12 @@ iNaturalist data summarized at the family level for NMDS
 # Prepare iNaturalist data at the genus level
 inat_wide <- inat_data %>%
   count(site_code,taxon_family_name) %>%
-  pivot_wider(names_from = taxon_family_name, values_from = n, values_fill = 0)
+  pivot_wider(names_from = taxon_family_name, values_from = n, values_fill = 0) %>%
+  column_to_rownames(var = "site_code")
 ```
 
 
 # Bee Biodiversity Metrics
-
 ```{r}
 #Total number of each bee species observed by site and month
 bees <- arthropods %>%
@@ -181,8 +213,8 @@ bees_agg <- arthropods %>%
 Bee Diversity Analysis
 ```{r}
 bees_wide <- bees %>%
-  mutate(site_month = paste(site_code, month, sep = "_"))%>%
-    pivot_wider(
+  mutate(site_month = paste(site_code, month, sep = "_")) %>%
+  pivot_wider(
     id_cols = spec_ID,
     names_from = site_month,
     values_from = spec.obs,
@@ -190,7 +222,9 @@ bees_wide <- bees %>%
   )
 
 # Prepare iNEXT input data
-bees.iNEXTinput <- as.data.frame(bees_wide[,-1])
+bees.iNEXTinput <- bees_wide %>%
+  column_to_rownames(var = "spec_ID") %>%
+  as.data.frame()
 
 # Run iNEXT to find richness data
 bees.iNEXT <- iNEXT(bees.iNEXTinput, q = 0, datatype = "abundance")
@@ -269,24 +303,29 @@ unique(arthropods_fun$fun_group)
 Functional Group Richness Analysis
 ```{r}
 arthropods_wide_sum <- arthropods %>%
-    group_by(fun_group, site_code)%>%
-    summarise(n.obs = n())%>%
-    mutate(fun_group = replace_na(fun_group, "Unknown"))%>%
+  # Filter out missing functional groups so they don't warp community distances
+  filter(!is.na(fun_group) & fun_group != "Unknown") %>%
+  group_by(site_code, fun_group) %>%
+  summarise(n.obs = n(), .groups = "drop") %>%
   pivot_wider(
     id_cols = site_code,
     names_from = fun_group,
     values_from = n.obs,
-    values_fill = 0
-  )
+    values_fill = 0) %>%
+    #Isolate site identifiers out of the numerical data matrix
+  column_to_rownames(var = "site_code")
 
-arthropods_wide <- arthropods_fun %>%
+arthropods_wide <- arthropods %>%
+  filter(!is.na(fun_group) & fun_group != "Unknown") %>% # Filter out missing functional groups
   mutate(site_month = paste(site_code, month, sep = "_")) %>%
+  group_by(site_month, fun_group) %>%
+  summarise(n.obs = n(), .groups = "drop") %>%
   pivot_wider(
     id_cols = site_month,
     names_from = fun_group,
     values_from = n.obs,
-    values_fill = 0
-  )
+    values_fill = 0) %>%
+  column_to_rownames(var = "site_month")
 ```
 
 ## Final Datasets
@@ -296,7 +335,7 @@ sites_final <- arthropods %>%
   mutate(
     fun_group = case_when(
       fun_group == "Pollinator" ~ "pol",
-      fun_group %in% c("Predator", "Predator/Scavenger", "Parasitoid") ~ "pred",
+      fun_group %in% c("Predator", "Predator/Scavenger", "Parasitoid","Parasite","Kleptoparasite") ~ "pred",
       fun_group == "Herbivore" ~ "herb",
       fun_group == "Detritivore" ~ "det",
       fun_group == "Omnivore" ~ "omn"
@@ -331,26 +370,25 @@ sites_final <- sites_final %>%
     mutate(bee.simpson = if_else(is.na(bee.simpson) & site_month !="EDI_August",0,bee.simpson))
 ```
 
-#Saving Data frames
+#Save Output Dataframes
 ```{r}
-#Floral iNaturalist Data Wide format
-write.csv(inat_wide, "/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/data/inat_wide.csv", row.names = FALSE)
-
 #Site level data
-write.csv(sites_final, "/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/data/sites_all.csv", row.names = FALSE)
-
+write.csv(sites_final, "../data/sites_all.csv", row.names = FALSE)
 #Cucumber averages data
-write.csv(cucumbers_avg, "/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/data/cucumbers_avg.csv", row.names = FALSE)
+write.csv(cucumbers_avg, "../data/cucumbers_avg.csv", row.names = FALSE)
+
+#----------------------------------------
+## Wide datasets for Community Analyses
+#Floral iNaturalist Data Wide format
+write.csv(inat_wide, "../data/NMDS_datasets/inat_wide.csv", row.names = TRUE)
 
 #Bee data
-write.csv(bees, "/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/data/bees.csv", row.names = FALSE)
-
-write.csv(bees_agg, "/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/data/bees_agg.csv", row.names = FALSE)
+write.csv(bees, "../data/NMDS_datasets/bees.csv", row.names = TRUE)
+write.csv(bees_agg, "../data/NMDS_datasets/bees_agg.csv", row.names = TRUE)
 
 #Arthropod functional groups wide format
-write.csv(arthropods_wide, "/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/data/arthropods_wide.csv", row.names = FALSE)
-
-write.csv(arthropods_wide_sum, "/Users/aska1693/Downloads/Chapter3_DUGresearch/dug-research/data/arthropods_wide_sum.csv", row.names = FALSE)
+write.csv(arthropods_wide, "../data/NMDS_datasets/arthropods_wide.csv", row.names = TRUE)
+write.csv(arthropods_wide_sum, "../data/NMDS_datasets/arthropods_wide_sum.csv", row.names = TRUE)
 ```
 
 # Session Info and Packages
