@@ -61,46 +61,6 @@ site_statistics <- sites %>%
     pivot_wider(names_from = variable, values_from = value)
 site_statistics 
 ```
-Assign iNaturalist floral observations to sites
-```{r}
-#Convert iNaturalist data to an sf object
-#Create buffer distances
-
-#Convert gbif to sf points
-sf_data <- st_as_sf(inat_raw, coords = c("longitude", "latitude"), crs = 4326)
-
-#Convert cities.test to sf points
-gardens.sf <- st_as_sf(sites_raw, coords = c("Long", "Lat"), crs = 4326)
-
-#Buffer to catch all observations associated with our project at each garden site
-buffer_distance <- set_units(500, "m")  # 500 m in meters
-gardens.buffer <- st_buffer(gardens.sf, dist = buffer_distance)
-```
-
-Assign all observations to a garden site
-```{r}
-# Perform spatial join: assign gardens to points within buffer
-sf_data <- st_join(sf_data, gardens.buffer["site_code"], join = st_within)
-
-# Fill points outside any garden buffer
-sf_data$site_code <- sf_data$site_code # Copy joined column
-
-#Adding site codes for all chive (allium) observations manually since it was geo-obscured by iNat
-manual_sites <- c(`81`="PAL", `183`="PAL", `202`="PAL", `637`="SLA", `649`="EDI",
-                  `664`="EDI", `905`="EDI", `985`="SHO", `1005`="GW", `1012`="GW",
-                  `1354`="RUB", `1356`="RUB", `1578`="SAM", `1640`="GABL",
-                  `2101`="APP", `2202`="SLA", `2211`="SLA", `2214`="SLA",
-                  `2446`="SHO", `2486`="CHA", `2511`="CHA")
-
-sf_data$site_code[as.integer(names(manual_sites))] <- manual_sites
-
-
-# Convert back to data frame if needed
-inat_data <- as.data.frame(sf_data)
-
-# Check unique city assignments
-unique(inat_data$site_code)
-```
 
 ## Garden Floral Biodiversity
 
@@ -213,26 +173,38 @@ bees_agg <- arthropods %>%
 Bee Diversity Analysis
 ```{r}
 bees_wide <- bees %>%
-  mutate(site_month = paste(site_code, month, sep = "_")) %>%
+mutate(site_month = paste(site_code, month, sep = "_")) %>%
+  ungroup() %>%
   pivot_wider(
     id_cols = spec_ID,
     names_from = site_month,
     values_from = spec.obs,
-    values_fill = 0  # fill missing combinations with 0
-  )
-
-# Prepare iNEXT input data
-bees.iNEXTinput <- bees_wide %>%
-  column_to_rownames(var = "spec_ID") %>%
-  as.data.frame()
+    values_fill = list(spec.obs = 0)
+  ) %>%
+  column_to_rownames(var = "spec_ID")
 
 # Run iNEXT to find richness data
-bees.iNEXT <- iNEXT(bees.iNEXTinput, q = 0, datatype = "abundance")
+bees.iNEXT <- iNEXT(bees_wide, q = 0, datatype = "abundance")
 
 # Extract richness and diversity data
-bees_richness <-  bees.iNEXT$AsyEst[bees.iNEXT$AsyEst$Diversity == "Species richness",]
-bees_shannon <-  bees.iNEXT$AsyEst[bees.iNEXT$AsyEst$Diversity == "Shannon diversity",]
-bees_simpson <-  bees.iNEXT$AsyEst[bees.iNEXT$AsyEst$Diversity == "Simpson diversity",]
+inext_cleaned <- bees.iNEXT$AsyEst %>%
+select(Assemblage, Diversity, Estimator, Observed) %>%
+  mutate(
+    Estimator = if_else(Estimator == Inf, Observed, Estimator),
+    Diversity = case_when(
+      Diversity == "Species richness"   ~ "bee.rich",
+      Diversity == "Shannon diversity"  ~ "bee.shannon",
+      Diversity == "Simpson diversity"  ~ "bee.simpson",
+      TRUE ~ Diversity)) %>%
+  select(-Estimator) %>%
+  pivot_wider(
+    names_from = Diversity,
+    values_from = Observed)%>%
+    separate_wider_delim(
+    cols = Assemblage,
+    delim = "_",
+    names = c("site_code", "month")
+  )
 ```
 
 
@@ -354,20 +326,9 @@ sites_final <- arthropods %>%
     left_join(arthropods_n, by = c("site_code","month"))
 
 
+# Join the site-level iNEXT data back into the monthly dataframe
 sites_final <- sites_final %>%
-  mutate(site_month = paste(site_code, month, sep = "_")) %>%
-  left_join(bees_richness %>% select(Assemblage, Estimator),
-            by = c("site_month" = "Assemblage")) %>%
-  rename(bee.rich = Estimator)%>%
-    mutate(bee.rich = if_else(is.na(bee.rich) & site_month !="EDI_August",0,bee.rich))%>%
-      left_join(bees_shannon %>% select(Assemblage, Estimator),
-            by = c("site_month" = "Assemblage")) %>%
-  rename(bee.shannon = Estimator)%>%
-    mutate(bee.shannon = if_else(is.na(bee.shannon) & site_month !="EDI_August",0,bee.shannon))%>%
-    left_join(bees_simpson %>% select(Assemblage, Estimator),
-            by = c("site_month" = "Assemblage")) %>%
-  rename(bee.simpson = Estimator)%>%
-    mutate(bee.simpson = if_else(is.na(bee.simpson) & site_month !="EDI_August",0,bee.simpson))
+  left_join(inext_cleaned, by = c("site_code","month"))
 ```
 
 #Save Output Dataframes
