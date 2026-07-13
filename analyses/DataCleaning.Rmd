@@ -44,7 +44,7 @@ Select subset of site variables
 ```{r}
 #Select which site level variables you want to keep in dataframe
 sites <- sites_raw %>%
-    dplyr::select(Site, site_code, Area_m2, Plots, Lat, Long, estYear, WealthIndex,PovertyIndex, DiversityIndex, MedNetWorth, MedHomeVal, VacantHU, RenterHU, tcc_200m, imp_200m, tcc_500m, imp_500m, CWD_m2, wood_m2, FWD_m2,logs, bareground_m2,floral_area_m2,dev_high_500m, dev_low_500m,wetland_500m, water_500m,dev_high_1000m, dev_low_1000m, water_1000m, wetland_1000m, shrub_grass_1000m, gbif.rich, gbif.shannon,gbif.simpson)
+    dplyr::select(Site, site_code, Area_m2, Plots, Lat, Long, estYear, WealthIndex,PovertyIndex, DiversityIndex, MedNetWorth, MedHomeVal, VacantHU, RenterHU, tcc_200m, imp_200m, tcc_500m, tcc_1000m, imp_500m, CWD_m2, wood_m2, FWD_m2,logs, bareground_m2,floral_area_m2,dev_high_500m, dev_low_500m,wetland_500m, water_500m,dev_high_1000m, dev_low_1000m, water_1000m, wetland_1000m, shrub_grass_1000m, gbif.rich, gbif.shannon,gbif.simpson)
 str(sites)
 ```
 
