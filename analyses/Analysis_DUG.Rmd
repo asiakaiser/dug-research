@@ -939,6 +939,27 @@ fit_sem <- brm(
 )
 
 summary(fit_sem)
+mcmc_plot(fit_sem, variable = "^b_", regex = TRUE, type = "intervals") +
+  theme_minimal() +
+  labs(title = "Posterior Intervals for SEM Path Coefficients",
+       x = "Estimate Scale")
+
+pp_deltano <- pp_check(fit_sem, resp = "deltano", ndraws = 50) +
+  theme_classic() +
+  theme(plot.title = element_text(size = 12))+
+  labs(title = "Cucumber Abundance",
+       x = "Observed vs. Simulated Values")
+
+pp_shannon <- pp_check(fit_sem, resp = "beeshannons", ndraws = 50) +
+  theme_classic() +
+  theme(plot.title = element_text(size = 12))+
+  labs(title = "Bee Shannon Diversity",
+       x = "Observed vs. Simulated Values")
+
+pplot_sem <- ggarrange(pp_deltano, pp_shannon,
+  ncol = 2,
+  common.legend = TRUE,
+  legend = "bottom")
 ```
 
 ## Plots
@@ -1542,6 +1563,8 @@ print(post.plots.land)
 # Save Images
 
 ```{r}
+set.seed(100)
+
 ggsave("../figures/Arthropods_PanelFig.pdf", plot = arthropods.panelplot, height = 6, width = 10)
 
 ggsave("../figures/Bees_PanelFig.pdf", plot = bees.panelplot, height = 6, width = 12)
@@ -1558,6 +1581,7 @@ ggsave("../figures/Posteriors_Arthropods.png", plot = post.plots.arthropods)
 ggsave("../figures/Posteriors_Cucumbers.png", plot = post.plots.cuc)
 ggsave("../figures/Posteriors_LocalHabitat.png", plot = post.plots.loc)
 ggsave("../figures/Posteriors_LandscapeHabitat.png", plot = post.plots.land)
+ggsave("../figures/Posteriors_SEM.png", plot = pplot_sem, height = 3, width = 5)
 
 ```
 
