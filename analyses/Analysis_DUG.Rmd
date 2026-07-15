@@ -1278,7 +1278,7 @@ summary(flor_density_brms)
 ### Landscape variables
 ```{r}
 set.seed(1)
-hist(sem_data$tcc1000m)
+hist(sem_data$tcc500m)
 hist(sem_data$water_wetland_1000m)
 hist(sem_data$gbif.rich)
 hist(sem_data$gbif.shannon)
@@ -1288,16 +1288,13 @@ hist(sem_data$shrub_grass1000m)
 cor.test(sem_data$imp500m, sem_data$WealthIndex)
 
 #TREE CANOPY COVER
-#rescaling tcc for a beta distribution: 
-sem_data$tcc_prop <- sem_data$tcc1000m / 20
-
 tcc_brms <- brm(
-  tcc_prop ~ WealthIndex_s,
-  family = "beta",
+  tcc500m ~ WealthIndex_s, 
+  family = gaussian(),  
   prior = c(
-    prior(normal(0, 1), class = "b"),
-    prior(normal(1, 0.5), class = "Intercept"),
-    prior(gamma(2, 0.1), class = "phi")
+    prior(normal(0, 5), class = "b"),  
+    prior(normal(12, 5), class = "Intercept"),
+    prior(exponential(0.1), class = "sigma")
   ),
   data = sem_data,
   chains = 4, cores = 4, iter = 2500, warmup = 1000,
@@ -1391,8 +1388,7 @@ modelsummary(
        "cylindricity" = cylindrical_cuc_brms
        ), 
   statistic = "conf.int", 
-  metrics = c("BIC", "R2"),
-  output = "../tables/model_outputs.xlsx"
+  metrics = c("BIC", "R2")
 )
 
 brms_models <- list("total arthropod abundance" = arthropods_brms,
@@ -1577,11 +1573,11 @@ ggsave("../figures/Cucumbers_PanelFig.png", plot = cucumber.panelplot, height = 
 
 ggsave("../figures/Supp_ConditionalEffects.png", plot = cond.effects.plot, height = 5, width = 12)
 
-ggsave("../figures/Posteriors_Arthropods.png", plot = post.plots.arthropods)
-ggsave("../figures/Posteriors_Cucumbers.png", plot = post.plots.cuc)
-ggsave("../figures/Posteriors_LocalHabitat.png", plot = post.plots.loc)
-ggsave("../figures/Posteriors_LandscapeHabitat.png", plot = post.plots.land)
-ggsave("../figures/Posteriors_SEM.png", plot = pplot_sem, height = 3, width = 5)
+ggsave("../figures/posterior_plots/Posteriors_Arthropods.png", plot = post.plots.arthropods)
+ggsave("../figures/posterior_plots/Posteriors_Cucumbers.png", plot = post.plots.cuc)
+ggsave("../figures/posterior_plots/Posteriors_LocalHabitat.png", plot = post.plots.loc)
+ggsave("../figures/posterior_plots/Posteriors_LandscapeHabitat.png", plot = post.plots.land)
+ggsave("../figures/posterior_plots/Posteriors_SEM.png", plot = pplot_sem, height = 3, width = 5)
 
 ```
 
