@@ -20,7 +20,7 @@ This repository contains code and data to analyze arthropod biodiversity and cuc
 #### Analyses
 
 1. `analyses/Analysis_DUG.Rmd`  
-   This R Markdown file contains the code to run all Bayesian regression models described in manuscript sections *Local and Landscape Variables and Wealth Index*, *Arthropod Abundance and Bee Richness*, and *Structural Equation Path Analysis*. 
+   This R Markdown file contains the code to run all Bayesian regression models described in manuscript sections *Local and Landscape Variables and Wealth Index*, *Arthropod Abundance and Bee Diversity*, and *Structural Equation Path Analysis*. 
 
 2. `analyses/CommunityAnalysis_DUG.Rmd`  
    This R Markdown file contains the code for NMDS ordination, the PERMANOVA to examine differences in community composition, and the Multivariate Generalized Linear Models to examine the drivers of differences in community composition, described in manuscript section *Community Dissimilarity*
