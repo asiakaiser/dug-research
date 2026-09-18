@@ -2,7 +2,7 @@
 
 Datasets and code for the manuscript:
 
-**The effects of local and landscape factors on arthropod-mediated ecosystem service and crop yield in urban community gardens**  
+**Urbanization and wealth alter arthropod biodiversity and pollination services in community gardens**  
 Asia Kaiser $^1$, Noah Mayer $^1$, Rene Aronson $^1$, Julian Resasco $^1$
 
 $^1$ Department of Ecology and Evolutionary Biology, The University of Colorado Boulder
